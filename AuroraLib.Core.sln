@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuroraLib.Core", "src\AuroraLib.Core\AuroraLib.Core.csproj", "{F94D401F-D3DD-4D8D-9AC4-B2DAEEBC31C1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark", "Benchmark\Benchmark.csproj", "{BCA84E89-C976-4631-AF25-43284541BB85}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F94D401F-D3DD-4D8D-9AC4-B2DAEEBC31C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F94D401F-D3DD-4D8D-9AC4-B2DAEEBC31C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F94D401F-D3DD-4D8D-9AC4-B2DAEEBC31C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F94D401F-D3DD-4D8D-9AC4-B2DAEEBC31C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCA84E89-C976-4631-AF25-43284541BB85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCA84E89-C976-4631-AF25-43284541BB85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCA84E89-C976-4631-AF25-43284541BB85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCA84E89-C976-4631-AF25-43284541BB85}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {344A7924-966C-4C2E-BC0D-B0C3B951C390}
+	EndGlobalSection
+EndGlobal
