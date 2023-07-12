@@ -9,17 +9,16 @@ namespace AuroraLib.Core.IO
     /// </summary>
     public sealed class MemoryPoolStream : Stream
     {
+        private const int defaultcapacity = 512;
+
         /// <inheritdoc/>
         public override bool CanRead => _open;
         /// <inheritdoc/>
         public override bool CanSeek => _open;
         /// <inheritdoc/>
         public override bool CanWrite => _open;
-        private bool _open;
-
         /// <inheritdoc/>
         public override long Length => _Length;
-        private long _Length;
 
         /// <inheritdoc/>
         public override long Position
@@ -35,10 +34,14 @@ namespace AuroraLib.Core.IO
                 _Position = value;
             }
         }
+        private bool _open;
+        private long _Length;
         private long _Position;
 
         private readonly ArrayPool<byte> _APool;
         private byte[] _Buffer;
+
+        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class.
@@ -49,7 +52,7 @@ namespace AuroraLib.Core.IO
         { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with the default ArrayPool and the specified capacity.
+        /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with the specified capacity.
         /// </summary>
         /// <param name="capacity">The initial capacity of the stream.</param>
         [DebuggerStepThrough]
@@ -58,20 +61,30 @@ namespace AuroraLib.Core.IO
         { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with the specified <see cref="ArrayPool{T}"/>.
+        /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with the specified <see cref="ArrayPool{byte}"/>.
         /// </summary>
         /// <param name="aPool">The ArrayPool used to rent and return byte arrays.</param>
         [DebuggerStepThrough]
-        public MemoryPoolStream(ArrayPool<byte> aPool)
+        public MemoryPoolStream(ArrayPool<byte> aPool) : this(aPool, defaultcapacity)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with the specified <see cref="ArrayPool{T}"/> and capacity.
+        /// </summary>
+        /// <param name="aPool">The ArrayPool used to rent and return byte arrays.</param>
+        /// <param name="capacity">The initial capacity of the stream.</param>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public MemoryPoolStream(ArrayPool<byte> aPool, int capacity)
         {
             _APool = aPool;
-            _Buffer = Array.Empty<byte>();
+            _Buffer = aPool.Rent(capacity);
             _Position = _Length = 0;
             _open = true;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with the specified <paramref name="stream"/>.
+        /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with a copy of the specified <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The Stream from which to read the initial data.</param>
         [DebuggerStepThrough]
@@ -87,23 +100,16 @@ namespace AuroraLib.Core.IO
         /// </summary>
         /// <param name="span">The ReadOnlySpan from which to initialize the stream's data.</param>
         [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public MemoryPoolStream(ReadOnlySpan<byte> span) : this(span.Length)
         {
             span.CopyTo(_Buffer);
             _Length = span.Length;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with the specified <see cref="ArrayPool{T}"/> and capacity.
-        /// </summary>
-        /// <param name="aPool">The ArrayPool used to rent and return byte arrays.</param>
-        /// <param name="capacity">The initial capacity of the stream.</param>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public MemoryPoolStream(ArrayPool<byte> aPool, int capacity) : this(aPool)
-        {
-            _Buffer = aPool.Rent(capacity);
-        }
+        #endregion
+
+        #region Stream Overrides
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
@@ -129,6 +135,26 @@ namespace AuroraLib.Core.IO
         /// <inheritdoc/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override void Write(byte[] buffer, int offset, int count)
+            => Write(buffer.AsSpan(offset, count));
+
+        /// <inheritdoc/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        public override void Write(ReadOnlySpan<byte> buffer)
+        {
+            long newpos = Position + buffer.Length;
+            if (newpos > _Length)
+            {
+                SetLength(newpos);
+            }
+            buffer.CopyTo(_Buffer.AsSpan((int)_Position, buffer.Length));
+            _Position = newpos;
+        }
+
+        /// <inheritdoc/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override long Seek(long offset, SeekOrigin origin) => origin switch
         {
             SeekOrigin.Begin => Position = offset,
@@ -141,6 +167,10 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         public override void SetLength(long length)
         {
+            if (!_open)
+            {
+                throw new ObjectDisposedException(nameof(MemoryPoolStream));
+            }
             if (length < 0 || length > int.MaxValue)
             {
                 throw new ArgumentOutOfRangeException(nameof(length), $"Maximum supported size {int.MaxValue}.");
@@ -168,37 +198,19 @@ namespace AuroraLib.Core.IO
             _Buffer = newBuffer;
         }
 
-        /// <inheritdoc/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public override void Write(byte[] buffer, int offset, int count)
+        /// <inheritdoc />
+        public override void CopyTo(Stream destination, int bufferSize)
         {
-            long newpos = Position + count;
-            if (newpos > _Length)
+            if (!_open)
             {
-                SetLength(newpos);
+                throw new ObjectDisposedException(nameof(MemoryPoolStream));
             }
-            buffer.AsSpan(offset, count).CopyTo(_Buffer.AsSpan((int)_Position, count));
-            _Position = newpos;
+            if (destination is null)
+            {
+                throw new ArgumentNullException(nameof(destination), "Stream is null.");
+            }
+            destination.Write(UnsaveAsSpan((int)_Position));
         }
-
-        /// <inheritdoc cref="MemoryExtensions.AsSpan{byte}(byte[]?)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Span<byte> AsSpan()
-            => _Buffer.AsSpan(0, (int)_Length);
-
-        /// <inheritdoc cref="MemoryExtensions.AsSpan{byte}(byte[]?, int)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Span<byte> AsSpan(int start)
-            => _Buffer.AsSpan(start, (int)_Length - start);
-
-        /// <inheritdoc cref="MemoryExtensions.AsSpan{byte}(byte[]?, int, int)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Span<byte> AsSpan(int start, int length)
-            => _Buffer.AsSpan(start, length);
 
         /// <summary>
         /// Dummy
@@ -216,10 +228,70 @@ namespace AuroraLib.Core.IO
             if (_Buffer.Length != 0)
             {
                 _APool.Return(_Buffer);
-                _Buffer = null;
+                _Buffer = Array.Empty<byte>();
             }
             _Length = _Position = 0;
             _open = false;
         }
+        #endregion
+
+        /// <inheritdoc cref="UnsaveAsSpan"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Span<byte> UnsaveAsSpan()
+            => _Buffer.AsSpan(0, (int)_Length);
+
+        /// <inheritdoc cref="UnsaveAsSpan"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Span<byte> UnsaveAsSpan(int start)
+            => _Buffer.AsSpan(start, (int)_Length - start);
+
+        /// <summary>
+        /// Returns a <see cref="Span{byte}"/> representing the data of the <see cref="MemoryPoolStream"/>, it should not be written to the stream while the span is in use.
+        /// </summary>
+        /// <param name="start">The index at which to begin the span.</param>
+        /// <param name="length">The span representation of the array.</param>
+        /// <returns>The span representation of the <see cref="MemoryPoolStream"/>.</returns>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Span<byte> UnsaveAsSpan(int start, int length)
+            => _Buffer.AsSpan(start, length);
+
+        /// <inheritdoc cref="MemoryStream.WriteTo(Stream)"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriteTo(Stream stream)
+        {
+            if (!_open)
+            {
+                throw new ObjectDisposedException(nameof(MemoryPoolStream));
+            }
+            if (stream is null)
+            {
+                throw new ArgumentNullException(nameof(stream), "Stream is null.");
+            }
+            stream.Write(_Buffer.AsSpan(0, (int)_Length));
+        }
+
+        /// <inheritdoc cref="MemoryStream.TryGetBuffer(out ArraySegment{byte})"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryGetBuffer(out ArraySegment<byte> buffer)
+        {
+            buffer = new ArraySegment<byte>(_Buffer, 0, (int)_Length);
+            return _open;
+        }
+
+        /// <inheritdoc cref="MemoryStream.ToArray"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public byte[] ToArray()
+        {
+            byte[] numArray = new byte[_Length];
+            _Buffer.AsSpan(0, (int)_Length).CopyTo(numArray);
+            return numArray;
+        }
+
     }
 }
