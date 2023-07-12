@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace AuroraLib.Core.Extensions
 {
@@ -20,6 +21,29 @@ namespace AuroraLib.Core.Extensions
             list.RemoveAt(OldIndex);
             list.Insert(NewIndex, item);
         }
+
+        /// <summary>
+        /// Counts the occurrences of a specific <paramref name="value"/> of <typeparamref name="T"/> in a <see cref="List{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the span.</typeparam>
+        /// <param name="list">The list to count the occurrences in.</param>
+        /// <param name="value">The value to count.</param>
+        /// <returns>The number of occurrences of the value in the span.</returns>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int Count<T>(this List<T> list, T value) where T : IEquatable<T>
+            => SpanEx.Count(list.UnsaveAsSpan(), value);
+
+        /// <summary>
+        /// Gets a <see cref="Span{T}"/> view over the data in a list. Items should not be added or removed from the <see cref="List{T}"/> while the <see cref="Span{T}"/> is in use.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the List.</typeparam>
+        /// <param name="list">The List to convert to Span.</param>
+        /// <returns>A Span representing the elements of the List.</returns>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Span<T> UnsaveAsSpan<T>(this List<T> list)
+            => CollectionsMarshal.AsSpan(list);
 
         /// <summary>
         /// Determines whether two <see cref="IEnumerable"/> collections are equal by comparing their elements.
