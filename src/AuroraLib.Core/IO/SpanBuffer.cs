@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using AuroraLib.Core.Extensions;
+using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -11,12 +12,16 @@ namespace AuroraLib.Core.IO
     public readonly struct SpanBuffer<T> : IDisposable
     {
         private readonly T[] _buffer;
-        private readonly int _length;
+
+        /// <summary>
+        /// The number of items in the <see cref="SpanBuffer{T}"/>.
+        /// </summary>
+        public readonly int Length;
 
         /// <summary>
         /// Gets the <see cref="Span{T}"/> representing the buffer's elements.
         /// </summary>
-        public Span<T> Span => _buffer.AsSpan(0, _length);
+        public Span<T> Span => _buffer.AsSpan(0, Length);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SpanBuffer{T}"/> class with the specified length.
@@ -26,9 +31,27 @@ namespace AuroraLib.Core.IO
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SpanBuffer(int length)
         {
-            _length = length;
+            Length = length;
             _buffer = ArrayPool<T>.Shared.Rent(length);
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SpanBuffer{T}"/> class with a copy of the specified <see cref="ReadOnlySpan{T}"/>.
+        /// </summary>
+        /// <param name="span">The ReadOnlySpan from which to initialize the buffer's data.</param>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public SpanBuffer(ReadOnlySpan<T> span) : this(span.Length)
+            => span.CopyTo(Span);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SpanBuffer{T}"/> class with a copy of the specified <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="list">The List from which to initialize the buffer's data.</param>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public SpanBuffer(List<T> span) : this(span.UnsaveAsSpan())
+        { }
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
