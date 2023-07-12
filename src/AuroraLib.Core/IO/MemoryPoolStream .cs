@@ -7,7 +7,7 @@ namespace AuroraLib.Core.IO
     /// <summary>
     /// Represents a <see cref="Stream"/> that uses a <see cref="ArrayPool{byte}"/> for efficient allocation and management.
     /// </summary>
-    public class MemoryPoolStream : Stream
+    public sealed class MemoryPoolStream : Stream
     {
         /// <inheritdoc/>
         public override bool CanRead => _open;

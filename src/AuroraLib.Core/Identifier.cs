@@ -4,12 +4,12 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace AuroraLib.Common
+namespace AuroraLib.Core
 {
     /// <summary>
     /// Represents a identifier.
     /// </summary>
-    public class Identifier : IIdentifier
+    public sealed class Identifier : IIdentifier
     {
         public byte[] Bytes;
 

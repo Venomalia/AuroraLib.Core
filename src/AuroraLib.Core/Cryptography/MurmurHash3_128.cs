@@ -8,7 +8,7 @@ namespace AuroraLib.Core.Cryptography
     /// <summary>
     /// 128-bit MurmurHash3 algorithms.
     /// </summary>
-    public class MurmurHash3_128 : IHash<UInt128>
+    public sealed class MurmurHash3_128 : IHash<UInt128>
     {
         /// <inheritdoc />
         public UInt128 Value => new(bytes);

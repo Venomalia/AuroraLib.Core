@@ -3,7 +3,7 @@
     /// <summary>
     /// a virtual stream consists of several streams.
     /// </summary>
-    public class MultiStream : Stream
+    public sealed class MultiStream : Stream
     {
         public IList<Stream> BaseStreams
         {

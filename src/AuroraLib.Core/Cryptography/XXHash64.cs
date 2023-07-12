@@ -9,7 +9,7 @@ namespace AuroraLib.Core.Cryptography
     /// <summary>
     /// 64-bit xxHash implementation.
     /// </summary>
-    public class XXHash64 : IHash<ulong>
+    public sealed class XXHash64 : IHash<ulong>
     {
         /// <inheritdoc />
         public ulong Value { get; protected set; }

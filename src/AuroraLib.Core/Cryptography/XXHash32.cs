@@ -8,7 +8,7 @@ namespace AuroraLib.Core.Cryptography
     /// <summary>
     /// 32-bit xxHash implementation.
     /// </summary>
-    public class XXHash32 : IHash<uint>
+    public sealed class XXHash32 : IHash<uint>
     {
         /// <inheritdoc />
         public uint Value { get; protected set; }

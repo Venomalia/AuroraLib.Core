@@ -6,7 +6,7 @@ namespace AuroraLib.Core.Cryptography
     /// <summary>
     /// Represents a CRC-32 hash algorithm.
     /// </summary>
-    public class Crc32 : IHash<uint>
+    public sealed class Crc32 : IHash<uint>
     {
         /// <inheritdoc />
         public uint Value => _value ^= _xorOut;

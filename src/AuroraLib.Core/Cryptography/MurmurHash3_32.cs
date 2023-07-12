@@ -8,7 +8,7 @@ namespace AuroraLib.Core.Cryptography
     /// <summary>
     /// 32-bit MurmurHash3 algorithms.
     /// </summary>
-    public class MurmurHash3_32 : IHash<uint>
+    public sealed class MurmurHash3_32 : IHash<uint>
     {
         /// <inheritdoc />
         public uint Value { get; protected set; }
