@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using AuroraLib.Core.Extensions;
+using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -8,7 +10,7 @@ namespace AuroraLib.Core.IO
     {
         #region Read
         /// <summary>
-        /// Reads a unmanaged struct of <typeparamref name="T"/> from the <paramref name="stream"/>.
+        /// Reads a unmanaged struct of <typeparamref name="T"/> from the <see cref="Stream"/>.
         /// </summary>
         /// <typeparam name="T">The type of element.</typeparam>
         /// <param name="stream">The stream to read from.</param>
@@ -35,7 +37,7 @@ namespace AuroraLib.Core.IO
         }
 
         /// <summary>
-        /// Reads an array of <typeparamref name="T"/> from the <paramref name="stream"/>.
+        /// Reads an array of <typeparamref name="T"/> from the <see cref="Stream"/>.
         /// </summary>
         /// <typeparam name="T">The type of elements in the array.</typeparam>
         /// <param name="stream">The stream to read from.</param>
@@ -62,7 +64,7 @@ namespace AuroraLib.Core.IO
             => stream.Read<T>((int)count, order);
 
         /// <summary>
-        /// Reads a span of <typeparamref name="T"/> from the <paramref name="stream"/>.
+        /// Reads a span of <typeparamref name="T"/> from the <see cref="Stream"/>.
         /// </summary>
         /// <typeparam name="T">The type of the values in the span.</typeparam>
         /// <param name="stream">The stream to read from.</param>
@@ -80,8 +82,7 @@ namespace AuroraLib.Core.IO
             if (stream.Read(buffer) != buffer.Length)
                 ThrowHelper<T>(values.Length);
 
-            int sizeT = sizeof(T);
-            if (order == Endian.Big == BitConverter.IsLittleEndian && sizeT > 1)
+            if (order == Endian.Big == BitConverter.IsLittleEndian && sizeof(T) > 1)
             {
                 BitConverterX.Swap(buffer, typeof(T), values.Length);
             }
@@ -103,7 +104,7 @@ namespace AuroraLib.Core.IO
 
         #region Write
         /// <summary>
-        /// Writes the specified <paramref name="objekt"/> to the <paramref name="stream"/> in the specified endianness.
+        /// Writes the specified vaule of <typeparamref name="T"/> to the <see cref="Stream"/>.
         /// </summary>
         /// <typeparam name="T">The type of the value to write.</typeparam>
         /// <param name="stream">The stream to write the value to.</param>
@@ -122,24 +123,40 @@ namespace AuroraLib.Core.IO
         }
 
         /// <summary>
-        /// Writes a sequence of <typeparamref name="T"/> <paramref name="objects"/> to the <paramref name="stream"/>.
+        /// Writes the data from the specified <see cref="ReadOnlySpan{T}"/> to the <see cref="Stream"/>.
         /// </summary>
-        /// <typeparam name="T">The type of objects in the sequence.</typeparam>
-        /// <param name="stream">The stream to write to.</param>
-        /// <param name="objects">The sequence of <typeparamref name="T"/> objects to write.</param>
-        /// <param name="order">The endianness of the data to write. Default is <see cref="Endian.Little"/>.</param>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteObjekt<T>(this Stream stream, IEnumerable<T> objects, Endian order = Endian.Little) where T : unmanaged
+        /// <typeparam name="T">The type of elements in the span.</typeparam>
+        /// <param name="stream">The stream to write the data to.</param>
+        /// <param name="span">The ReadOnlySpan containing the data to write.</param>
+        /// <param name="order">The byte order of the data. Default is Endian.Little.</param>
+        public static unsafe void Write<T>(this Stream stream, ReadOnlySpan<T> span, Endian order = Endian.Little) where T : unmanaged
         {
-            foreach (var item in objects)
+            if (order == Endian.Big == BitConverter.IsLittleEndian && sizeof(T) > 1)
             {
-                stream.Write(item, order);
+                using SpanBuffer<T> copy = new(span);
+                Span<byte> buffer = MemoryMarshal.Cast<T, byte>(copy);
+                BitConverterX.Swap(buffer, typeof(T), copy.Length);
+                stream.Write(buffer);
+            }
+            else
+            {
+                ReadOnlySpan<byte> buffer = MemoryMarshal.Cast<T, byte>(span);
+                stream.Write(buffer);
             }
         }
 
         /// <summary>
-        /// Writes multiple instances of the specified <typeparamref name="T"/> <paramref name="objekt"/> to the <paramref name="stream"/>.
+        /// Writes the data from the specified <see cref="List{T}"/> to the <see cref="Stream"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the List.</typeparam>
+        /// <param name="stream">The stream to write the data to.</param>
+        /// <param name="list">The List containing the data to write.</param>
+        /// <param name="order">The byte order of the data. Default is Endian.Little.</param>
+        public static void Write<T>(this Stream stream, List<T> list, Endian order = Endian.Little) where T : unmanaged
+            => Write(stream, (ReadOnlySpan<T>)list.UnsaveAsSpan(), order);
+
+        /// <summary>
+        /// Writes multiple instances of the specified <typeparamref name="T"/> <paramref name="objekt"/> to the <see cref="Stream"/>.
         /// </summary>
         /// <typeparam name="T">The type of the object to write.</typeparam>
         /// <param name="stream">The stream to write to.</param>
