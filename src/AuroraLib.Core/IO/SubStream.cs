@@ -7,7 +7,7 @@ namespace AuroraLib.Core.IO
     /// <summary>
     /// Represents a <see cref="SubStream"/> that provides a view into a portion of an underlying <see cref="Stream"/>.
     /// </summary>
-    public sealed class SubStream : Stream
+    public class SubStream : Stream
     {
         /// <summary>
         /// Returns the underlying stream.
