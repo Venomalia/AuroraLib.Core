@@ -1,5 +1,4 @@
-﻿using AuroraLib.Common;
-using AuroraLib.Core.Exceptions;
+﻿using AuroraLib.Core.Exceptions;
 using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.Text;
 using System.Diagnostics;
@@ -60,20 +59,7 @@ namespace AuroraLib.Core.IO
         }
         #endregion
 
-        /// <summary>
-        /// Copies the entire contents of the stream to the specified destination stream.
-        /// </summary>
-        /// <param name="stream">The source stream to copy from.</param>
-        /// <param name="destination">The destination stream to copy to.</param>
-        /// <param name="bufferSize">The size of the buffer used for copying. Default is 81920 bytes.</param>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyAllTo(this Stream stream, Stream destination, int bufferSize = 81920)
-        {
-            stream.Seek(0, SeekOrigin.Begin);
-            stream.CopyTo(destination, bufferSize);
-        }
-
+        #region ToArray
         /// <summary>
         /// Writes the stream contents to a byte array, regardless of the <see cref="Stream.Position"/>.
         /// </summary>
@@ -81,14 +67,12 @@ namespace AuroraLib.Core.IO
         /// <param name="bufferSize"></param>
         /// <returns></returns>
         [DebuggerStepThrough]
-        public static byte[] ToArray(this Stream stream, int bufferSize = 81920)
+        public static byte[] ToArray(this Stream stream)
         {
-            if (stream is MemoryStream ms)
-                return ms.ToArray();
-
-            using MemoryStream memoryStream = new((int)(stream.Length));
-            stream.CopyAllTo(memoryStream, bufferSize);
-            return memoryStream.ToArray();
+            byte[] copy = new byte[stream.Length];
+            stream.Seek(0, SeekOrigin.Begin);
+            stream.Read(copy);
+            return copy;
         }
 
         /// <summary>
@@ -99,12 +83,13 @@ namespace AuroraLib.Core.IO
         /// <returns></returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static byte[] ToArrayHere(this Stream stream, int bufferSize = 81920)
+        public static byte[] ToArrayHere(this Stream stream)
         {
-            using MemoryStream memoryStream = new((int)(stream.Length - stream.Position));
-            stream.CopyTo(memoryStream, bufferSize);
-            return memoryStream.ToArray();
+            byte[] copy = new byte[stream.Length - stream.Position];
+            stream.Read(copy);
+            return copy;
         }
+        #endregion
 
         #region Match
 
