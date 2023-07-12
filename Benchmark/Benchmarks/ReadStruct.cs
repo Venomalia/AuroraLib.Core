@@ -16,7 +16,7 @@ namespace Benchmark.Benchmarks
         private static readonly MemoryStream ms = new(src);
 
         [Benchmark]
-        public void BinaryReaderRead()
+        public void BinaryReader_Read()
         {
             ms.Seek(0, SeekOrigin.Begin);
             BinaryReader reader = new(ms);
@@ -31,7 +31,7 @@ namespace Benchmark.Benchmarks
         }
 
         [Benchmark]
-        public void BinaryPrimitivesRead()
+        public void BinaryPrimitives_Read()
         {
             ms.Seek(0, SeekOrigin.Begin);
             Span<byte> bytes = stackalloc byte[SIZE];
@@ -47,7 +47,7 @@ namespace Benchmark.Benchmarks
         }
 
         [Benchmark]
-        public void AuroraCoreReadStruct()
+        public void AuroraCore_Read()
         {
             ms.Seek(0, SeekOrigin.Begin);
             for (var i = 0; i < n; ++i)
@@ -57,14 +57,14 @@ namespace Benchmark.Benchmarks
         }
 
         [Benchmark]
-        public void AuroraCoreReadArrayStruct()
+        public void AuroraCore_ReadArray()
         {
             ms.Seek(0, SeekOrigin.Begin);
             _ = ms.Read<TestStruct>(n);
         }
 
         [Benchmark]
-        public void AuroraCoreReadArrayPoolStruct()
+        public void AuroraCore_ReadArrayPool()
         {
             ms.Seek(0, SeekOrigin.Begin);
             TestStruct[] testStructs = ArrayPool<TestStruct>.Shared.Rent(n);
@@ -73,7 +73,7 @@ namespace Benchmark.Benchmarks
         }
 
         [Benchmark]
-        public void AuroraCoreReadSpanBufferStruct()
+        public void AuroraCore_ReadSpanBuffer()
         {
             ms.Seek(0, SeekOrigin.Begin);
             using (SpanBuffer<TestStruct> buffer = new(n))
