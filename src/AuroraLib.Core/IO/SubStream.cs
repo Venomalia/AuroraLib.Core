@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace AuroraLib.Core.IO
@@ -48,6 +47,7 @@ namespace AuroraLib.Core.IO
         public override long Position
         {
             [DebuggerStepThrough]
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _position;
             [DebuggerStepThrough]
             set
@@ -87,12 +87,23 @@ namespace AuroraLib.Core.IO
         /// <param name="length">The length of the substream.</param>
         /// <param name="protectBaseStream">Specifies whether the base stream should be protected from being closed when the substream is closed.</param>
         [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SubStream(Stream stream, long length, bool protectBaseStream = true) : this(stream, length, stream.Position, protectBaseStream)
-        {
-        }
+        { }
+
+        /// <summary>
+        /// Creates a new <see cref="SubStream"/> instance of the specified <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="stream">The underlying stream.</param>
+        /// <param name="protectBaseStream">Specifies whether the base stream should be protected from being closed when the substream is closed.</param>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public SubStream(Stream stream, bool protectBaseStream = true) : this(stream, stream.Length, stream.Position, protectBaseStream)
+        { }
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void Flush()
             => BaseStream.Flush();
 
@@ -106,13 +117,18 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         public override int Read(Span<byte> buffer)
         {
+            int num = (int)(_length - _position);
+            if (num > buffer.Length)
+            {
+                num = buffer.Length;
+            }
             lock (_basestream)
             {
                 BaseStream.Seek(_position + Offset, SeekOrigin.Begin);
-                int r = BaseStream.Read(buffer);
-                _position += r;
-                return r;
+                BaseStream.Read(buffer[..num]);
             }
+            _position += num;
+            return num;
         }
 
         /// <inheritdoc/>
@@ -131,15 +147,7 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         public override void Write(byte[] buffer, int offset, int count)
-        {
-            long remaining = Length - _position;
-            if (Length - _position < count)
-                throw new ArgumentOutOfRangeException(nameof(count));
-
-            BaseStream.Position = _position + Offset;
-            BaseStream.Write(buffer, offset, count);
-            _position += count;
-        }
+            => throw new NotSupportedException();
 
         #region Dispose
         /// <inheritdoc/>
