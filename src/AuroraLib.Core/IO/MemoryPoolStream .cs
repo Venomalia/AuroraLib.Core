@@ -235,13 +235,13 @@ namespace AuroraLib.Core.IO
         }
         #endregion
 
-        /// <inheritdoc cref="UnsaveAsSpan"/>
+        /// <inheritdoc cref="UnsaveAsSpan(int, int)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<byte> UnsaveAsSpan()
             => _Buffer.AsSpan(0, (int)_Length);
 
-        /// <inheritdoc cref="UnsaveAsSpan"/>
+        /// <inheritdoc cref="UnsaveAsSpan(int, int)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<byte> UnsaveAsSpan(int start)

@@ -213,7 +213,7 @@ namespace AuroraLib.Core.IO
                         i[p] = 0;
                 }
             }
-            match = null;
+            match = Array.Empty<byte>();
             return false;
         }
         #endregion

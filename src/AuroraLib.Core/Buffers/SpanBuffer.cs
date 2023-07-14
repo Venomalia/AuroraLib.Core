@@ -3,15 +3,15 @@ using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace AuroraLib.Core.IO
+namespace AuroraLib.Core.Buffers
 {
     /// <summary>
-    /// Represents a buffer of <typeparamref name="T"/> that allocated from an <see cref="ArrayPool{T}"/> and provides save access of its elements.
+    /// Represents a buffer of <typeparamref name="T"/> that allocated from an <see cref="ArrayPool{byte}"/> and provides save access of its elements.
     /// </summary>
     /// <typeparam name="T">The type of elements in the buffer.</typeparam>
-    public readonly struct SpanBuffer<T> : IDisposable
+    public readonly struct SpanBuffer<T> : IDisposable where T : unmanaged
     {
-        private readonly T[] _buffer;
+        private readonly byte[] _buffer;
 
         /// <summary>
         /// The number of items in the <see cref="SpanBuffer{T}"/>.
@@ -21,10 +21,20 @@ namespace AuroraLib.Core.IO
         /// <summary>
         /// Gets the <see cref="Span{T}"/> representing of the <see cref="SpanBuffer{T}"/>.
         /// </summary>
-        public Span<T> Span => _buffer.AsSpan(0, Length);
+        public unsafe Span<T> Span
+        {
+            [DebuggerStepThrough]
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                fixed (byte* bp = _buffer)
+                {
+                    return new(bp, Length);
+                }
+            }
+        }
 
         #region constructor
-
         /// <summary>
         /// Initializes a new instance of the <see cref="SpanBuffer{T}"/> class with the specified length.
         /// </summary>
@@ -34,7 +44,7 @@ namespace AuroraLib.Core.IO
         public SpanBuffer(int length)
         {
             Length = length;
-            _buffer = ArrayPool<T>.Shared.Rent(length);
+            _buffer = ArrayPool<byte>.Shared.Rent(length * Unsafe.SizeOf<T>());
         }
 
         /// <summary>
@@ -68,7 +78,7 @@ namespace AuroraLib.Core.IO
         {
             [DebuggerStepThrough]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => ref _buffer[index];
+            get => ref Span[index];
         }
 
         /// <inheritdoc cref="Span{T}.Clear"/>
@@ -98,7 +108,7 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<T> Slice(int start)
-            => _buffer.AsSpan(start, Length - start);
+            => Span[start..];
 
         /// <inheritdoc cref="Span{T}.Slice(int)"/>
         [DebuggerStepThrough]
@@ -117,7 +127,7 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
-            => ArrayPool<T>.Shared.Return(_buffer);
+            => ArrayPool<byte>.Shared.Return(_buffer);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Span<T>(SpanBuffer<T> x) => x.Span;
