@@ -21,8 +21,9 @@ High performance zero allocation structure reader and other tools for big and li
 ## Benchmarks
 
 [ReadStruct](https://github.com/Venomalia/AuroraLib.Core/blob/main/Benchmark/Benchmarks/ReadStruct.cs)
+
 |                    Method |        Mean |     Error |    StdDev |      Median |   Gen0 | Allocated |
-|-------------------------- |------------:|----------:|----------:|------------:|-------:|----------:|
+|---------------------------|------------:|----------:|----------:|------------:|-------:|----------:|
 |         BinaryReader_Read | 16,051.4 ns | 212.14 ns | 165.63 ns | 16,022.4 ns | 0.0305 |     160 B |
 |     BinaryPrimitives_Read |  8,804.4 ns |  55.60 ns |  46.43 ns |  8,812.8 ns |      - |         - |
 |           AuroraCore_Read |  9,359.9 ns |  49.50 ns |  43.88 ns |  9,362.7 ns |      - |         - |
@@ -31,8 +32,9 @@ High performance zero allocation structure reader and other tools for big and li
 | AuroraCore_ReadSpanBuffer |    405.3 ns |   8.09 ns |  10.52 ns |    401.1 ns |      - |         - |
 
 [WriteStream](https://github.com/Venomalia/AuroraLib.Core/blob/main/Benchmark/Benchmarks/WriteStream.cs)
+
 |                 Method |      N |         Mean |      Error |     StdDev |     Gen0 |     Gen1 |     Gen2 | Allocated |
-|----------------------- |------- |-------------:|-----------:|-----------:|---------:|---------:|---------:|----------:|
+|------------------------|------- |-------------:|-----------:|-----------:|---------:|---------:|---------:|----------:|
 |     MemoryStream_Write |    100 |     1.105 us |  0.0216 us |  0.0191 us |   0.4597 |        - |        - |    1928 B |
 | MemoryPoolStream_Write |    100 |     1.051 us |  0.0106 us |  0.0088 us |   0.0153 |        - |        - |      64 B |
 |     MemoryStream_Write |  10000 |   160.457 us |  3.0166 us |  3.9225 us |  41.5039 |  41.5039 |  41.5039 |  262206 B |

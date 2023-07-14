@@ -11,7 +11,7 @@ namespace AuroraLib.Core.Cryptography
     public sealed class MurmurHash3_32 : IHash<uint>
     {
         /// <inheritdoc />
-        public uint Value { get; protected set; }
+        public uint Value { get; private set; }
 
         /// <inheritdoc />
         public void Compute(ReadOnlySpan<byte> input)

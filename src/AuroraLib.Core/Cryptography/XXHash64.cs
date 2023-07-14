@@ -12,7 +12,7 @@ namespace AuroraLib.Core.Cryptography
     public sealed class XXHash64 : IHash<ulong>
     {
         /// <inheritdoc />
-        public ulong Value { get; protected set; }
+        public ulong Value { get; private set; }
 
         /// <inheritdoc />
         public void Compute(ReadOnlySpan<byte> input)
