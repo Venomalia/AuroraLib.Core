@@ -55,9 +55,10 @@ namespace AuroraLib.Core.IO
         /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with the specified capacity.
         /// </summary>
         /// <param name="capacity">The initial capacity of the stream.</param>
+        /// <param name="setLength">Set the capacity as the stream length.</param>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public MemoryPoolStream(int capacity) : this(ArrayPool<byte>.Shared, capacity)
+        public MemoryPoolStream(int capacity, bool setLength = false) : this(ArrayPool<byte>.Shared, capacity, setLength)
         { }
 
         /// <summary>
@@ -65,6 +66,7 @@ namespace AuroraLib.Core.IO
         /// </summary>
         /// <param name="aPool">The ArrayPool used to rent and return byte arrays.</param>
         [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public MemoryPoolStream(ArrayPool<byte> aPool) : this(aPool, defaultcapacity)
         { }
 
@@ -75,13 +77,25 @@ namespace AuroraLib.Core.IO
         /// <param name="capacity">The initial capacity of the stream.</param>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public MemoryPoolStream(ArrayPool<byte> aPool, int capacity)
+        public MemoryPoolStream(ArrayPool<byte> aPool, int capacity, bool setLength = false) : this(aPool, aPool.Rent(capacity), setLength ? capacity : 0)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with a buffer from the specified ArrayPool.
+        /// </summary>
+        /// <param name="aPool">The ArrayPool<byte> to use for buffer management.</param>
+        /// <param name="buffer">The byte[] buffer to use for stream data storage.</param>
+        /// <param name="length">The initial capacity of the stream.</param>
+        [DebuggerStepThrough]
+        public MemoryPoolStream(ArrayPool<byte> aPool, byte[] buffer, int length = 0)
         {
             _APool = aPool;
-            _Buffer = aPool.Rent(capacity);
-            _Position = _Length = 0;
+            _Buffer = buffer;
+            _Length = length;
+            _Position = 0;
             _open = true;
         }
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with a copy of the specified <paramref name="stream"/>.
@@ -131,6 +145,23 @@ namespace AuroraLib.Core.IO
             _Position += num;
             return num;
         }
+
+        /// <inheritdoc/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override int ReadByte()
+        {
+            if (Position > Length)
+            {
+                return -1;
+            }
+            return _Buffer[Position++];
+        }
+
+        /// <inheritdoc/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override void WriteByte(byte value) => Write(stackalloc byte[1] { value });
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
