@@ -6,7 +6,7 @@ namespace AuroraLib.Core
     /// Represents a 16-byte, 128-bit unsigned integer. is mainly used for checksums.
     /// </summary>
     [Serializable]
-    public struct UInt128 : IFormattable, IComparable<UInt128>, IEquatable<UInt128>
+    public readonly struct UInt128 : IFormattable, IComparable<UInt128>, IEquatable<UInt128>
     {
         public readonly ulong Low, High;
 
@@ -21,10 +21,13 @@ namespace AuroraLib.Core
 
         public UInt128(ReadOnlySpan<char> HexString)
         {
+            if (HexString.Length > 32)
+                throw new OverflowException();
+
             if (HexString.Length > 16)
             {
-                Low = UInt64.Parse(HexString[..16], NumberStyles.HexNumber);
-                High = UInt64.Parse(HexString[^16..], NumberStyles.HexNumber);
+                Low = UInt64.Parse(HexString[^16..], NumberStyles.HexNumber);
+                High = UInt64.Parse(HexString[..^16], NumberStyles.HexNumber);
             }
             else
             {
@@ -45,7 +48,7 @@ namespace AuroraLib.Core
             High = BitConverter.ToUInt64(value[^8..]);
         }
 
-        public override string ToString() => ToString(string.Empty, null);
+        public override string ToString() => ToString("X", null);
 
         public string ToString(IFormatProvider provider) => ToString(string.Empty, provider);
 
@@ -58,7 +61,7 @@ namespace AuroraLib.Core
             return High.ToString(format, provider) + Low.ToString(format, provider);
         }
 
-        public int CompareTo(UInt128 other)
+        public readonly int CompareTo(UInt128 other)
         {
             if (this > other) return 1;
             return this == other ? 0 : -1;
@@ -70,7 +73,7 @@ namespace AuroraLib.Core
         public bool Equals(UInt128 other)
             => this == other;
 
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             unchecked
             {
@@ -147,7 +150,7 @@ namespace AuroraLib.Core
 
         public static implicit operator UInt128(ushort x) => new(0, x);
 
-        public static implicit operator UInt128(UInt24 x) => new(0, (ulong)x);
+        public static implicit operator UInt128(UInt24 x) => new(0, x);
 
         public static implicit operator UInt128(uint x) => new(0, x);
 

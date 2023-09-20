@@ -2,7 +2,6 @@
 using HashDepot;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
 
 namespace AuroraLib.Core.Cryptography
 {
