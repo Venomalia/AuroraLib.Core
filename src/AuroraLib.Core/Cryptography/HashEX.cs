@@ -1,5 +1,6 @@
 ﻿using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.Text;
+using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -58,5 +59,33 @@ namespace AuroraLib.Core.Cryptography
             ReadOnlySpan<byte> buffer = MemoryMarshal.Cast<T,byte>(input);
             hash.Compute(buffer);
         }
+
+        /// <summary>
+        /// Asynchronously computes a hash value for the specified stream using the given hash algorithm.
+        /// </summary>
+        /// <typeparam name="T">The type of hash value to compute.</typeparam>
+        /// <param name="hash">The hash algorithm to use.</param>
+        /// <param name="stream">The stream from which to read data.</param>
+        /// <param name="bufferSize">The size of the buffer used for reading data from the stream.</param>
+        /// <returns>A task representing the asynchronous operation that computes the hash value.</returns>
+        [DebuggerStepThrough]
+        public static async Task<T> ComputeAsync<T>(this IHash<T> hash, Stream stream, int bufferSize = 4096) where T : unmanaged
+        {
+            byte[] buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
+            try
+            {
+                int bytes;
+                while ((bytes = await stream.ReadAsync(buffer).ConfigureAwait(false)) > 0)
+                {
+                    hash.Compute(buffer.AsSpan(0, bytes));
+                }
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
+            return hash.Value;
+        }
+
     }
 }
