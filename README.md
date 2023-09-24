@@ -2,21 +2,44 @@
 
 High performance zero allocation structure reader and other tools for big and little-endian.
 
+[Nuget Package](https://www.nuget.org/packages/AuroraLib.Core)
 
-## Common Utilities
+## Common
 
-|                | Description                                                                |
+| Utilities      | Description                                                                |
+|----------------|----------------------------------------------------------------------------|
+|SubStream       | Provides a view into a portion of an underlying Stream.                    |
+|MemoryPoolStream| like `MemoryStream` but wrapper around `ArrayPool` for efficient allocation.|
+|BitReader       | Offers many methods for reading bit streams.                               |
+|BitWriter       | Offers many methods to write a bit stream.                                 |
+|SpanBuffer      | A buffer that allocated from the `ArrayPool`.                              |
+|CircularBuffer  | A CircularBuffer that allocated from the `ArrayPool`.                      |
+|ValueStringBuilder| Stream extensions to read and write various structures.                    |
+|StreamEx        | Stream extensions to read and write various structures.                    |
+|BitConverterX   | Extension to the BitConverter.                                             |
+
+| Values Types   | Description                                                                |
 |----------------|----------------------------------------------------------------------------|
 |Int24           | 24-bit unsigned integer.                                                   |
 |UInt24          | 24-bit signed integer.                                                     |
 |UInt128         | 128-bit unsigned integer.                                                  |
-|Identifier32    | 4-byte array, for file signatures                                          |
-|Identifier64    | 8-byte array, for file signatures                                          |
-|SubStream       | Provides a view into a portion of an underlying Stream                     |
-|MemoryPoolStream| like `MemoryStream` but wrapper around `ArrayPool` for efficient allocation|
-|SpanBuffer      | A buffer that allocated from the `ArrayPool`                               |
-|StreamEx        | Stream extensions                                                          |
+|Identifier32    | 4-byte array, for file signatures similar to dword in c++.                 |
+|Identifier64    | 8-byte array, for file signatures.                                         |
+
+| Hash           | Description                                                                |
+|----------------|----------------------------------------------------------------------------|
+|Adler32         | 32-bit Adler implementation.                                               |
+|Adler64         | 64-bit Adler implementation.                                               |
+|CityHash32      | [google](https://github.com/google/cityhash) 32-bit CityHash implementation.                                     |
+|CityHash64      | [google](https://github.com/google/cityhash) 64-bit CityHash implementation.                                     |
+|CityHash128     | [google](https://github.com/google/cityhash) 128-bit CityHash implementation.                                    |
 |Crc32           | Fully customizable Crc32 algorithm                                         |
+|Fnv1 32         | 32-bit Fnv1 or Fnv1a implementation.                                       |
+|Fnv1 64         | 64-bit Fnv1 or Fnv1a implementation.                                       |
+|MurmurHash3 32  | 32-bit MurmurHash3 implementation from [HashDepot](https://github.com/ssg/HashDepot).                          |
+|MurmurHash3 128 | 128-bit MurmurHash3 implementation from [HashDepot](https://github.com/ssg/HashDepot).                         |
+|XXHash32        | 32-bit XXHash implementation from [HashDepot](https://github.com/ssg/HashDepot).                               |
+|XXHash64        | 64-bit XXHash implementation from [HashDepot](https://github.com/ssg/HashDepot).                               |
 
 ## Benchmarks
 
