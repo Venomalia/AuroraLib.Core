@@ -5,7 +5,7 @@
     /// </summary>
     // base on https://github.com/SuperHackio/Hack.io
     [Serializable]
-    public struct Int24 : IComparable, IFormattable, IConvertible, IComparable<Int24>, IComparable<Int32>, IEquatable<Int24>, IEquatable<Int32>
+    public readonly struct Int24 : IComparable, IFormattable, IConvertible, IComparable<Int24>, IComparable<Int32>, IEquatable<Int24>, IEquatable<Int32>
     {
         private readonly sbyte b0, b1, b2;
 

@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 namespace AuroraLib.Core.Buffers
 {
     /// <summary>
-    /// Represents a buffer of <typeparamref name="T"/> that allocated from an <see cref="ArrayPool{byte}"/> and provides save access of its elements.
+    /// Represents a buffer of <typeparamref name="T"/> that allocated from <see cref="ArrayPool{byte}.Shared"/> and provides save access of its elements.
     /// </summary>
     /// <typeparam name="T">The type of elements in the buffer.</typeparam>
     public readonly struct SpanBuffer<T> : IDisposable where T : unmanaged
@@ -46,6 +46,13 @@ namespace AuroraLib.Core.Buffers
             Length = length;
             _buffer = ArrayPool<byte>.Shared.Rent(length * Unsafe.SizeOf<T>());
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SpanBuffer{T}"/> class with the specified length.
+        /// </summary>
+        /// <param name="length">The length of the buffer.</param>
+        public SpanBuffer(uint length) : this((int)length)
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SpanBuffer{T}"/> class with a copy of the specified <see cref="ReadOnlySpan{T}"/>.

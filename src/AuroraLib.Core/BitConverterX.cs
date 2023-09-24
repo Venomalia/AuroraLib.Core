@@ -1,5 +1,4 @@
-﻿using System.Buffers.Binary;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -127,7 +126,7 @@ namespace AuroraLib.Core
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static void Swap(Span<byte> buffer, Type type)
         {
-            if (type == typeof(byte) ||type == typeof(UInt24) || type == typeof(Int24))
+            if (type == typeof(byte) || type == typeof(UInt24) || type == typeof(Int24))
             {
                 buffer.Reverse();
                 return;
@@ -376,8 +375,14 @@ namespace AuroraLib.Core
         /// <returns></returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int GetBits(byte b, int index, int length)
-            => b >> index - length & (1 << length) - 1;
+        public static byte GetBits(byte b, int index, int length)
+        {
+            if (index + length > 8)
+            {
+                GetBitsThrowHelper(8);
+            }
+            return (byte)(b >> index - length & (1 << length) - 1);
+        }
 
         /// <summary>
         /// Get a <paramref name="length"/>-bit signed integer from a 16-bit signed integer.
@@ -388,8 +393,14 @@ namespace AuroraLib.Core
         /// <returns></returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int GetBits(short b, int index, int length)
-            => b >> index - length & (1 << length) - 1;
+        public static short GetBits(short b, short index, short length)
+        {
+            if (index + length > 16)
+            {
+                GetBitsThrowHelper(16);
+            }
+            return (short)(b >> index - length & (1 << length) - 1);
+        }
 
         /// <summary>
         /// Get a <paramref name="length"/>-bit signed integer from a 32-bit signed integer.
@@ -401,7 +412,13 @@ namespace AuroraLib.Core
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int GetBits(int b, int index, int length)
-            => b >> index - length & (1 << length) - 1;
+        {
+            if (index + length > 32)
+            {
+                GetBitsThrowHelper(32);
+            }
+            return b >> index - length & (int)((1L << length) - 1);
+        }
 
         /// <summary>
         /// Get a <paramref name="length"/>-bit signed integer from a 64-bit signed integer.
@@ -413,7 +430,21 @@ namespace AuroraLib.Core
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long GetBits(long b, int index, int length)
-            => b >> index - length & (1 << length) - 1;
+        {
+            if (length > 64 || index > 64)
+            {
+                GetBitsThrowHelper(64);
+            }
+            if (length == 64)
+            {
+                return b;
+            }
+            return b >> index - length & (1L << length) - 1;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void GetBitsThrowHelper(int length)
+            => throw new ArgumentOutOfRangeException("GetBits", $"Length & index must be between 1 and {length}.");
 
         /// <summary>
         /// Read single bits as steam of bools

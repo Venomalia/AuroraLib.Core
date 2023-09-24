@@ -5,7 +5,7 @@
     /// </summary>
     // base on https://github.com/SuperHackio/Hack.io
     [Serializable]
-    public struct UInt24 : IComparable, IFormattable, IConvertible, IComparable<UInt24>, IComparable<uint>, IEquatable<UInt24>, IEquatable<uint>
+    public readonly struct UInt24 : IComparable, IFormattable, IConvertible, IComparable<UInt24>, IComparable<uint>, IEquatable<UInt24>, IEquatable<uint>
     {
         private readonly byte b0, b1, b2;
 
@@ -132,10 +132,6 @@
         public static implicit operator UInt24(ushort x) => new(x);
 
         public static explicit operator ushort(UInt24 x) => (ushort)x.Value;
-
-        public static explicit operator UInt24(Int24 x) => new((uint)x.Value);
-
-        public static explicit operator Int24(UInt24 x) => new((int)x.Value);
 
         public static explicit operator UInt24(int x) => new((uint)x);
 
