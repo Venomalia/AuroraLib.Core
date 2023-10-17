@@ -289,6 +289,24 @@ namespace AuroraLib.Core.IO
         public Span<byte> UnsaveAsSpan(int start, int length)
             => _Buffer.AsSpan(start, length);
 
+        /// <summary>
+        /// Returns a <see cref="Memory{T}{byte}"/> representing the data of the <see cref="MemoryPoolStream"/>, it should not be written to the stream while the memory is in use.
+        /// </summary>
+        /// <returns>The memory representation of the <see cref="MemoryPoolStream"/>.</returns>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Memory<byte> UnsaveAsMemory()
+            => _Buffer.AsMemory(0, (int)_Length);
+
+        /// <summary>
+        /// Gets the byte buffer of the <see cref="MemoryPoolStream"/>, it should not be written to the stream while the byte buffer is in use.
+        /// </summary>
+        /// <returns>The byte buffer of the <see cref="MemoryPoolStream"/>.</returns>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public byte[] UnsaveGetBuffer()
+            => _Buffer;
+
         /// <inheritdoc cref="MemoryStream.WriteTo(Stream)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
