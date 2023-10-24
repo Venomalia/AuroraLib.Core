@@ -117,7 +117,7 @@
 
         public static bool operator <=(UInt24 l, UInt24 r) => l.Value <= r.Value;
 
-        public static implicit operator UInt24(byte x) => new(x);
+        public static implicit operator UInt24(byte x) => new((uint)x);
 
         public static explicit operator byte(UInt24 x) => (byte)x.Value;
 
@@ -129,7 +129,7 @@
 
         public static explicit operator short(UInt24 x) => (short)x.Value;
 
-        public static implicit operator UInt24(ushort x) => new(x);
+        public static implicit operator UInt24(ushort x) => new((uint)x);
 
         public static explicit operator ushort(UInt24 x) => (ushort)x.Value;
 
@@ -141,11 +141,11 @@
 
         public static implicit operator uint(UInt24 x) => x.Value;
 
-        public static explicit operator UInt24(long x) => new UInt24((uint)x);
+        public static explicit operator UInt24(long x) => new((uint)x);
 
         public static implicit operator long(UInt24 x) => x.Value;
 
-        public static explicit operator UInt24(ulong x) => new UInt24((uint)x);
+        public static explicit operator UInt24(ulong x) => new((uint)x);
 
         public static implicit operator ulong(UInt24 x) => x.Value;
 
