@@ -56,7 +56,7 @@ namespace AuroraLib.Core.Cryptography
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Compute<T>(this IHash hash, ReadOnlySpan<T> input) where T : unmanaged
         {
-            ReadOnlySpan<byte> buffer = MemoryMarshal.Cast<T,byte>(input);
+            ReadOnlySpan<byte> buffer = MemoryMarshal.Cast<T, byte>(input);
             hash.Compute(buffer);
         }
 
