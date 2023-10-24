@@ -211,9 +211,9 @@ namespace AuroraLib.Core.IO
             {
                 SetBuffer((int)length);
             }
-            else if (_Position > _Length)
+            else if (_Position > length)
             {
-                _Position = _Length;
+                _Position = length;
             }
             _Length = length;
         }
