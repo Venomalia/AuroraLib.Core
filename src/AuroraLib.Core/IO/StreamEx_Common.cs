@@ -220,46 +220,25 @@ namespace AuroraLib.Core.IO
 
         #region DetectByteOrder
         /// <summary>
-        /// Attempts to detect the byte order in which the stream is written, based on the provided types.
+        /// Detects the byte order (endianess) of the data in the given stream.
         /// </summary>
-        /// <typeparam name="T">The types to use for checking the byte order.</typeparam>
-        /// <param name="stream">The stream to check.</param>
+        /// <typeparam name="T">The data type to compare byte order.</typeparam>
+        /// <param name="stream">The stream containing the data.</param>
+        /// <param name="count">The number of items.</param>
         /// <returns>The detected byte order.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe Endian DetectByteOrder<T>(this Stream stream) where T : unmanaged
-            => stream.At(stream.Position, s => s.DetectByteOrder(sizeof(T)) < 0 ? Endian.Little : Endian.Big);
-
-        /// <summary>
-        /// Attempts to detect the byte order in which the stream is written, based on the provided types.
-        /// </summary>
-        /// <param name="stream">The stream to check.</param>
-        /// <param name="types">The types to use for checking the byte order</param>
-        /// <returns>The detected byte order.</returns>
-        public static Endian DetectByteOrder(this Stream stream, params Type[] types)
+        public static unsafe Endian DetectByteOrder<T>(this Stream stream, int count = 1) where T : unmanaged, IComparable<T>
         {
             long orpos = stream.Position;
-            int proBigOrder = 0;
-            foreach (var type in types)
+            int trend = 0;
+            for (int i = 0; i < count; i++)
             {
-                proBigOrder += stream.DetectByteOrder(Marshal.SizeOf(type));
+                T value = stream.Read<T>();
+                trend += value.CompareTo(BitConverterX.Swap(value));
             }
             stream.Seek(orpos, SeekOrigin.Begin);
-            return proBigOrder < 0 ? Endian.Little : Endian.Big;
-        }
-
-        private static int DetectByteOrder(this Stream stream, int size)
-        {
-            Span<byte> buffer = stackalloc byte[size];
-            stream.Read(buffer);
-
-            int proBigOrder = 0;
-            for (int i = 0; i < size; i++)
-            {
-                int j = i < size / 2 ? i : size - i - 1;
-                proBigOrder += (buffer[j] == 0 ? (i < size / 2 ? 1 : -1) : 0);
-            }
-            return proBigOrder;
+            return trend < 0 ? Endian.Little : Endian.Big;
         }
         #endregion
 
