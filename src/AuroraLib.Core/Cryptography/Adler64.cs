@@ -6,7 +6,7 @@ namespace AuroraLib.Core.Cryptography
     /// <summary>
     /// 64-bit Adler implementation.
     /// </summary>
-    public class Adler64 : IHash<ulong>
+    public sealed class Adler64 : IHash<ulong>
     {
         private const ulong Prime = 4294967291;
 
