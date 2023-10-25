@@ -7,9 +7,8 @@ namespace AuroraLib.Core.Buffers
     /// <summary>
     /// A CircularBuffer class that inherits from Stream, uses a <see cref="ArrayPool{byte}"/> for efficient allocation and management.
     /// </summary>
-    public sealed class CircularBuffer : Stream
+    public class CircularBuffer : Stream
     {
-
         /// <inheritdoc/>
         public override bool CanRead => _open;
         /// <inheritdoc/>
@@ -42,7 +41,7 @@ namespace AuroraLib.Core.Buffers
         private long _Position;
 
         private readonly ArrayPool<byte> _APool;
-        private byte[] _Buffer;
+        protected byte[] _Buffer;
 
         /// <summary>
         /// Initializes a new instance of the CircularBuffer class with the specified capacity.
@@ -110,17 +109,27 @@ namespace AuroraLib.Core.Buffers
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public override void Write(ReadOnlySpan<byte> buffer)
         {
-            int total = (int)Math.Min(Length, buffer.Length);
-            int left = (int)Math.Min(Length - Position, total);
-
-            buffer.Slice(buffer.Length - total, left).CopyTo(_Buffer.AsSpan((int)Position, left));
-
-            if (total > left)
+            if (Length >= Position + buffer.Length)
             {
-                left = total - left;
-                buffer.Slice(buffer.Length - left, left).CopyTo(_Buffer.AsSpan(0, left));
+                // The entire buffer fits without wrapping around.
+                buffer.CopyTo(_Buffer.AsSpan((int)Position));
+                Position += buffer.Length;
             }
-            Position += buffer.Length;
+            else
+            {
+                // Partially write and wrap around.
+                int bytesNeeded = (int)Math.Min(Length, buffer.Length);
+                int left = (int)(Length - (Position));
+                // If the buffer.length is greater than this CircularBuffer we don't need to write the bytes.
+                buffer.Slice(buffer.Length - bytesNeeded, left).CopyTo(_Buffer.AsSpan((int)Position, left));
+
+                if (bytesNeeded > left)
+                {
+                    left = bytesNeeded - left;
+                    buffer.Slice(buffer.Length - left, left).CopyTo(_Buffer.AsSpan(0, left));
+                }
+                Position += bytesNeeded;
+            }
         }
 
         /// <inheritdoc/>
