@@ -151,7 +151,7 @@ namespace AuroraLib.Core.IO
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int ReadByte()
         {
-            if (Position > Length)
+            if (Position >= Length)
             {
                 return -1;
             }
