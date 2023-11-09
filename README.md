@@ -14,7 +14,8 @@ High performance zero allocation structure reader and other tools for big and li
 |BitWriter       | Offers many methods to write a bit stream.                                 |
 |SpanBuffer      | A buffer that allocated from the `ArrayPool`.                              |
 |CircularBuffer  | A CircularBuffer that allocated from the `ArrayPool`.                      |
-|ValueStringBuilder| Stream extensions to read and write various structures.                    |
+|BackwardsMemoryStream| Reads and writes from back to front.                                  |
+|ValueStringBuilder| Stream extensions to read and write various structures.                  |
 |StreamEx        | Stream extensions to read and write various structures.                    |
 |BitConverterX   | Extension to the BitConverter.                                             |
 
