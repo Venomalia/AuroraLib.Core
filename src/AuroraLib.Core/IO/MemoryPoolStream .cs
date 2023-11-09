@@ -86,8 +86,17 @@ namespace AuroraLib.Core.IO
         public MemoryPoolStream(Stream stream) : this((int)stream.Length, true)
         {
             stream.Seek(0, SeekOrigin.Begin);
-            stream.Read(_Buffer);
+            stream.Read(_Buffer.AsSpan(0, (int)stream.Length));
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with data read from the specified <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="stream">The stream to read data from.</param>
+        /// <param name="length">The length of the stream to read.</param>
+        [DebuggerStepThrough]
+        public MemoryPoolStream(Stream stream, int length) : this(length, true)
+            => stream.Read(_Buffer.AsSpan(0, length));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with the data from the specified ReadOnlySpan.
