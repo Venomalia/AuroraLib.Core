@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using AuroraLib.Core.IO;
+using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -7,17 +8,8 @@ namespace AuroraLib.Core.Buffers
     /// <summary>
     /// A CircularBuffer class that inherits from Stream, uses a <see cref="ArrayPool{byte}"/> for efficient allocation and management.
     /// </summary>
-    public class CircularBuffer : Stream
+    public class CircularBuffer : PoolStream
     {
-        /// <inheritdoc/>
-        public override bool CanRead => _open;
-        /// <inheritdoc/>
-        public override bool CanSeek => _open;
-        /// <inheritdoc/>
-        public override bool CanWrite => _open;
-        /// <inheritdoc/>
-        public override long Length => _Length;
-
         /// <inheritdoc/>
         public override long Position
         {
@@ -36,12 +28,7 @@ namespace AuroraLib.Core.Buffers
             }
         }
 
-        private bool _open;
-        private long _Length;
         private long _Position;
-
-        private readonly ArrayPool<byte> _APool;
-        protected byte[] _Buffer;
 
         /// <summary>
         /// Initializes a new instance of the CircularBuffer class with the specified capacity.
@@ -59,14 +46,8 @@ namespace AuroraLib.Core.Buffers
         /// <param name="aPool">The ArrayPool<byte> to use for buffer management.</param>
         /// <param name="capacity">The capacity of the circular buffer.</param>
         [DebuggerStepThrough]
-        public CircularBuffer(ArrayPool<byte> aPool, int capacity)
-        {
-            _APool = aPool;
-            _Buffer = aPool.Rent(capacity);
-            _Length = capacity;
-            _Position = 0;
-            _open = true;
-        }
+        public CircularBuffer(ArrayPool<byte> aPool, int capacity) : base(aPool, aPool.Rent(capacity), capacity)
+        { }
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
@@ -138,59 +119,12 @@ namespace AuroraLib.Core.Buffers
         public override void WriteByte(byte value)
             => _Buffer[Position++] = value;
 
-        /// <inheritdoc/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override long Seek(long offset, SeekOrigin origin) => origin switch
-        {
-            SeekOrigin.Begin => Position = offset,
-            SeekOrigin.Current => Position += offset,
-            SeekOrigin.End => Position = Length + offset,
-            _ => throw new ArgumentException($"Origin {origin} is invalid."),
-        };
-
-
-        /// <summary>
-        /// Not supported!
-        /// </summary>
-        [DebuggerStepThrough]
-        public override void SetLength(long value)
+        protected override void ExpandBuffer(int minimumLength)
         {
             throw new NotSupportedException();
         }
 
-        /// <summary>
-        /// Dummy
-        /// </summary>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override void Flush()
-        { }
-
-        /// <inheritdoc/>
-        [DebuggerStepThrough]
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            if (_Buffer.Length != 0)
-            {
-                _APool.Return(_Buffer);
-                _Buffer = Array.Empty<byte>();
-            }
-            _Length = _Position = 0;
-            _open = false;
-        }
-
-        /// <inheritdoc cref="UnsaveAsSpan(int, int)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Span<byte> UnsaveAsSpan()
-            => _Buffer.AsSpan(0, (int)_Length);
-
-        /// <inheritdoc cref="UnsaveAsSpan(int, int)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Span<byte> UnsaveAsSpan(int start)
-            => _Buffer.AsSpan(start, (int)_Length - start);
+        protected override Span<byte> InternalBufferAsSpan(int start, int length)
+            => _Buffer.AsSpan(start, length);
     }
 }
