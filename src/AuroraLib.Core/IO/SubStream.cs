@@ -11,16 +11,7 @@ namespace AuroraLib.Core.IO
         /// <summary>
         /// Returns the underlying stream.
         /// </summary>
-        public Stream BaseStream
-        {
-            get
-            {
-                if (_basestream == null)
-                    throw new ObjectDisposedException(GetType().Name);
-
-                return _basestream;
-            }
-        }
+        public Stream BaseStream => _basestream;
         private readonly Stream _basestream;
 
         /// <summary>
@@ -31,10 +22,10 @@ namespace AuroraLib.Core.IO
         private readonly bool ProtectBaseStream;
 
         /// <inheritdoc/>
-        public override bool CanRead => _basestream != Null && BaseStream.CanRead;
+        public override bool CanRead => BaseStream.CanRead;
 
         /// <inheritdoc/>
-        public override bool CanSeek => _basestream != Null && BaseStream.CanSeek;
+        public override bool CanSeek => BaseStream.CanSeek;
 
         /// <inheritdoc/>
         public override bool CanWrite => false;
@@ -158,7 +149,7 @@ namespace AuroraLib.Core.IO
 
             if (disposing)
             {
-                if (_basestream != null && !ProtectBaseStream)
+                if (_basestream.CanRead && !ProtectBaseStream)
                 {
                     try { _basestream.Dispose(); }
                     catch { }
