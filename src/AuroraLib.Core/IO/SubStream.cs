@@ -108,11 +108,7 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         public override int Read(Span<byte> buffer)
         {
-            int num = (int)(_length - _position);
-            if (num > buffer.Length)
-            {
-                num = buffer.Length;
-            }
+            int num = (int)Math.Min(buffer.Length, _length - _position);
             lock (_basestream)
             {
                 BaseStream.Seek(_position + Offset, SeekOrigin.Begin);
