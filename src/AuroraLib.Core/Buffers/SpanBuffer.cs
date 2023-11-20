@@ -44,7 +44,7 @@ namespace AuroraLib.Core.Buffers
         public SpanBuffer(int length)
         {
             Length = length;
-            _buffer = ArrayPool<byte>.Shared.Rent(length * Unsafe.SizeOf<T>());
+            _buffer = length == 0 ? Array.Empty<byte>() : ArrayPool<byte>.Shared.Rent(length * Unsafe.SizeOf<T>());
         }
 
         /// <summary>
@@ -134,7 +134,9 @@ namespace AuroraLib.Core.Buffers
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
-            => ArrayPool<byte>.Shared.Return(_buffer);
+        {
+            if (Length != 0) ArrayPool<byte>.Shared.Return(_buffer);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Span<T>(SpanBuffer<T> x) => x.Span;
