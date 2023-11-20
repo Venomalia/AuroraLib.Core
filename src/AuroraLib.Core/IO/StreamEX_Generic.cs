@@ -1,5 +1,6 @@
 ﻿using AuroraLib.Core.Buffers;
 using AuroraLib.Core.Extensions;
+using AuroraLib.Core.Interfaces;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -183,6 +184,30 @@ namespace AuroraLib.Core.IO
         public static unsafe void Write<T>(this Stream stream, T objekt, int count, Endian order = Endian.Little) where T : unmanaged
             => Write(stream, objekt, (uint)count, order);
 
+        #endregion
+
+        #region Read&Write IBinaryObject
+        /// <summary>
+        /// Reads an object of type T that implements <see cref="IBinaryObject"/> from the stream.
+        /// </summary>
+        /// <typeparam name="T">The type of object to read.</typeparam>
+        /// <param name="stream">The stream from which to read the object.</param>
+        /// <returns>The deserialized object of type T.</returns>
+        public static T Read<T>(this Stream stream) where T : IBinaryObject, new()
+        {
+            T value = new();
+            value.BinaryDeserialize(stream);
+            return value;
+        }
+
+        /// <summary>
+        /// Writes an object that implements <see cref="IBinaryObject"/> to the stream.
+        /// </summary>
+        /// <typeparam name="T">The type of object to write.</typeparam>
+        /// <param name="stream">The stream to which the object is written.</param>
+        /// <param name="objekt">The object to be serialized and written to the stream.</param>
+        public static void Write<T>(this Stream stream, T objekt) where T : IBinaryObject
+            => objekt.BinarySerialize(stream);
         #endregion
 
         #region For
