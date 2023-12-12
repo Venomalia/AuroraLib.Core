@@ -3,6 +3,7 @@ using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.Text;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace AuroraLib.Core.IO
 {
@@ -219,25 +220,45 @@ namespace AuroraLib.Core.IO
 
         #region DetectByteOrder
         /// <summary>
-        /// Detects the byte order (endianess) of the data in the given stream.
+        /// Detects the byte order (Endianess) of a data stream based on the smallest possible value.
         /// </summary>
-        /// <typeparam name="T">The data type to compare byte order.</typeparam>
+        /// <typeparam name="T">The type of the values in the stream..</typeparam>
         /// <param name="stream">The stream containing the data.</param>
         /// <param name="count">The number of items.</param>
         /// <returns>The detected byte order.</returns>
         [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe Endian DetectByteOrder<T>(this Stream stream, int count = 1) where T : unmanaged, IComparable<T>
         {
             long orpos = stream.Position;
             int trend = 0;
             for (int i = 0; i < count; i++)
             {
-                T value = stream.Read<T>();
-                trend += value.CompareTo(BitConverterX.Swap(value));
+                T valueLE = stream.Read<T>();
+                T valueBE = BitConverterX.Swap(valueLE);
+                trend += valueLE.CompareTo(valueBE);
             }
             stream.Seek(orpos, SeekOrigin.Begin);
             return trend < 0 ? Endian.Little : Endian.Big;
+        }
+
+        /// <summary>
+        /// Detects the byte order (Endianess) of a data stream based on the proximity to a reference value.
+        /// </summary>
+        /// <typeparam name="T">The type of the values in the stream..</typeparam>
+        /// <param name="stream">The stream containing the data.</param>
+        /// <param name="reference">The reference value used to determine proximity.</param>
+        /// <returns>The detected byte order.</returns>
+        [DebuggerStepThrough]
+        public static unsafe Endian DetectByteOrderByDistance<T>(this Stream stream, T reference) where T : unmanaged, IConvertible
+        {
+            T valueLE = stream.Peek<T>();
+            T valueBE = BitConverterX.Swap(valueLE);
+
+            double dRef = reference.ToDouble(null);
+            double diff1 = Math.Abs(valueLE.ToDouble(null) - dRef);
+            double diff2 = Math.Abs(valueBE.ToDouble(null) - dRef);
+
+            return diff1 < diff2 ? Endian.Little : Endian.Big;
         }
         #endregion
 
