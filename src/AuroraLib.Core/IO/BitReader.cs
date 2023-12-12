@@ -1,9 +1,7 @@
-﻿using AuroraLib.Core;
-using AuroraLib.Core.IO;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace AuroraLib.Common
+namespace AuroraLib.Core.IO
 {
     /// <summary>
     /// Reads bits from a stream.
