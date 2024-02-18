@@ -90,7 +90,10 @@ namespace AuroraLib.Core.IO
         }
 
         #region Throw
-
+        /// <exception cref="EndOfStreamException">Thrown when attempting to read beyond the end of the stream.</exception>
+        /// <exception cref="NotSupportedException">The stream does not support reading.</exception>
+        /// <exception cref="IOException">An I/O error occurred.</exception>
+        /// <exception cref="ObjectDisposedException">Methods were called after the stream was closed.</exception>
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static void ThrowHelper<T>()
             => throw new EndOfStreamException($"Cannot read {typeof(T)} is beyond the end of the stream.");
