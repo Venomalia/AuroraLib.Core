@@ -105,5 +105,21 @@ namespace AuroraLib.Core.Extensions
             ReadOnlySpan<byte> buffer = MemoryMarshal.Cast<T, byte>(span);
             return (int)XXHash32.Generate(buffer);
         }
+
+        /// <summary>
+        /// Casts an array of one primitive type <typeparamref name="TFrom"/> to a span of another primitive type <typeparamref name="TTo"/>.
+        /// </summary>
+        /// <typeparam name="TFrom">The type of elements in the source array.</typeparam>
+        /// <typeparam name="TTo">The type of elements in the resulting span.</typeparam>
+        /// <param name="buffer">The source array to convert.</param>
+        /// <returns>A span containing the elements converted from the source array.</returns>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Span<TTo> ToSpan<TFrom, TTo>(this TFrom[] buffer) where TFrom : unmanaged where TTo : unmanaged
+        {
+            ref TTo toRef = ref Unsafe.As<TFrom, TTo>(ref MemoryMarshal.GetArrayDataReference(buffer));
+            return MemoryMarshal.CreateSpan(ref toRef, buffer.Length / Unsafe.SizeOf<TFrom>() * Unsafe.SizeOf<TTo>());
+        }
+
     }
 }
