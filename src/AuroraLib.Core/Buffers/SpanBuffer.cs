@@ -2,6 +2,7 @@
 using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace AuroraLib.Core.Buffers
 {
@@ -21,18 +22,37 @@ namespace AuroraLib.Core.Buffers
         /// <summary>
         /// Gets the <see cref="Span{T}"/> representing of the <see cref="SpanBuffer{T}"/>.
         /// </summary>
-        public unsafe Span<T> Span
+        public Span<T> Span
         {
             [DebuggerStepThrough]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                fixed (byte* bp = _buffer)
-                {
-                    return new(bp, Length);
-                }
+                ref T tRef = ref Unsafe.As<byte, T>(ref MemoryMarshal.GetArrayDataReference(_buffer));
+                return MemoryMarshal.CreateSpan(ref tRef, Length);
             }
         }
+
+        /// <summary>
+        /// Gets a Span of bytes representing this <see cref="SpanBuffer{T}"/>.
+        /// </summary>
+        public Span<byte> Bytes
+        {
+            [DebuggerStepThrough]
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                ref byte bRef = ref MemoryMarshal.GetArrayDataReference(_buffer);
+                return MemoryMarshal.CreateSpan(ref bRef, Length * Unsafe.SizeOf<T>());
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the underlying buffer as a byte array.
+        /// </summary>
+        /// <returns>The underlying buffer.</returns>
+        [DebuggerStepThrough]
+        public byte[] GetBuffer() => _buffer;
 
         #region constructor
         /// <summary>
