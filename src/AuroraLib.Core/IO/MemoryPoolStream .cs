@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 namespace AuroraLib.Core.IO
 {
     /// <summary>
-    /// Represents a <see cref="Stream"/> that uses a <see cref="ArrayPool{byte}"/> for efficient allocation and management.
+    /// Represents a <see cref="Stream"/> that uses a ArrayPool for efficient allocation and management.
     /// </summary>
     public sealed class MemoryPoolStream : PoolStream
     {

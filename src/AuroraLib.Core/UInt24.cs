@@ -9,8 +9,8 @@
     {
         private readonly byte b0, b1, b2;
 
-        public const uint MaxValue32 = 0x00ffffff;
-        public const uint MinValue32 = 0x00000000;
+        public const uint MaxValue = 0x00ffffff;
+        public const uint MinValue = 0x00000000;
 
         /// <summary>
         /// The value of this Int24 as an Int32
@@ -36,26 +36,35 @@
 
         private static void ValidateNumericRange(uint value)
         {
-            if (value > MaxValue32)
+            if (value > MaxValue)
                 throw new OverflowException(string.Format("Value of {0} will not fit in a 24-bit unsigned integer", value));
         }
 
+        /// <inheritdoc/>
         public override string ToString() => Value.ToString();
 
+        /// <inheritdoc/>
         public string ToString(IFormatProvider provider) => Value.ToString(provider);
 
+        /// <inheritdoc/>
         public string ToString(string format) => Value.ToString(format);
 
+        /// <inheritdoc/>
         public string ToString(string format, IFormatProvider provider) => Value.ToString(format, provider);
 
+        /// <inheritdoc/>
         public override bool Equals(object obj) => obj is UInt24 ui24 && ui24.Value == Value;
 
+        /// <inheritdoc/>
         public bool Equals(UInt24 other) => this == other;
 
+        /// <inheritdoc/>
         public bool Equals(uint other) => Value == other;
 
+        /// <inheritdoc/>
         public override int GetHashCode() => Value.GetHashCode();
 
+        /// <inheritdoc/>
         public int CompareTo(object value)
         {
             if (value == null)
@@ -67,15 +76,13 @@
             throw new ArgumentException("Argument must be an UInt32 or an UInt24");
         }
 
+        /// <inheritdoc/>
         public int CompareTo(UInt24 value)
             => CompareTo(value.Value);
 
+        /// <inheritdoc/>
         public int CompareTo(uint value)
-        {
-            if ((object)value == null)
-                return 1;
-            return Value < value ? -1 : Value > value ? 1 : 0;
-        }
+            => Value < value ? -1 : Value > value ? 1 : 0;
 
         #region operators
 

@@ -43,22 +43,31 @@
                 throw new OverflowException($"Value of {value} will not fit in a 24-bit signed integer");
         }
 
+        /// <inheritdoc/>
         public override string ToString() => Value.ToString();
 
+        /// <inheritdoc/>
         public string ToString(IFormatProvider provider) => Value.ToString(provider);
 
+        /// <inheritdoc/>
         public string ToString(string format) => Value.ToString(format);
 
+        /// <inheritdoc/>
         public string ToString(string format, IFormatProvider provider) => Value.ToString(format, provider);
 
+        /// <inheritdoc/>
         public override bool Equals(object obj) => obj is Int24 i24 && i24.Value == Value;
 
+        /// <inheritdoc/>
         public bool Equals(Int24 other) => this == other;
 
+        /// <inheritdoc/>
         public bool Equals(int other) => this.Value == other;
 
+        /// <inheritdoc/>
         public override int GetHashCode() => Value.GetHashCode();
 
+        /// <inheritdoc/>
         public int CompareTo(object value)
         {
             if (value == null)
@@ -72,14 +81,14 @@
             throw new ArgumentException("Argument must be an Int32 or an Int24");
         }
 
+        /// <inheritdoc/>
         public int CompareTo(Int24 value)
             => CompareTo(value.Value);
 
+        /// <inheritdoc/>
         public int CompareTo(int value)
         {
-            if ((object)value == null)
-                return 1;
-            return (this.Value < value ? -1 : (this.Value > value ? 1 : 0));
+            return (Value < value ? -1 : (Value > value ? 1 : 0));
         }
 
         #region operators

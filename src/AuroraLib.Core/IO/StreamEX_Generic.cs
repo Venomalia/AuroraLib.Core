@@ -17,10 +17,7 @@ namespace AuroraLib.Core.IO
         /// <param name="stream">The stream to read from.</param>
         /// <param name="order">The endianness of the data in the stream. Default is <see cref="Endian.Little"/>.</param>
         /// <returns>The value <typeparamref name="T"/> that were read.</returns>
-        /// <exception cref="EndOfStreamException">Thrown when attempting to read <typeparamref name="T"/> beyond the end of the stream.</exception>
-        /// <exception cref="NotSupportedException">The stream does not support reading.</exception>
-        /// <exception cref="IOException">An I/O error occurred.</exception>
-        /// <exception cref="ObjectDisposedException">Methods were called after the stream was closed.</exception>
+        /// <inheritdoc cref="ThrowHelper{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe T Read<T>(this Stream stream, Endian order = Endian.Little) where T : unmanaged
@@ -71,10 +68,7 @@ namespace AuroraLib.Core.IO
         /// <param name="stream">The stream to read from.</param>
         /// <param name="values">The span of values to read into.</param>
         /// <param name="order">The endianness of the data in the stream. Default is <see cref="Endian.Little"/>.</param>
-        /// <exception cref="EndOfStreamException">Thrown when attempting to read beyond the end of the stream.</exception>
-        /// <exception cref="NotSupportedException">The stream does not support reading.</exception>
-        /// <exception cref="IOException">An I/O error occurred.</exception>
-        /// <exception cref="ObjectDisposedException">Methods were called after the stream was closed.</exception>
+        /// <inheritdoc cref="ThrowHelper{T}()"/>
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public unsafe static void Read<T>(this Stream stream, Span<T> values, Endian order = Endian.Little) where T : unmanaged
         {
@@ -196,6 +190,7 @@ namespace AuroraLib.Core.IO
         /// <typeparam name="T">The type of object to read.</typeparam>
         /// <param name="stream">The stream from which to read the object.</param>
         /// <returns>The deserialized object of type T.</returns>
+        /// <inheritdoc cref="ThrowHelper{T}()"/>
         public static T Read<T>(this Stream stream) where T : IBinaryObject, new()
         {
             T value = new();

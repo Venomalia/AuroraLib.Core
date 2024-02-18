@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 namespace AuroraLib.Core.Buffers
 {
     /// <summary>
-    /// Represents a buffer of <typeparamref name="T"/> that allocated from <see cref="ArrayPool{byte}.Shared"/> and provides save access of its elements.
+    /// Represents a buffer of <typeparamref name="T"/> that allocated from ArrayPool of bytes and provides save access of its elements.
     /// </summary>
     /// <typeparam name="T">The type of elements in the buffer.</typeparam>
     public readonly struct SpanBuffer<T> : IDisposable where T : unmanaged
@@ -47,10 +47,7 @@ namespace AuroraLib.Core.Buffers
             _buffer = length == 0 ? Array.Empty<byte>() : ArrayPool<byte>.Shared.Rent(length * Unsafe.SizeOf<T>());
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SpanBuffer{T}"/> class with the specified length.
-        /// </summary>
-        /// <param name="length">The length of the buffer.</param>
+        /// <inheritdoc cref="SpanBuffer{T}.SpanBuffer(int)"/>
         public SpanBuffer(uint length) : this((int)length)
         { }
 
@@ -69,7 +66,7 @@ namespace AuroraLib.Core.Buffers
         /// <param name="list">The List from which to initialize the buffer's data.</param>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SpanBuffer(List<T> span) : this(span.UnsaveAsSpan())
+        public SpanBuffer(List<T> list) : this(list.UnsaveAsSpan())
         { }
 
         #endregion
@@ -138,9 +135,12 @@ namespace AuroraLib.Core.Buffers
             if (Length != 0) ArrayPool<byte>.Shared.Return(_buffer);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator Span<T>(SpanBuffer<T> x) => x.Span;
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+
         public static implicit operator ReadOnlySpan<T>(SpanBuffer<T> x) => x.Span;
+
+        public static implicit operator Span<byte>(SpanBuffer<T> x) => x.Bytes;
+
+        public static implicit operator ReadOnlySpan<byte>(SpanBuffer<T> x) => x.Bytes;
     }
 }

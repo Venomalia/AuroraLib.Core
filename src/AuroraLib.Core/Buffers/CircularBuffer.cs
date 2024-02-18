@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 namespace AuroraLib.Core.Buffers
 {
     /// <summary>
-    /// A CircularBuffer class that inherits from Stream, uses a <see cref="ArrayPool{byte}"/> for efficient allocation and management.
+    /// A CircularBuffer class that inherits from <see cref="PoolStream"/>.
     /// </summary>
     public class CircularBuffer : PoolStream
     {
