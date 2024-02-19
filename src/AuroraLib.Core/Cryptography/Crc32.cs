@@ -24,7 +24,7 @@ namespace AuroraLib.Core.Cryptography
         /// <param name="reverse">Use reverse calculation.</param>
         /// <param name="initial">The initial value for the CRC calculation.</param>
         /// <param name="xorOut">The XOR output value for the CRC calculation.</param>
-        public Crc32(uint polynomial = 0x04C11DB7, bool reverse = false, uint initial = uint.MaxValue, uint xorOut = uint.MaxValue)
+        public Crc32(uint polynomial, bool reverse = false, uint initial = uint.MaxValue, uint xorOut = uint.MaxValue)
         {
             _table = InitializeTable(polynomial, reverse);
             _xorOut = xorOut;
@@ -44,6 +44,10 @@ namespace AuroraLib.Core.Cryptography
         /// those values.
         /// </remarks>
         public Crc32(Crc32Algorithm alg) : this(alg.Polynomial(), alg.Reverse(), alg.Initial(), alg.XorOut())
+        { }
+
+        ///  <inheritdoc cref="Crc32(uint, bool, uint, uint)"/>
+        public Crc32() : this(Crc32Algorithm.Default)
         { }
 
         /// <inheritdoc />
