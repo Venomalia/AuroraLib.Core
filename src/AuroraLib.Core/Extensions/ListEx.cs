@@ -15,11 +15,11 @@ namespace AuroraLib.Core.Extensions
         /// <param name="newIndex">The new index where the item should be moved.</param>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Move<T>(this IList<T> list, int OldIndex, int NewIndex)
+        public static void Move<T>(this IList<T> list, int oldIndex, int newIndex)
         {
-            T item = list[OldIndex];
-            list.RemoveAt(OldIndex);
-            list.Insert(NewIndex, item);
+            T item = list[oldIndex];
+            list.RemoveAt(oldIndex);
+            list.Insert(newIndex, item);
         }
 
         /// <summary>

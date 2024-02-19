@@ -1,9 +1,9 @@
-﻿using AuroraLib.Core.Exceptions;
+﻿using AuroraLib.Core.Buffers;
+using AuroraLib.Core.Exceptions;
 using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.Text;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Threading;
 
 namespace AuroraLib.Core.IO
 {
@@ -17,25 +17,24 @@ namespace AuroraLib.Core.IO
         /// <summary>
         /// Peek the next byte
         /// </summary>
-        /// <param name="FS">this</param>
+        /// <param name="stream">this</param>
         /// <returns>The next byte to be read</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static byte PeekByte(this Stream FS)
+        public static byte PeekByte(this Stream stream)
         {
-            byte val = (byte)FS.ReadByte();
-            FS.Position--;
+            byte val = stream.ReadUInt8();
+            stream.Position--;
             return val;
         }
         #endregion
 
-        #region ToArray
+        #region To
         /// <summary>
         /// Writes the stream contents to a byte array, regardless of the <see cref="Stream.Position"/>.
         /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="bufferSize"></param>
-        /// <returns></returns>
+        /// <param name="stream">The stream to convert.</param>
+        /// <returns>A array containing the content of the stream.</returns>
         [DebuggerStepThrough]
         public static byte[] ToArray(this Stream stream)
         {
@@ -46,17 +45,20 @@ namespace AuroraLib.Core.IO
         }
 
         /// <summary>
-        /// Writes the stream contents to a byte array, from the current <see cref="Stream.Position"/>.
+        /// Writes the stream contents to a SpanBuffer, regardless of the <see cref="Stream.Position"/>.
         /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="bufferSize"></param>
-        /// <returns></returns>
+        /// <param name="stream">The stream to convert.</param>
+        /// <returns>A SpanBuffer containing the content of the stream.</returns>
+        /// <exception cref="NotSupportedException"></exception>
         [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static byte[] ToArrayHere(this Stream stream)
+        public static SpanBuffer<byte> ToSpanBuffer(this Stream stream)
         {
-            byte[] copy = new byte[stream.Length - stream.Position];
-            stream.Read(copy);
+            if (stream.Length > int.MaxValue)
+                throw new NotSupportedException($"Stream length exceeds the maximum supported length for {nameof(SpanBuffer<byte>)}.");
+
+            SpanBuffer<byte> copy = new((int)stream.Length);
+            stream.Seek(0, SeekOrigin.Begin);
+            stream.Read(copy.Span);
             return copy;
         }
         #endregion
@@ -109,22 +111,13 @@ namespace AuroraLib.Core.IO
         #endregion
 
         #region Search
-        /// <summary>
-        /// searches for a specific pattern in a stream and moves its position until the pattern is found.
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="pattern">the string to search for</param>
-        /// <returns>"true" when the pattern is found</returns>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Search(this Stream stream, string pattern) => stream.Search(pattern.GetBytes());
 
         /// <summary>
-        /// Searches for the specified <paramref name="pattern"/> of <see cref="byte"/> in the <paramref name="stream"/>.
+        /// Searches for a specific pattern in a stream and moves its position until the pattern is found.
         /// Moves the current position until a pattern is found or the end is reached.
         /// </summary>
         /// <param name="stream">The stream to search.</param>
-        /// <param name="pattern">The pattern of bytes to search for.</param>
+        /// <param name="pattern">The pattern to search for.</param>
         /// <returns>True if the pattern is found in the stream, otherwise false.</returns>
         [DebuggerStepThrough]
         public static bool Search(this Stream stream, ReadOnlySpan<byte> pattern)
@@ -150,14 +143,15 @@ namespace AuroraLib.Core.IO
             return false;
         }
 
-        /// <summary>
-        /// Searches for the specified <paramref name="patterns"/> of <see cref="Byte"/> in the <paramref name="stream"/>.
-        /// Moves the current position until a pattern is found or the end is reached.
-        /// </summary>
+        /// <inheritdoc cref="Search(Stream, ReadOnlySpan{byte})"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Search(this Stream stream, string pattern) => stream.Search(pattern.GetBytes());
+
+        /// <inheritdoc cref="Search(Stream, ReadOnlySpan{byte})"/>
         /// <param name="stream">The stream to search.</param>
         /// <param name="patterns">The patterns of bytes to search for.</param>
         /// <param name="match">When this method returns true, contains the matched pattern; otherwise, null.</param>
-        /// <returns>True if any of the patterns are found in the stream, otherwise false.</returns>
         public static bool Search(this Stream stream, IEnumerable<byte[]> patterns, out byte[] match)
         {
             int[] i = new int[patterns.Count()];
