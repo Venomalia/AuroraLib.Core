@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using AuroraLib.Core.Buffers;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -545,5 +546,20 @@ namespace AuroraLib.Core
             }
         }
         #endregion
+
+        #region ToString
+        /// <summary>
+        /// Converts the numeric value of each element of a specified ReadOnlySpan of bytes to its equivalent hexadecimal string representation.
+        /// </summary>
+        /// <param name="value">An ReadOnlySpan of bytes.</param>
+        /// <returns>A string of hexadecimal pairs separated by hyphens, where each pair represents the corresponding element in <paramref name="value"/>; for example, "7F-2C-4A-00".</returns>
+        [DebuggerStepThrough]
+        public static string ToString(ReadOnlySpan<byte> value)
+        {
+            using SpanBuffer<byte> buffer = new(value);
+            return BitConverter.ToString(buffer.GetBuffer(), 0, buffer.Length);
+        }
+        #endregion
+
     }
 }
