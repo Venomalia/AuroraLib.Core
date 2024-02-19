@@ -9,27 +9,14 @@ namespace AuroraLib.Core.Text
     /// </summary>
     public static class EncodingX
     {
+        /// <summary>
+        /// The default encoding used for operations.
+        /// </summary>
         public static Encoding DefaultEncoding { get; set; } = Encoding.GetEncoding(28591);
 
         internal static readonly Predicate<byte> InvalidByte = b => b < 32 || b == 127;
 
         #region GetStringFast
-        /// <summary>
-        /// Converts a span of bytes to a string.
-        /// </summary>
-        /// <param name="bytes">The span of bytes to convert.</param>
-        /// <returns>The resulting string.</returns>
-        [DebuggerStepThrough]
-        public static string GetStringFast(ReadOnlySpan<byte> bytes)
-        {
-            Span<char> chars = stackalloc char[bytes.Length];
-            for (int i = 0; i < chars.Length; i++)
-            {
-                chars[i] = (char)bytes[i];
-            }
-            return new(chars);
-        }
-
         /// <summary>
         /// Converts a span of bytes to a string, stopping at the specified terminator byte.
         /// </summary>
@@ -37,12 +24,35 @@ namespace AuroraLib.Core.Text
         /// <param name="terminator">The terminator byte indicating the end of the string.</param>
         /// <returns>The resulting string.</returns>
         [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string GetStringFast(ReadOnlySpan<byte> bytes, in byte terminator)
+        public static string GetStringFast(ReadOnlySpan<byte> bytes, byte terminator = 0x0)
         {
-            int end = bytes.IndexOf(terminator);
-            return GetStringFast(bytes[..(end == -1 ? bytes.Length : end)]);
+            int length = bytes.IndexOf(terminator);
+            if (length == -1) length = bytes.Length;
+            return InternalGetStringFast(bytes[..length]);
         }
+
+        /// <summary>
+        /// Converts a ReadOnlySpan of bytes to Span of characters.
+        /// </summary>
+        /// <param name="bytes">The bytes to convert to characters.</param>
+        /// <param name="chars">The span to write the characters into.</param>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void GetCharsFast(ReadOnlySpan<byte> bytes, Span<char> chars)
+        {
+            for (int i = 0; i < chars.Length; i++)
+                chars[i] = (char)bytes[i];
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static string InternalGetStringFast(ReadOnlySpan<byte> bytes)
+        {
+            Span<char> chars = stackalloc char[bytes.Length];
+            GetCharsFast(bytes, chars);
+            return new(chars);
+        }
+
+
         #endregion
 
         #region GetString
