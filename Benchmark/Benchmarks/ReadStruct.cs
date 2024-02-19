@@ -58,13 +58,6 @@ namespace Benchmark.Benchmarks
         }
 
         [Benchmark]
-        public void AuroraCore_ReadArray()
-        {
-            ms.Seek(0, SeekOrigin.Begin);
-            _ = ms.Read<TestStruct>(n);
-        }
-
-        [Benchmark]
         public void AuroraCore_ReadArrayPool()
         {
             ms.Seek(0, SeekOrigin.Begin);

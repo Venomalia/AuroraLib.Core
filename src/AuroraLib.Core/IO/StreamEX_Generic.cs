@@ -9,6 +9,15 @@ namespace AuroraLib.Core.IO
 {
     public static partial class StreamEx
     {
+        /// <summary>
+        /// Specifies the system's byte order as either <see cref="Endian.Little"/> or <see cref="Endian.Big"/>.
+        /// </summary>
+#if BIGENDIAN
+        public const Endian SystemOrder = Endian.Big;
+#else
+        public const Endian SystemOrder = Endian.Little;
+#endif
+
         #region Read
         /// <summary>
         /// Reads a unmanaged struct of <typeparamref name="T"/> from the <see cref="Stream"/>.
@@ -27,10 +36,8 @@ namespace AuroraLib.Core.IO
             if (stream.Read(buffer) != buffer.Length)
                 ThrowHelper<T>();
 
-            if (order == Endian.Big == BitConverter.IsLittleEndian)
-            {
+            if (order != SystemOrder)
                 BitConverterX.Swap(buffer, typeof(T));
-            }
             return value;
         }
 
@@ -77,10 +84,8 @@ namespace AuroraLib.Core.IO
             if (stream.Read(buffer) != buffer.Length)
                 ThrowHelper<T>(values.Length);
 
-            if (order == Endian.Big == BitConverter.IsLittleEndian && sizeof(T) > 1)
-            {
+            if (order != SystemOrder && sizeof(T) > 1)
                 BitConverterX.Swap(buffer, typeof(T), values.Length);
-            }
         }
 
         #region Throw
@@ -110,10 +115,10 @@ namespace AuroraLib.Core.IO
         /// <param name="order">The endianness of the data to write. Default is <see cref="Endian.Little"/>.</param>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        public static unsafe void Write<T>(this Stream stream, T objekt, Endian order = Endian.Little) where T : unmanaged
+        public static unsafe void Write<T>(this Stream stream, T value, Endian order = Endian.Little) where T : unmanaged
         {
-            Span<byte> buffer = new(&objekt, sizeof(T));
-            if (order == Endian.Big == BitConverter.IsLittleEndian && buffer.Length > 1)
+            Span<byte> buffer = new(&value, sizeof(T));
+            if (order != SystemOrder && buffer.Length > 1)
             {
                 BitConverterX.Swap(buffer, typeof(T));
             }
@@ -129,7 +134,7 @@ namespace AuroraLib.Core.IO
         /// <param name="order">The byte order of the data. Default is Endian.Little.</param>
         public static unsafe void Write<T>(this Stream stream, ReadOnlySpan<T> span, Endian order = Endian.Little) where T : unmanaged
         {
-            if (order == Endian.Big == BitConverter.IsLittleEndian && sizeof(T) > 1)
+            if (order != SystemOrder && sizeof(T) > 1)
             {
                 using SpanBuffer<T> copy = new(span);
                 Span<byte> buffer = MemoryMarshal.Cast<T, byte>(copy);
@@ -166,7 +171,7 @@ namespace AuroraLib.Core.IO
         public static unsafe void Write<T>(this Stream stream, T objekt, uint count, Endian order = Endian.Little) where T : unmanaged
         {
             Span<byte> buffer = new(&objekt, sizeof(T));
-            if (order == Endian.Big == BitConverter.IsLittleEndian && buffer.Length > 1)
+            if (order != SystemOrder && buffer.Length > 1)
             {
                 BitConverterX.Swap(buffer, typeof(T));
             }
