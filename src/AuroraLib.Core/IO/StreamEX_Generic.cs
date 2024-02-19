@@ -38,35 +38,9 @@ namespace AuroraLib.Core.IO
 
             if (order != SystemOrder)
                 BitConverterX.Swap(buffer, typeof(T));
+
             return value;
         }
-
-        /// <summary>
-        /// Reads an array of <typeparamref name="T"/> from the <see cref="Stream"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of elements in the array.</typeparam>
-        /// <param name="stream">The stream to read from.</param>
-        /// <param name="count">The number of elements to read.</param>
-        /// <param name="order">The endianness of the data in the stream. Default is <see cref="Endian.Little"/>.</param>
-        /// <returns>An array of <typeparamref name="T"/> read from the stream.</returns>
-        /// <exception cref="EndOfStreamException">Thrown when attempting to read <typeparamref name="T"/> beyond the end of the stream.</exception>
-        /// <exception cref="NotSupportedException">The stream does not support reading.</exception>
-        /// <exception cref="IOException">An I/O error occurred.</exception>
-        /// <exception cref="ObjectDisposedException">Methods were called after the stream was closed.</exception>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe static T[] Read<T>(this Stream stream, int count, Endian order = Endian.Little) where T : unmanaged
-        {
-            T[] values = new T[count];
-            stream.Read<T>(values, order);
-            return values;
-        }
-
-        /// <inheritdoc cref="Read{T}(Stream, int, Endian)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T[] Read<T>(this Stream stream, uint count, Endian order = Endian.Little) where T : unmanaged
-            => stream.Read<T>((int)count, order);
 
         /// <summary>
         /// Reads a span of <typeparamref name="T"/> from the <see cref="Stream"/>.

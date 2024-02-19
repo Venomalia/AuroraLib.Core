@@ -12,36 +12,6 @@ namespace AuroraLib.Core.IO
     /// </summary>
     public static partial class StreamEx
     {
-        #region Read
-        /// <summary>
-        /// Reads a block of bytes from the stream.
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="Count">The maximum number of bytes to read.</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentOutOfRangeException">Offset or Count is negative.</exception>
-        /// <exception cref="NotSupportedException">The stream does not support reading.</exception>
-        /// <exception cref="IOException">An I/O error occurred.</exception>
-        /// <exception cref="ArgumentException">Offset and Count describe an invalid range in array.</exception>
-        /// <exception cref="ObjectDisposedException">Methods were called after the stream was closed.</exception>
-        [DebuggerStepThrough]
-        public static byte[] Read(this Stream stream, int Count)
-        {
-            if (stream.Position + Count > stream.Length)
-                ThrowHelper<byte>(Count);
-
-            byte[] Final = new byte[Count];
-            stream.Read(Final);
-
-            return Final;
-        }
-
-        /// <inheritdoc cref="Read(Stream, int)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static byte[] Read(this Stream stream, uint Count)
-            => Read(stream, (int)Count);
-        #endregion
 
         #region PeekByte
         /// <summary>
