@@ -2,27 +2,52 @@
 
 namespace AuroraLib.Core.Exceptions
 {
-
+    /// <summary>
+    /// Exception thrown when an identifier is invalid.
+    /// </summary>
     public class InvalidIdentifierException : Exception
     {
-        public string ExpectedIdentifier { get; set; }
+        /// <summary>
+        /// The expected identifier.
+        /// </summary>
+        public readonly string ExpectedIdentifier;
 
-        public InvalidIdentifierException()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InvalidIdentifierException"/> class.
+        /// </summary>
+        public InvalidIdentifierException() : base()
+            => ExpectedIdentifier = string.Empty;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InvalidIdentifierException"/> class with a specified expected identifier.
+        /// </summary>
+        /// <param name="expectedIdentifier">The expected identifier.</param>
+        public InvalidIdentifierException(string expectedIdentifier) : base($"Expected \"{expectedIdentifier}\"")
+            => ExpectedIdentifier = expectedIdentifier;
+
+        /// <inheritdoc cref="InvalidIdentifierException(string)"/>
+        public InvalidIdentifierException(ReadOnlySpan<byte> expectedIdentifier) : this(BitConverterX.ToString(expectedIdentifier))
         { }
 
-        public InvalidIdentifierException(string ExpectedIdentifier) : base($"Expected \"{ExpectedIdentifier}\"")
-        {
-            this.ExpectedIdentifier = ExpectedIdentifier;
-        }
+        /// <inheritdoc cref="InvalidIdentifierException(string)"/>
+        public InvalidIdentifierException(IIdentifier expectedIdentifier) : this(expectedIdentifier.AsSpan())
+        { }
 
-        public InvalidIdentifierException(IIdentifier ExpectedIdentifier) : base($"Expected \"{ExpectedIdentifier}\"")
-        {
-            this.ExpectedIdentifier = ExpectedIdentifier.ToString();
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InvalidIdentifierException"/> class with specified identifier and expected identifier.
+        /// </summary>
+        /// <param name="identifier">The actual identifier.</param>
+        /// <param name="expectedIdentifier">The expected identifier.</param>
+        public InvalidIdentifierException(string identifier, string expectedIdentifier) : base($"\"{identifier}\" Expected: \"{expectedIdentifier}\"")
+            => ExpectedIdentifier = expectedIdentifier;
 
-        public InvalidIdentifierException(IIdentifier Identifier, IIdentifier ExpectedIdentifier) : base($"\"{Identifier}\" Expected: \"{ExpectedIdentifier}\"")
-        {
-            this.ExpectedIdentifier = ExpectedIdentifier.ToString();
-        }
+        /// <inheritdoc cref="InvalidIdentifierException(string,string)"/>
+        public InvalidIdentifierException(ReadOnlySpan<byte> identifier, ReadOnlySpan<byte> expectedIdentifier) : this(BitConverterX.ToString(identifier), BitConverterX.ToString(expectedIdentifier))
+        { }
+
+        /// <inheritdoc cref="InvalidIdentifierException(string,string)"/>
+        public InvalidIdentifierException(IIdentifier identifier, IIdentifier expectedIdentifier) : this(identifier.AsSpan(), expectedIdentifier.AsSpan())
+        { }
     }
+
 }

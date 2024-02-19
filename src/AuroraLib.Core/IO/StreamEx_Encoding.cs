@@ -203,30 +203,48 @@ namespace AuroraLib.Core.IO
 
         #region MatchString
         /// <summary>
-        /// Matches the specified characters with the data in the <paramref name="stream"/> using the specified <paramref name="encoding"/>.
+        /// Matches the specified <paramref name="expected"/> characters with the data in the <paramref name="stream"/>/>.
         /// </summary>
         /// <param name="stream">The stream to match against.</param>
-        /// <param name="chars">The characters to match.</param>
+        /// <param name="expected">The characters to match.</param>
         /// <param name="encoding">The encoding used for converting characters to bytes.</param>
         /// <returns>true if the specified characters match the data in the stream; otherwise, false.</returns>
         [DebuggerStepThrough]
-        public static bool Match(this Stream stream, ReadOnlySpan<char> chars, Encoding encoding)
+        public static bool Match(this Stream stream, ReadOnlySpan<char> expected, Encoding encoding)
         {
-            Span<byte> buffer = stackalloc byte[encoding.GetByteCount(chars)];
             encoding.GetBytes(chars, buffer);
+            Span<byte> buffer = stackalloc byte[encoding.GetByteCount(expected)];
+            encoding.GetBytes(expected, buffer);
             return stream.Match(buffer);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Match(this Stream stream, ReadOnlySpan<char> expected)
+            => stream.Match(expected, EncodingX.DefaultEncoding);
+
         /// <summary>
-        /// Matches the specified characters with the data in the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The stream to match against.</param>
         /// <param name="chars">The characters to match.</param>
         /// <returns>true if the specified characters match the data in the stream; otherwise, false.</returns>
+        /// <param name="expected">The expected bytes to match.</param>
+        /// <param name="encoding">The encoding used for converting characters to bytes.</param>
+        /// <exception cref="InvalidIdentifierException">Thrown when the match fails.</exception>
+        [DebuggerStepThrough]
+        public static void MatchThrow(this Stream stream, ReadOnlySpan<char> expected, Encoding encoding)
+        {
+            Span<byte> buffer = stackalloc byte[encoding.GetByteCount(expected)];
+            encoding.GetBytes(expected, buffer);
+            stream.MatchThrow(buffer);
+        }
+
+        /// <inheritdoc cref="MatchThrow(Stream, ReadOnlySpan{char},Encoding)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Match(this Stream stream, ReadOnlySpan<char> chars)
             => stream.Match(chars, EncodingX.DefaultEncoding);
+        public static void MatchThrow(this Stream stream, ReadOnlySpan<char> expected)
+            => stream.MatchThrow(expected, EncodingX.DefaultEncoding);
 
         #endregion
 

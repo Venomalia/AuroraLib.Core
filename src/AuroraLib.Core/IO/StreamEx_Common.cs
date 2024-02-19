@@ -64,47 +64,47 @@ namespace AuroraLib.Core.IO
         #region Match
 
         /// <summary>
-        /// Matches the specified <paramref name="bytes"/> with the data in the <paramref name="stream"/>.
+        /// Matches the specified <paramref name="expected"/> identifier with the data in the <paramref name="stream"/>.
         /// </summary>
         /// <param name="stream">The stream to match against.</param>
-        /// <param name="bytes">The bytes to match.</param>
+        /// <param name="expected">The expected bytes to match.</param>
         /// <returns>true if the specified bytes match the data in the stream; otherwise, false.</returns>
         [DebuggerStepThrough]
-        public static bool Match(this Stream stream, Span<byte> bytes)
+        public static bool Match(this Stream stream, ReadOnlySpan<byte> expected)
         {
-            Span<byte> buffer = stackalloc byte[bytes.Length];
+            Span<byte> buffer = stackalloc byte[expected.Length];
             int i = stream.Read(buffer);
-            return i == bytes.Length && buffer.SequenceEqual(bytes);
+            return i == expected.Length && buffer.SequenceEqual(expected);
         }
 
-        /// <summary>
-        /// Matches the identifier in the <paramref name="stream"/> with the specified <paramref name="identifier"/>.
-        /// </summary>
-        /// <param name="stream">The stream to match against.</param>
-        /// <param name="identifier">The identifier to match.</param>
-        /// <returns>true if the identifier matches the content of the stream; otherwise, false.</returns>
+        /// <inheritdoc cref="Match(Stream, ReadOnlySpan{byte})"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Match(this Stream stream, in IIdentifier identifier)
-            => stream.Match(identifier.AsSpan());
+        public static bool Match(this Stream stream, IIdentifier expected)
+            => stream.Match(expected.AsSpan());
 
         /// <summary>
-        /// Matches the identifier in the <paramref name="stream"/> with the specified <paramref name="identifier"/> and throws an <see cref="InvalidIdentifierException"/> if the match fails.
+        /// Matches the identifier in the <paramref name="stream"/> with the specified <paramref name="expected"/> identifier and throws an <see cref="InvalidIdentifierException"/> if the match fails.
         /// </summary>
         /// <param name="stream">The stream to match against.</param>
-        /// <param name="identifier">The identifier to match.</param>
+        /// <param name="expected">The expected bytes to match.</param>
         /// <exception cref="InvalidIdentifierException">Thrown when the match fails.</exception>
         [DebuggerStepThrough]
-        public static void MatchThrow(this Stream stream, in IIdentifier identifier)
+        public static void MatchThrow(this Stream stream, ReadOnlySpan<byte> expected)
         {
-            Span<byte> magic = identifier.AsSpan();
-            Span<byte> buffer = stackalloc byte[magic.Length];
+            Span<byte> buffer = stackalloc byte[expected.Length];
             int i = stream.Read(buffer);
-            if (i != magic.Length || !buffer.SequenceEqual(magic))
+            if (i != expected.Length || !buffer.SequenceEqual(expected))
             {
-                throw new InvalidIdentifierException(new Identifier(buffer.ToArray()), identifier);
+                throw new InvalidIdentifierException(buffer, expected);
             }
         }
+
+        /// <inheritdoc cref="MatchThrow(Stream, ReadOnlySpan{byte})"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MatchThrow(this Stream stream, IIdentifier expected)
+            => stream.Match(expected.AsSpan());
 
         #endregion
 
