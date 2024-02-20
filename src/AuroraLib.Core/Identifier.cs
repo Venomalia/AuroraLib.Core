@@ -23,7 +23,7 @@ namespace AuroraLib.Core
         public Identifier(byte[] bytes)
             => Bytes = bytes;
 
-        public Identifier(string span) : this(span.GetBytes())
+        public Identifier(string span) : this(EncodingX.DefaultEncoding.GetBytes(span))
         { }
 
         public Identifier(IIdentifier identifier) : this(identifier.AsSpan().ToArray())
@@ -42,7 +42,7 @@ namespace AuroraLib.Core
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string GetString()
-            => EncodingX.GetStringFast(AsSpan(), 0x0);
+            => EncodingX.GetString(AsSpan(), 0x0);
 
         /// <inheritdoc />
         [DebuggerStepThrough]
@@ -53,8 +53,10 @@ namespace AuroraLib.Core
         public static explicit operator Identifier(byte[] v) => new(v);
         public static explicit operator byte[](Identifier v) => v.Bytes;
 
+        /// <inheritdoc />
         public override int GetHashCode() => (int)HashDepot.XXHash.Hash32(AsSpan());
 
-        public override string ToString() => EncodingX.GetValidByteCount(AsSpan()) > Math.Max(2, Bytes.Length - 4) ? GetString() : BitConverter.ToString(AsSpan().ToArray());
+        /// <inheritdoc />
+        public override string ToString() => EncodingX.GetDisplayableString(AsSpan());
     }
 }

@@ -146,7 +146,7 @@ namespace AuroraLib.Core.IO
         /// <inheritdoc cref="Search(Stream, ReadOnlySpan{byte})"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Search(this Stream stream, string pattern) => stream.Search(pattern.GetBytes());
+        public static bool Search(this Stream stream, string pattern) => stream.Search(EncodingX.DefaultEncoding.GetBytes(pattern));
 
         /// <inheritdoc cref="Search(Stream, ReadOnlySpan{byte})"/>
         /// <param name="stream">The stream to search.</param>

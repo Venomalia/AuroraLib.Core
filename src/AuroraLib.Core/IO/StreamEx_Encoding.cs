@@ -17,7 +17,7 @@ namespace AuroraLib.Core.IO
         {
             Span<byte> bytes = stackalloc byte[chars.Length];
             stream.Read(bytes);
-            EncodingX.GetCharsFast(bytes, chars);
+            EncodingX.GetChars(bytes, chars);
         }
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace AuroraLib.Core.IO
         public static string ReadString(this Stream stream, Predicate<byte> ifstopByte)
         {
             List<byte> bytes = ReadStringBytes(stream, ifstopByte);
-            return EncodingX.GetStringFast(bytes.UnsaveAsSpan());
+            return EncodingX.GetString(bytes.UnsaveAsSpan());
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace AuroraLib.Core.IO
         {
             Span<byte> bytes = stackalloc byte[length];
             stream.Read(bytes);
-            return EncodingX.GetStringFast(bytes, Padding);
+            return EncodingX.GetString(bytes, Padding);
         }
 
         /// <summary>
