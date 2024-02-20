@@ -233,34 +233,26 @@ namespace AuroraLib.Core.IO
         /// </summary>
         /// <param name="stream">the current stream</param>
         /// <param name="offset">A byte offset relative to the origin parameter.</param>
-        /// <param name="origin">A value of type System.IO.SeekOrigin indicating the reference point used to obtain the new position.</param>
-        /// <param name="boundary">The byte boundary to Seek to</param>
-        /// <returns></returns>
+        /// <param name="origin">A value of type <see cref="SeekOrigin"/> indicating the reference point used to obtain the new position.</param>
+        /// <param name="boundary">The byte boundary to Seek to.</param>
+        /// <returns>The new position within the current stream.</returns>
         [DebuggerStepThrough]
         public static long Align(this Stream stream, long offset, SeekOrigin origin, int boundary = 32)
         {
             if (boundary <= 1)
                 throw new ArgumentException($"{nameof(boundary)}: Must be 2 or more");
 
-            switch (origin)
+            offset = origin switch
             {
-                case SeekOrigin.Current:
-                    offset += stream.Position;
-                    break;
-
-                case SeekOrigin.End:
-                    offset = stream.Length - offset;
-                    break;
-            }
+                SeekOrigin.Begin => offset + stream.Position,
+                SeekOrigin.Current => offset,
+                SeekOrigin.End => stream.Length - offset,
+                _ => throw new AggregateException(),
+            };
             return stream.Seek(AlignPosition(offset, boundary), SeekOrigin.Begin);
         }
 
-        /// <summary>
-        /// sets the position within the current stream to the nearest possible boundary.
-        /// </summary>
-        /// <param name="stream">the current stream</param>
-        /// <param name="origin">A value of type System.IO.SeekOrigin indicating the reference point used to obtain the new position.</param>
-        /// <returns></returns>
+        /// <inheritdoc cref="Align(Stream, long, SeekOrigin, int)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Align(this Stream stream, int boundary = 32)

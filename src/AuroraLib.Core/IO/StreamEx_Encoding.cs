@@ -177,7 +177,7 @@ namespace AuroraLib.Core.IO
         /// <param name="terminator">The terminator byte to add at the end (default is 0x0).</param>
         /// <exception cref="ArgumentException">Thrown when the encoded bytes exceed the specified length.</exception>
         [DebuggerStepThrough]
-        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars, Encoding encoding, int length, byte terminator = 0x0)
+        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars, Encoding encoding, int length, byte terminator)
         {
             if (encoding.GetByteCount(chars) > length)
             {
@@ -193,7 +193,7 @@ namespace AuroraLib.Core.IO
         /// <inheritdoc cref="WriteString(Stream, ReadOnlySpan{char}, Encoding,int,byte)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars, int length, byte terminator = 0x0)
+        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars, int length, byte terminator)
             => stream.WriteString(chars, EncodingX.DefaultEncoding, length, terminator);
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace AuroraLib.Core.IO
         /// <param name="terminator">The terminator byte to add at the end (default is 0x0).</param>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars, byte terminator = 0x0)
+        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars, byte terminator)
         {
             stream.WriteString(chars);
             stream.WriteByte(terminator);
