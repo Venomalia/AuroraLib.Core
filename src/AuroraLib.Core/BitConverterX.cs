@@ -127,12 +127,6 @@ namespace AuroraLib.Core
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static void Swap(Span<byte> buffer, Type type)
         {
-            if (type == typeof(byte) || type == typeof(UInt24) || type == typeof(Int24))
-            {
-                buffer.Reverse();
-                return;
-            }
-
             int offset = 0;
             ReadOnlySpan<int> fields = GetPrimitiveTypeSizes(type);
             foreach (int fieldSize in fields)
@@ -205,9 +199,7 @@ namespace AuroraLib.Core
                 if (fieldtype.IsPrimitive || fieldtype == typeof(UInt24) || fieldtype == typeof(Int24))
                     primList.Add(Marshal.SizeOf(fieldtype));
                 else
-                {
                     primList.AddRange(GetPrimitiveTypeSizes(fieldtype).ToArray());
-                }
             }
             int[] primitives = primList.ToArray();
             TypePrimitives.Add(type.GetHashCode(), primitives);

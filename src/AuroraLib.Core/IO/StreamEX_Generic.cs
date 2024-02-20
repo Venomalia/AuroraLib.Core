@@ -31,17 +31,61 @@ namespace AuroraLib.Core.IO
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe T Read<T>(this Stream stream, Endian order = Endian.Little) where T : unmanaged
         {
+            if (sizeof(T) <= 4)
+                return stream.ReadPrimitiveHelper<T>(order);
+
+            return stream.ReadGenericHelper<T>(order);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private unsafe static T ReadGenericHelper<T>(this Stream stream, Endian order) where T : unmanaged
+        {
             T value;
             Span<byte> buffer = new(&value, sizeof(T));
             if (stream.Read(buffer) != buffer.Length)
                 ThrowHelper<T>();
 
             if (order != SystemOrder)
+            {
                 BitConverterX.Swap(buffer, typeof(T));
+            }
 
             return value;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+        private unsafe static T ReadPrimitiveHelper<T>(this Stream stream, Endian order) where T : unmanaged
+        {
+            Type typeT = typeof(T);
+            switch (sizeof(T))
+            {
+                case 1:
+                    byte bVaule = (byte)ReadByteHelper<T>(stream);
+                    return Unsafe.As<byte, T>(ref bVaule);
+                case 2:
+                    if (typeT == typeof(short) || typeT == typeof(ushort) || typeT == typeof(Half) || typeT.IsEnum)
+                    {
+                        short iVaule = (short)ReadInt24Helper<T>(stream, order);
+                        return Unsafe.As<short, T>(ref iVaule);
+                    }
+                    break;
+                case 3:
+                    if (typeT == typeof(Int24) || typeT == typeof(UInt24))
+                    {
+                        Int24 iVaule = ReadInt24Helper<T>(stream, order);
+                        return Unsafe.As<Int24, T>(ref iVaule);
+                    }
+                    break;
+                default:
+                    if (typeT == typeof(int) || typeT == typeof(uint) || typeT == typeof(float) || typeT.IsEnum)
+                    {
+                        int iVaule = ReadInt32Helper<T>(stream, order);
+                        return Unsafe.As<int, T>(ref iVaule);
+                    }
+                    break;
+            }
+            return stream.ReadGenericHelper<T>(order);
+        }
         /// <summary>
         /// Reads a span of <typeparamref name="T"/> from the <see cref="Stream"/>.
         /// </summary>
