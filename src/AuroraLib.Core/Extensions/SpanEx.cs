@@ -93,6 +93,42 @@ namespace AuroraLib.Core.Extensions
         }
 
         /// <summary>
+        /// Finds the index of the first element in the specified span that matches the condition.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the span.</typeparam>
+        /// <param name="span">The read-only span to search.</param>
+        /// <param name="condition">The delegate that defines the condition to search for.</param>
+        /// <returns>The zero-based index of the first occurrence of an element that satisfies the condition, if found; otherwise, -1.</returns>
+        [DebuggerStepThrough]
+        public static int IndexOf<T>(this ReadOnlySpan<T> span, Predicate<T> condition)
+        {
+            for (int i = 0; i < span.Length; i++)
+            {
+                if (condition(span[i]))
+                    return i;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Finds the index of the last element in the specified span that matches the condition.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the span.</typeparam>
+        /// <param name="span">The read-only span to search.</param>
+        /// <param name="condition">The delegate that defines the condition to search for.</param>
+        /// <returns>The zero-based index of the last occurrence of an element that satisfies the condition, if found; otherwise, -1.</returns>
+        [DebuggerStepThrough]
+        public static int LastIndexOf<T>(this ReadOnlySpan<T> span, Predicate<T> condition)
+        {
+            for (int i = span.Length - 1; i >= 0; i--)
+            {
+                if (condition(span[i]))
+                    return i;
+            }
+            return -1;
+        }
+
+        /// <summary>
         /// Computes the hash code for a <see cref="ReadOnlySpan{T}"/> of elements using the <see cref="XXHash32"/> algorithm.
         /// </summary>
         /// <typeparam name="T">The type of elements in the sequences.</typeparam>
