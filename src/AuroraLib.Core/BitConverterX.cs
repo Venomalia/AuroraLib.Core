@@ -182,24 +182,31 @@ namespace AuroraLib.Core
             }
         }
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-        private static int[] NewPrimitiveTypeSizes(Type type)
+        private static ReadOnlySpan<int> NewPrimitiveTypeSizes(Type type)
         {
             List<int> primList = new();
-            FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-
-            foreach (FieldInfo field in fields)
+            if (type == typeof(Int24) || type == typeof(UInt24))
             {
-                if (field.IsStatic) continue;
+                primList.Add(3);
+            }
+            else
+            {
+                FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                foreach (FieldInfo field in fields)
+                {
+                    if (field.IsStatic) continue;
 
-                Type fieldtype = field.FieldType;
+                    Type fieldtype = field.FieldType;
 
-                if (fieldtype.IsEnum)
-                    fieldtype = Enum.GetUnderlyingType(fieldtype);
+                    if (fieldtype.IsEnum)
+                        fieldtype = Enum.GetUnderlyingType(fieldtype);
 
-                if (fieldtype.IsPrimitive || fieldtype == typeof(UInt24) || fieldtype == typeof(Int24))
-                    primList.Add(Marshal.SizeOf(fieldtype));
-                else
-                    primList.AddRange(GetPrimitiveTypeSizes(fieldtype).ToArray());
+                    if (fieldtype.IsPrimitive || fieldtype == typeof(UInt24) || fieldtype == typeof(Int24))
+                        primList.Add(Marshal.SizeOf(fieldtype));
+                    else
+                        primList.AddRange(GetPrimitiveTypeSizes(fieldtype).ToArray());
+                }
+
             }
             int[] primitives = primList.ToArray();
             TypePrimitives.Add(type.GetHashCode(), primitives);
