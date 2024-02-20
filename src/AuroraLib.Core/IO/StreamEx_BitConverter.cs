@@ -125,6 +125,18 @@ namespace AuroraLib.Core.IO
             => stream.Read<long>(order);
 
         /// <summary>
+        /// Returns a half-precision floating point number converted from two bytes at a specified position.
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <param name="order">Byte order</param>
+        /// <returns>A half-precision floating point number.</returns>
+        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Half ReadHalf(this Stream stream, Endian order = Endian.Little)
+            => (Half)ReadInt16Helper<Half>(stream, order);
+
+        /// <summary>
         /// Returns a single-precision floating point number converted from four bytes at a specified position.
         /// </summary>
         /// <param name="stream"></param>
@@ -134,7 +146,7 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float ReadSingle(this Stream stream, Endian order = Endian.Little)
-            => stream.Read<float>(order);
+            => ReadInt32Helper<float>(stream, order);
 
         /// <summary>
         /// Returns a double-precision floating point number converted from eight bytes at a specified position.
