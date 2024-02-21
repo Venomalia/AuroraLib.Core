@@ -3,6 +3,6 @@
     /// <summary>
     /// Interface for compressing and decompressing data.
     /// </summary>
-    public interface ICompressionAlgorithm : ICompressionDecoder, ICompressionEncoder
+    public interface ICompression : ICompressionDecoder, ICompressionEncoder
     { }
 }
