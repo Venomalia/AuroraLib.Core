@@ -1,4 +1,5 @@
-﻿using AuroraLib.Core.Interfaces;
+﻿using AuroraLib.Core.Extensions;
+using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.Text;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -136,7 +137,7 @@ namespace AuroraLib.Core
         public static explicit operator string(Identifier64 v) => v.GetString();
 
         /// <inheritdoc />
-        public override int GetHashCode() => (int)HashDepot.XXHash.Hash32(AsSpan());
+        public override int GetHashCode() => SpanEx.SequenceGetHashCode(AsSpan());
 
         /// <inheritdoc />
         public override string ToString() => EncodingX.GetDisplayableString(AsSpan());

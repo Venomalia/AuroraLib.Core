@@ -1,5 +1,4 @@
-﻿using AuroraLib.Core.Cryptography;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -156,18 +155,39 @@ namespace AuroraLib.Core.Extensions
             => LastIndexOf((ReadOnlySpan<T>)span, condition);
 
         /// <summary>
-        /// Computes the hash code for a <see cref="ReadOnlySpan{T}"/> of elements using the <see cref="XXHash32"/> algorithm.
+        /// Computes the hash code for the elements in the specified span.
         /// </summary>
         /// <typeparam name="T">The type of elements in the sequences.</typeparam>
         /// <param name="span">The read-only span of elements to compute the hash code from.</param>
         /// <returns>The computed hash code.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int GetHashCodeFast<T>(this ReadOnlySpan<T> span) where T : unmanaged
+        public static int SequenceGetHashCode<T>(this ReadOnlySpan<T> span) where T : unmanaged
         {
+            // If char use string implementation
+            if (typeof(T) == typeof(char))
+            {
+                ReadOnlySpan<char> chars = MemoryMarshal.Cast<T, char>(span);
+                return String.GetHashCode(chars);
+            }
+
             ReadOnlySpan<byte> buffer = MemoryMarshal.Cast<T, byte>(span);
-            return (int)XXHash32.Generate(buffer);
+            HashCode gen = default;
+            gen.AddBytes(buffer);
+            return gen.ToHashCode();
         }
+
+        /// <inheritdoc cref="SequenceGetHashCode{T}(ReadOnlySpan{T})"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SequenceGetHashCode<T>(this Span<T> span) where T : unmanaged
+            => SequenceGetHashCode((ReadOnlySpan<T>)span);
+
+        /// <inheritdoc cref="SequenceGetHashCode{T}(ReadOnlySpan{T})"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SequenceGetHashCode<T>(this T[] array) where T : unmanaged
+            => SequenceGetHashCode(array.AsSpan());
 
         /// <summary>
         /// Casts an array of one primitive type <typeparamref name="TFrom"/> to a span of another primitive type <typeparamref name="TTo"/>.
