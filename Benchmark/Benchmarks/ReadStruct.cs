@@ -1,5 +1,4 @@
-﻿using AuroraLib.Core;
-using AuroraLib.Core.Buffers;
+﻿using AuroraLib.Core.Buffers;
 using AuroraLib.Core.IO;
 using BenchmarkDotNet.Attributes;
 using System.Buffers;
@@ -12,15 +11,28 @@ namespace Benchmark.Benchmarks
     {
         private const int n = 1000;
         private const int SIZE = 16;
-        private static readonly byte[] src = new byte[SIZE * n];
 
-        private static readonly MemoryStream ms = new(src);
+        private Stream stream;
+
+        [GlobalSetup]
+        public void GlobalSetup()
+        {
+            stream = new FileStream("Test.tmp", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            stream.Write(0, SIZE * n / 4);
+            stream.Position = 0;
+        }
+
+        [GlobalCleanup]
+        public void GlobalCleanup()
+        {
+            stream.Dispose();
+        }
 
         [Benchmark]
         public void BinaryReader_Read()
         {
-            ms.Seek(0, SeekOrigin.Begin);
-            BinaryReader reader = new(ms);
+            stream.Seek(0, SeekOrigin.Begin);
+            BinaryReader reader = new(stream);
             for (var i = 0; i < n; ++i)
             {
                 _ = reader.ReadInt64();
@@ -34,11 +46,11 @@ namespace Benchmark.Benchmarks
         [Benchmark]
         public void BinaryPrimitives_Read()
         {
-            ms.Seek(0, SeekOrigin.Begin);
+            stream.Seek(0, SeekOrigin.Begin);
             Span<byte> bytes = stackalloc byte[SIZE];
             for (var i = 0; i < n; ++i)
             {
-                ms.Read(bytes);
+                stream.Read(bytes);
                 _ = BinaryPrimitives.ReadInt64LittleEndian(bytes.Slice(0, 8));
                 _ = BinaryPrimitives.ReadInt32LittleEndian(bytes.Slice(8, 4));
                 _ = BinaryPrimitives.ReadInt16LittleEndian(bytes.Slice(12, 2));
@@ -50,30 +62,33 @@ namespace Benchmark.Benchmarks
         [Benchmark]
         public void AuroraCore_Read()
         {
-            ms.Seek(0, SeekOrigin.Begin);
+            stream.Seek(0, SeekOrigin.Begin);
             for (var i = 0; i < n; ++i)
             {
-                _ = ms.Read<TestStruct>();
+                _ = stream.ReadInt64();
+                _ = stream.ReadInt32();
+                _ = stream.ReadInt16();
+                _ = stream.ReadByte();
+                _ = stream.ReadByte();
             }
         }
 
         [Benchmark]
-        public void AuroraCore_ReadArrayPool()
+        public void AuroraCore_ReadT()
         {
-            ms.Seek(0, SeekOrigin.Begin);
-            TestStruct[] testStructs = ArrayPool<TestStruct>.Shared.Rent(n);
-            ms.Read(testStructs.AsSpan()[..n]);
-            ArrayPool<TestStruct>.Shared.Return(testStructs);
-        }
-
-        [Benchmark]
-        public void AuroraCore_ReadSpanBuffer()
-        {
-            ms.Seek(0, SeekOrigin.Begin);
-            using (SpanBuffer<TestStruct> buffer = new(n))
+            stream.Seek(0, SeekOrigin.Begin);
+            for (var i = 0; i < n; ++i)
             {
-                ms.Read<TestStruct>(buffer);
+                _ = stream.Read<TestStruct>();
             }
+        }
+
+        [Benchmark]
+        public void AuroraCore_ReadSpanBufferT()
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            using SpanBuffer<TestStruct> buffer = new(n);
+            stream.Read<TestStruct>(buffer);
         }
 
         private struct TestStruct
