@@ -5,6 +5,9 @@ using System.Runtime.InteropServices;
 
 namespace AuroraLib.Core.Extensions
 {
+    /// <summary>
+    /// Provides extension methods and utilities for spans.
+    /// </summary>
     public static class SpanEx
     {
         /// <summary>
@@ -70,6 +73,12 @@ namespace AuroraLib.Core.Extensions
             return minLength;
         }
 
+        /// <inheritdoc cref="MaxMatch{T}(ReadOnlySpan{T},ReadOnlySpan{T})"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int MaxMatch<T>(this Span<T> span, ReadOnlySpan<T> sequence2) where T : IEquatable<T>
+            => MaxMatch((ReadOnlySpan<T>)span, sequence2);
+
         /// <summary>
         /// Counts the occurrences of a specific <paramref name="value"/> of <typeparamref name="T"/> in a <see cref="ReadOnlySpan{T}"/>.
         /// </summary>
@@ -92,6 +101,12 @@ namespace AuroraLib.Core.Extensions
             return count;
         }
 
+        /// <inheritdoc cref="Count{T}(ReadOnlySpan{T}, T)"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int Count<T>(this Span<T> span, T value) where T : IEquatable<T>
+            => Count((ReadOnlySpan<T>)span, value);
+
         /// <summary>
         /// Finds the index of the first element in the specified span that matches the condition.
         /// </summary>
@@ -110,6 +125,12 @@ namespace AuroraLib.Core.Extensions
             return -1;
         }
 
+        /// <inheritdoc cref="IndexOf{T}(ReadOnlySpan{T}, Predicate{T})"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int IndexOf<T>(this Span<T> span, Predicate<T> condition) where T : unmanaged
+            => IndexOf((ReadOnlySpan<T>)span, condition);
+
         /// <summary>
         /// Finds the index of the last element in the specified span that matches the condition.
         /// </summary>
@@ -127,6 +148,12 @@ namespace AuroraLib.Core.Extensions
             }
             return -1;
         }
+
+        /// <inheritdoc cref="LastIndexOf{T}(ReadOnlySpan{T}, Predicate{T})"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int LastIndexOf<T>(this Span<T> span, Predicate<T> condition) where T : unmanaged
+            => LastIndexOf((ReadOnlySpan<T>)span, condition);
 
         /// <summary>
         /// Computes the hash code for a <see cref="ReadOnlySpan{T}"/> of elements using the <see cref="XXHash32"/> algorithm.
