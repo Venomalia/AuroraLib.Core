@@ -502,18 +502,6 @@ namespace AuroraLib.Core
         }
         #endregion
 
-        #region Nibbles
-        /// <summary>
-        /// Get two 4-bit signed integer from a 8-bit unsigned integer.
-        /// </summary>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static (int low, int high) GetNibbles(this byte b)
-            => (b & 0xf, b & 0xf0 >> 4);
-        #endregion Nibbles
-
         #region DataXor
         /// <summary>
         /// Performs an XOR operation between the elements of the <paramref name="data"/> span and the specified <paramref name="key"/>.
