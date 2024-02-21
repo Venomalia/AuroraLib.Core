@@ -1,10 +1,14 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace AuroraLib.Core.Extensions
 {
-    public static class ListEx
+    /// <summary>
+    /// Provides extension methods and utilities for collections.
+    /// </summary>
+    public static class CollectionEx
     {
         /// <summary>
         /// Moves an item within the list from the specified old index to the new index.
@@ -46,53 +50,35 @@ namespace AuroraLib.Core.Extensions
             => CollectionsMarshal.AsSpan(list);
 
         /// <summary>
-        /// Determines whether two <see cref="IEnumerable"/> collections are equal by comparing their elements.
+        /// Computes the hash code for the elements in the specified list.
         /// </summary>
-        /// <typeparam name="T">The type of elements in the enumerable.</typeparam>
-        /// <param name="left">The first enumerable collection to compare.</param>
-        /// <param name="right">The second enumerable collection to compare.</param>
-        /// <returns>True if the collections are equal; otherwise, false.</returns>
+        /// <typeparam name="T">The type of elements in the list. It must be an unmanaged type.</typeparam>
+        /// <param name="list">The list containing the elements to compute the hash code for.</param>
+        /// <returns>The computed hash code.</returns>
         [DebuggerStepThrough]
-        public static bool Equals<T>(this IEnumerable<T> left, IEnumerable<T> right)
-        {
-            if (ReferenceEquals(left, right))
-                return true;
-
-            if (left is null || right is null)
-                return false;
-
-            using (var leftE = left.GetEnumerator())
-            using (var rightE = right.GetEnumerator())
-            {
-                while (leftE.MoveNext() && rightE.MoveNext())
-                {
-                    if (!leftE.Current.Equals(rightE.Current))
-                        return false;
-                }
-
-                return !leftE.MoveNext() && !rightE.MoveNext();
-            }
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SequenceGetHashCode<T>(this List<T> list) where T : unmanaged
+            => SpanEx.SequenceGetHashCode(list.UnsaveAsSpan());
 
         /// <summary>
-        /// Computes the hash code for an <see cref="IEnumerable{T}"/> collection of <typeparamref name="T"/>.
+        /// Computes the hash code for the elements in the specified collection./>.
         /// </summary>
         /// <typeparam name="T">The type of elements in the enumerable.</typeparam>
         /// <param name="list">The enumerable collection of elements to compute the hash code from.</param>
-        /// <param name="starting">The starting value for the hash code computation.</param>
-        /// <param name="additive">The additive value used in the hash code computation.</param>
         /// <returns>The computed hash code.</returns>
         [DebuggerStepThrough]
-        public static int GetHashCode<T>(this IEnumerable<T> list, int starting = 0, int additive = 1)
+        public static int SequenceGetHashCode<T>(this IEnumerable<T> list)
         {
-            int hashcode = starting;
+            if (list == null || list.Count() == 0)
+                return 0;
 
+            int hashCode = 17;
             foreach (var item in list)
             {
-                hashcode = hashcode * additive + item.GetHashCode();
+                hashCode = hashCode * 23 + (item == null ? 0 : item.GetHashCode());
             }
 
-            return hashcode;
+            return hashCode;
         }
     }
 }

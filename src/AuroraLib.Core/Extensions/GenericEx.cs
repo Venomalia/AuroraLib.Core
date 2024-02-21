@@ -3,6 +3,9 @@ using System.Runtime.CompilerServices;
 
 namespace AuroraLib.Core.Extensions
 {
+    /// <summary>
+    /// Provides extension methods and utilities for generics.
+    /// </summary>
     public static class GenericEx
     {
         /// <summary>
