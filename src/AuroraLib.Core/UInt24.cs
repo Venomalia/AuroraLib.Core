@@ -1,12 +1,15 @@
-﻿namespace AuroraLib.Core
+﻿using System.Diagnostics;
+
+namespace AuroraLib.Core
 {
     /// <summary>
     /// Represents a 3-byte, 24-bit unsigned integer.
     /// </summary>
-    // base on https://github.com/SuperHackio/Hack.io
     [Serializable]
+    [DebuggerDisplay("{Value}")]
     public readonly struct UInt24 : IComparable, IFormattable, IConvertible, IComparable<UInt24>, IComparable<uint>, IEquatable<UInt24>, IEquatable<uint>
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly byte b0, b1, b2;
 
         public const uint MaxValue = 0x00ffffff;
@@ -15,13 +18,10 @@
         /// <summary>
         /// The value of this Int24 as an Int32
         /// </summary>
-        public uint Value
-            => (uint)(b0 | b1 << 8 | b2 << 16);
+        public uint Value => (uint)(b0 | b1 << 8 | b2 << 16);
 
         public UInt24(uint value)
         {
-            ValidateNumericRange(value);
-
             b0 = (byte)(value & 0xFF);
             b1 = (byte)(value >> 8 & 0xFF);
             b2 = (byte)(value >> 16 & 0xFF);
@@ -32,12 +32,6 @@
             b0 = value.b0;
             b1 = value.b1;
             b2 = value.b2;
-        }
-
-        private static void ValidateNumericRange(uint value)
-        {
-            if (value > MaxValue)
-                throw new OverflowException(string.Format("Value of {0} will not fit in a 24-bit unsigned integer", value));
         }
 
         /// <inheritdoc/>
@@ -53,7 +47,7 @@
         public string ToString(string format, IFormatProvider provider) => Value.ToString(format, provider);
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) => obj is UInt24 ui24 && ui24.Value == Value;
+        public override bool Equals(object? obj) => obj is UInt24 ui24 && ui24.Value == Value;
 
         /// <inheritdoc/>
         public bool Equals(UInt24 other) => this == other;
@@ -65,7 +59,7 @@
         public override int GetHashCode() => Value.GetHashCode();
 
         /// <inheritdoc/>
-        public int CompareTo(object value)
+        public int CompareTo(object? value)
         {
             if (value == null)
                 return 1;
@@ -85,44 +79,9 @@
             => Value < value ? -1 : Value > value ? 1 : 0;
 
         #region operators
-
-        public static UInt24 operator +(UInt24 a, UInt24 b) => new(a.Value + b.Value);
-
-        public static UInt24 operator -(UInt24 a, UInt24 b) => new(a.Value - b.Value);
-
-        public static UInt24 operator *(UInt24 a, UInt24 b) => new(a.Value * b.Value);
-
-        public static UInt24 operator /(UInt24 a, UInt24 b) => new(a.Value / b.Value);
-
-        public static UInt24 operator %(UInt24 a, UInt24 b) => new(a.Value % b.Value);
-
-        public static UInt24 operator &(UInt24 a, UInt24 b) => new(a.Value & b.Value);
-
-        public static UInt24 operator |(UInt24 a, UInt24 b) => new(a.Value | b.Value);
-
-        public static UInt24 operator ^(UInt24 a, UInt24 b) => new(a.Value ^ b.Value);
-
-        public static uint operator >>(UInt24 a, int b) => a.Value >> b;
-
-        public static uint operator <<(UInt24 a, int b) => a.Value << b;
-
-        public static UInt24 operator ~(UInt24 a) => new(~a.Value);
-
         public static UInt24 operator ++(UInt24 a) => new(a.Value + 1);
 
         public static UInt24 operator --(UInt24 a) => new(a.Value - 1);
-
-        public static bool operator ==(UInt24 l, UInt24 r) => l.Value == r.Value;
-
-        public static bool operator !=(UInt24 l, UInt24 r) => l.Value != r.Value;
-
-        public static bool operator >(UInt24 l, UInt24 r) => l.Value > r.Value;
-
-        public static bool operator <(UInt24 l, UInt24 r) => l.Value < r.Value;
-
-        public static bool operator >=(UInt24 l, UInt24 r) => l.Value >= r.Value;
-
-        public static bool operator <=(UInt24 l, UInt24 r) => l.Value <= r.Value;
 
         public static implicit operator UInt24(byte x) => new((uint)x);
 
@@ -207,7 +166,6 @@
 
         public TypeCode GetTypeCode()
             => TypeCode.UInt32;
-
         #endregion IConvertible
     }
 }

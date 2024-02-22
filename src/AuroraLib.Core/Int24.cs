@@ -1,13 +1,18 @@
-﻿namespace AuroraLib.Core
+﻿using System.Diagnostics;
+
+namespace AuroraLib.Core
 {
     /// <summary>
     /// Represents a 3-byte, 24-bit signed integer.
     /// </summary>
-    // base on https://github.com/SuperHackio/Hack.io
     [Serializable]
+    [DebuggerDisplay("{Value}")]
     public readonly struct Int24 : IComparable, IFormattable, IConvertible, IComparable<Int24>, IComparable<Int32>, IEquatable<Int24>, IEquatable<Int32>
     {
-        private readonly sbyte b0, b1, b2;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly byte b0, b1;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly sbyte b2;
 
         public const int MaxValue = 8388607;
         public const int MinValue = -8388608;
@@ -15,8 +20,7 @@
         /// <summary>
         /// The value of this Int24 as an Int32
         /// </summary>
-        public int Value
-            => b0 | (b1 << 8) | (b2 << 16);
+        public int Value => b0 | (b1 << 8) | (b2 << 16);
 
         /// <summary>
         /// Create a new Int24
@@ -24,9 +28,8 @@
         /// <param name="value"></param>
         public Int24(int value)
         {
-            ValidateNumericRange(value);
-            b0 = (sbyte)((value) & 0xFF);
-            b1 = (sbyte)((value >> 8) & 0xFF);
+            b0 = (byte)((value) & 0xFF);
+            b1 = (byte)((value >> 8) & 0xFF);
             b2 = (sbyte)((value >> 16) & 0xFF);
         }
 
@@ -35,12 +38,6 @@
             b0 = value.b0;
             b1 = value.b1;
             b2 = value.b2;
-        }
-
-        private static void ValidateNumericRange(int value)
-        {
-            if (value > (MaxValue + 1) || value < MinValue)
-                throw new OverflowException($"Value of {value} will not fit in a 24-bit signed integer");
         }
 
         /// <inheritdoc/>
@@ -56,7 +53,7 @@
         public string ToString(string format, IFormatProvider provider) => Value.ToString(format, provider);
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) => obj is Int24 i24 && i24.Value == Value;
+        public override bool Equals(object? obj) => obj is Int24 i24 && i24.Value == Value;
 
         /// <inheritdoc/>
         public bool Equals(Int24 other) => this == other;
@@ -68,7 +65,7 @@
         public override int GetHashCode() => Value.GetHashCode();
 
         /// <inheritdoc/>
-        public int CompareTo(object value)
+        public int CompareTo(object? value)
         {
             if (value == null)
             {
@@ -92,56 +89,9 @@
         }
 
         #region operators
-
-        public static Int24 operator +(Int24 a, Int24 b) => new(a.Value + b.Value);
-
-        public static Int24 operator -(Int24 a, Int24 b) => new(a.Value - b.Value);
-
-        public static Int24 operator *(Int24 a, Int24 b) => new(a.Value * b.Value);
-
-        public static Int24 operator /(Int24 a, Int24 b) => new(a.Value / b.Value);
-
-        public static Int24 operator %(Int24 a, Int24 b) => new(a.Value % b.Value);
-
-        public static Int24 operator &(Int24 a, Int24 b) => new(a.Value & b.Value);
-
-        public static Int24 operator |(Int24 a, Int24 b) => new(a.Value | b.Value);
-
-        public static Int24 operator ^(Int24 a, Int24 b) => new(a.Value ^ b.Value);
-
-        public static int operator >>(Int24 a, int b) => a.Value >> b;
-
-        public static int operator <<(Int24 a, int b) => a.Value << b;
-
-        public static Int24 operator ~(Int24 a) => new(~a.Value);
-
         public static Int24 operator ++(Int24 a) => new(a.Value + 1);
 
         public static Int24 operator --(Int24 a) => new(a.Value - 1);
-
-        public static bool operator ==(Int24 l, Int24 r) => l.Value == r.Value;
-
-        public static bool operator !=(Int24 l, Int24 r) => l.Value != r.Value;
-
-        public static bool operator >(Int24 l, Int24 r) => l.Value > r.Value;
-
-        public static bool operator <(Int24 l, Int24 r) => l.Value < r.Value;
-
-        public static bool operator >=(Int24 l, Int24 r) => l.Value >= r.Value;
-
-        public static bool operator <=(Int24 l, Int24 r) => l.Value <= r.Value;
-
-        public static int operator +(byte a, Int24 b) => a + b.Value;
-
-        public static int operator +(short a, Int24 b) => a + b.Value;
-
-        public static int operator +(ushort a, Int24 b) => a + b.Value;
-
-        public static int operator +(int a, Int24 b) => a + b.Value;
-
-        public static long operator +(uint a, Int24 b) => a + b.Value;
-
-        public static long operator +(long a, Int24 b) => a + b.Value;
 
         public static implicit operator Int24(byte x) => new(x);
 
