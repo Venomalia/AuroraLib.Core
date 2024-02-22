@@ -12,29 +12,11 @@ namespace AuroraLib.Core
     public static class BitConverterX
     {
         #region ConvertGeneric
-        /// <summary>
-        /// Converts a read-only span of bytes to an instance of <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The type to convert to.</typeparam>
-        /// <param name="value">The read-only span of bytes.</param>
-        /// <returns>An instance of <typeparamref name="T"/>.</returns>
+        /// <inheritdoc cref="MemoryMarshal.Read{T}(ReadOnlySpan{byte})"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe T To<T>(ReadOnlySpan<byte> value) where T : unmanaged
-        {
-            if (value.Length < sizeof(T))
-            {
-                throw new ArgumentException($"The input span must have a length of {sizeof(T)} bytes.", nameof(value));
-            }
-
-            T result;
-            fixed (byte* pValue = value)
-            {
-                result = *(T*)pValue;
-            }
-
-            return result;
-        }
+        public static T Read<T>(ReadOnlySpan<byte> source) where T : unmanaged
+            => MemoryMarshal.Read<T>(source);
 
         /// <summary>
         /// Converts a instance of <typeparamref name="T"/> to a byte array.
@@ -44,43 +26,23 @@ namespace AuroraLib.Core
         /// <returns>A byte array representing the value.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe byte[] GetBytes<T>(T value) where T : unmanaged
+        public static byte[] GetBytes<T>(ref T value) where T : unmanaged
         {
-            byte[] result = new byte[sizeof(T)];
-
-            fixed (byte* pResult = result)
-            {
-                T* pValue = (T*)pResult;
-                *pValue = value;
-            }
-
+            byte[] result = new byte[Unsafe.SizeOf<T>()];
+            MemoryMarshal.Write(result,ref  value);
             return result;
         }
 
-        /// <summary>
-        /// Tries to write the bytes of a instance of <typeparamref name="T"/> to the specified destination span.
-        /// </summary>
-        /// <typeparam name="T">The type of the value.</typeparam>
-        /// <param name="destination">The destination span.</param>
-        /// <param name="value">The value to write.</param>
-        /// <returns>true if the bytes were successfully written; otherwise, false.</returns>
+        /// <inheritdoc cref="GetBytes{T}(ref T)"/>
+        [DebuggerStepThrough]
+        public static byte[] GetBytes<T>(T value) where T : unmanaged
+            => GetBytes(ref value);
+
+        /// <inheritdoc cref="MemoryMarshal.TryWrite{T}(Span{byte}, ref T)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe bool TryWriteBytes<T>(Span<byte> destination, T value) where T : unmanaged
-        {
-            if (destination.Length < sizeof(T))
-            {
-                return false;
-            }
-
-            fixed (byte* destinationPtr = &destination.GetPinnableReference())
-            {
-                T* valuePtr = (T*)destinationPtr;
-                *valuePtr = value;
-            }
-
-            return true;
-        }
+        public static bool TryWrite<T>(Span<byte> destination, ref T value) where T : unmanaged
+            => MemoryMarshal.TryWrite(destination, ref value);
         #endregion
 
         #region SwapGeneric
