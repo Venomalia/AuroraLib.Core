@@ -10,6 +10,7 @@ namespace AuroraLib.Core
     /// <summary>
     /// Represents a 32-bit identifier that is not affected by the endian order.
     /// </summary>
+    [Serializable]
     public unsafe struct Identifier32 : IIdentifier
     {
         private byte b0, b1, b2, b3;

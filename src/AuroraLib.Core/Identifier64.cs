@@ -10,6 +10,7 @@ namespace AuroraLib.Core
     /// <summary>
     /// Represents a 64-bit identifier that is not affected by the endian order.
     /// </summary>
+    [Serializable]
     public unsafe struct Identifier64 : IIdentifier
     {
         /// <summary>
