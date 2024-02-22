@@ -1,4 +1,5 @@
 ﻿using AuroraLib.Core.Buffers;
+using AuroraLib.Core.Extensions;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -54,9 +55,9 @@ namespace AuroraLib.Core
         /// <returns>An instance of <typeparamref name="T"/>.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe T Swap<T>(T vaule) where T : unmanaged
+        public static T Swap<T>(T vaule) where T : unmanaged
         {
-            Span<byte> src = new(&vaule, sizeof(T));
+            Span<byte> src = vaule.AsBytes();
             Swap<T>(src);
             return vaule;
         }
@@ -69,10 +70,10 @@ namespace AuroraLib.Core
         /// <returns>An instance of <typeparamref name="T"/> with swapped bits.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe T SwapBits<T>(T vaule) where T : unmanaged
+        public static T SwapBits<T>(T vaule) where T : unmanaged
         {
-            Span<byte> src = new(&vaule, sizeof(T));
-            Swap<T>(src);
+            Span<byte> src = vaule.AsBytes();
+            src.Reverse();
             for (int i = 0; i < src.Length; i++)
             {
                 src[i] = Swap(src[i]);

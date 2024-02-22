@@ -204,5 +204,18 @@ namespace AuroraLib.Core.Extensions
             return MemoryMarshal.CreateSpan(ref toRef, buffer.Length / Unsafe.SizeOf<TFrom>() * Unsafe.SizeOf<TTo>());
         }
 
+        /// <summary>
+        /// Converts an instance of an unmanaged type to a span of bytes.
+        /// </summary>
+        /// <typeparam name="T">The type of the buffer.</typeparam>
+        /// <param name="buffer">The buffer to convert to bytes.</param>
+        /// <returns>A span of bytes representing the same memory as the original buffer.</returns>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Span<byte> AsBytes<T>(this ref T buffer) where T : unmanaged
+        {
+            ref byte bRef = ref Unsafe.As<T, byte>(ref buffer);
+            return MemoryMarshal.CreateSpan(ref bRef, Unsafe.SizeOf<T>());
+        }
     }
 }
