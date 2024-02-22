@@ -11,12 +11,15 @@ namespace AuroraLib.Core.Cryptography
     {
         private readonly byte[] bytes;
 
+        /// <inheritdoc />
+        public int ByteSize => hashInstance.HashSize / 8;
+
         private readonly HashAlgorithm hashInstance;
 
         public BaseHash(HashAlgorithm algorithm)
         {
             hashInstance = algorithm;
-            bytes = new byte[hashInstance.HashSize / 8];
+            bytes = new byte[ByteSize];
         }
 
         /// <inheritdoc />
@@ -32,6 +35,10 @@ namespace AuroraLib.Core.Cryptography
             bytes.AsSpan().CopyTo(output);
             return output;
         }
+
+        /// <inheritdoc />
+        public void Write(Span<byte> destination)
+            => bytes.AsSpan().CopyTo(destination);
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -2,6 +2,7 @@
 using HashDepot;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace AuroraLib.Core.Cryptography
 {
@@ -13,7 +14,10 @@ namespace AuroraLib.Core.Cryptography
         /// <inheritdoc />
         public UInt128 Value => new(bytes);
 
-        private byte[] bytes = new byte[12];
+        /// <inheritdoc />
+        public int ByteSize => 16;
+
+        private byte[] bytes = new byte[16];
 
         /// <inheritdoc />
         public void Compute(ReadOnlySpan<byte> input)
@@ -21,6 +25,13 @@ namespace AuroraLib.Core.Cryptography
 
         /// <inheritdoc />
         public byte[] GetBytes() => bytes;
+
+        /// <inheritdoc />
+        public void Write(Span<byte> destination)
+        {
+            UInt128 vaule = Value;
+            MemoryMarshal.Write(destination, ref vaule);
+        }
 
         /// <inheritdoc />
         public void Reset()

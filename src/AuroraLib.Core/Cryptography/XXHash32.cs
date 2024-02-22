@@ -2,6 +2,7 @@
 using HashDepot;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace AuroraLib.Core.Cryptography
 {
@@ -14,12 +15,22 @@ namespace AuroraLib.Core.Cryptography
         public uint Value { get; private set; }
 
         /// <inheritdoc />
+        public int ByteSize => 4;
+
+        /// <inheritdoc />
         public void Compute(ReadOnlySpan<byte> input)
             => Value = XXHash.Hash32(input, Value);
 
         /// <inheritdoc />
         public byte[] GetBytes()
             => BitConverterX.GetBytes(Value);
+
+        /// <inheritdoc />
+        public void Write(Span<byte> destination)
+        {
+            uint vaule = Value;
+            MemoryMarshal.Write(destination, ref vaule);
+        }
 
         /// <inheritdoc />
         public void SetSeed(uint seed = 0u)

@@ -1,6 +1,7 @@
 ﻿using AuroraLib.Core.Interfaces;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace AuroraLib.Core.Cryptography
 {
@@ -9,7 +10,11 @@ namespace AuroraLib.Core.Cryptography
     /// </summary>
     public sealed class CityHash128 : IHash<UInt128>
     {
+        /// <inheritdoc />
         public UInt128 Value { get; private set; }
+
+        /// <inheritdoc />
+        public int ByteSize => 16;
 
         /// <inheritdoc />
         [DebuggerStepThrough]
@@ -24,6 +29,13 @@ namespace AuroraLib.Core.Cryptography
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] GetBytes()
             => BitConverterX.GetBytes(Value);
+
+        /// <inheritdoc />
+        public void Write(Span<byte> destination)
+        {
+            UInt128 vaule = Value;
+            MemoryMarshal.Write(destination, ref vaule);
+        }
 
         /// <inheritdoc />
         [DebuggerStepThrough]

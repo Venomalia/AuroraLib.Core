@@ -1,5 +1,6 @@
 ﻿using AuroraLib.Core.Interfaces;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace AuroraLib.Core.Cryptography
 {
@@ -10,7 +11,11 @@ namespace AuroraLib.Core.Cryptography
     {
         private const ulong Prime = 4294967291;
 
+        /// <inheritdoc />
         public ulong Value { get; private set; }
+
+        /// <inheritdoc />
+        public int ByteSize => 8;
 
         public Adler64()
             => Reset();
@@ -43,6 +48,13 @@ namespace AuroraLib.Core.Cryptography
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] GetBytes()
             => BitConverterX.GetBytes(Value);
+
+        /// <inheritdoc />
+        public void Write(Span<byte> destination)
+        {
+            ulong vaule = Value;
+            MemoryMarshal.Write(destination, ref vaule);
+        }
 
         /// <inheritdoc />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
