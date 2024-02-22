@@ -3,6 +3,7 @@ using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.Text;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace AuroraLib.Core
@@ -22,21 +23,6 @@ namespace AuroraLib.Core
         /// The higher 32-bit identifier.
         /// </summary>
         public Identifier32 Higher;
-
-        /// <summary>
-        /// Gets the memory address of the identifier as a pointer to the first byte.
-        /// </summary>
-        public byte* Address
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get
-            {
-                fixed (Identifier32* bytePtr = &Lower)
-                {
-                    return (byte*)bytePtr;
-                }
-            }
-        }
 
         /// <inheritdoc />
         public byte this[int index]
@@ -108,7 +94,10 @@ namespace AuroraLib.Core
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<byte> AsSpan()
-            => new(Address, 8);
+        {
+            ref byte tRef = ref Unsafe.As<Identifier32, byte>(ref Lower);
+            return MemoryMarshal.CreateSpan(ref tRef, 8);
+        }
 
         /// <inheritdoc />
         [DebuggerStepThrough]

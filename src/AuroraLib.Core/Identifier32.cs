@@ -3,6 +3,7 @@ using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.Text;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace AuroraLib.Core
@@ -14,21 +15,6 @@ namespace AuroraLib.Core
     public unsafe struct Identifier32 : IIdentifier
     {
         private byte b0, b1, b2, b3;
-
-        /// <summary>
-        /// Gets the memory address of the identifier as a pointer to the first byte.
-        /// </summary>
-        public byte* Address
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get
-            {
-                fixed (byte* bytePtr = &b0)
-                {
-                    return bytePtr;
-                }
-            }
-        }
 
         /// <inheritdoc />
         public byte this[int index]
@@ -109,7 +95,7 @@ namespace AuroraLib.Core
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<byte> AsSpan()
-            => new(Address, 4);
+            => MemoryMarshal.CreateSpan(ref b0, 4);
 
         /// <inheritdoc />
         [DebuggerStepThrough]
