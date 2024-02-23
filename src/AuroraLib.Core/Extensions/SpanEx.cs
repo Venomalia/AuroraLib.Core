@@ -27,7 +27,6 @@ namespace AuroraLib.Core.Extensions
         /// <typeparam name="T">The type of elements in the sequences.</typeparam>
         /// <param name="values">The array to search in.</param>
         /// <param name="sequence">The sequence to search for.</param>
-        /// <param name="start">The starting index for the search. Default is 0.</param>
         /// <returns>The index of the first occurrence of the sequence, or -1 if not found.</returns>
         [DebuggerStepThrough]
         public static int SequenceSearch<T>(this ReadOnlySpan<T> values, ReadOnlySpan<T> sequence) where T : IEquatable<T>

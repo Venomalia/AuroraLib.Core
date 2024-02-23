@@ -12,7 +12,14 @@ namespace AuroraLib.Core
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly byte b0, b1, b2;
 
+        /// <summary>
+        /// Represents the largest possible value of <see cref="UInt24"/>, This field is constant.
+        /// </summary>
         public const uint MaxValue = 0x00ffffff;
+
+        /// <summary>
+        /// Represents the smallest possible value of <see cref="UInt24"/>, This field is constant.
+        /// </summary>
         public const uint MinValue = 0x00000000;
 
         /// <summary>
@@ -38,13 +45,13 @@ namespace AuroraLib.Core
         public override string ToString() => Value.ToString();
 
         /// <inheritdoc/>
-        public string ToString(IFormatProvider provider) => Value.ToString(provider);
+        public string ToString(IFormatProvider? provider) => Value.ToString(provider);
 
         /// <inheritdoc/>
-        public string ToString(string format) => Value.ToString(format);
+        public string ToString(string? format) => Value.ToString(format);
 
         /// <inheritdoc/>
-        public string ToString(string format, IFormatProvider provider) => Value.ToString(format, provider);
+        public string ToString(string? format, IFormatProvider? provider) => Value.ToString(format, provider);
 
         /// <inheritdoc/>
         public override bool Equals(object? obj) => obj is UInt24 ui24 && ui24.Value == Value;
@@ -119,51 +126,52 @@ namespace AuroraLib.Core
 
         #region IConvertible
 
-        bool IConvertible.ToBoolean(IFormatProvider provider)
+        bool IConvertible.ToBoolean(IFormatProvider? provider)
             => Convert.ToBoolean(Value, provider);
 
-        char IConvertible.ToChar(IFormatProvider provider)
+        char IConvertible.ToChar(IFormatProvider? provider)
             => Convert.ToChar(Value, provider);
 
-        sbyte IConvertible.ToSByte(IFormatProvider provider)
+        sbyte IConvertible.ToSByte(IFormatProvider? provider)
             => Convert.ToSByte(Value, provider);
 
-        byte IConvertible.ToByte(IFormatProvider provider)
+        byte IConvertible.ToByte(IFormatProvider? provider)
             => Convert.ToByte(Value, provider);
 
-        short IConvertible.ToInt16(IFormatProvider provider)
+        short IConvertible.ToInt16(IFormatProvider? provider)
             => Convert.ToInt16(Value, provider);
 
-        ushort IConvertible.ToUInt16(IFormatProvider provider)
+        ushort IConvertible.ToUInt16(IFormatProvider? provider)
             => Convert.ToUInt16(Value, provider);
 
-        int IConvertible.ToInt32(IFormatProvider provider)
+        int IConvertible.ToInt32(IFormatProvider? provider)
             => Convert.ToInt32(Value, provider);
 
-        uint IConvertible.ToUInt32(IFormatProvider provider)
+        uint IConvertible.ToUInt32(IFormatProvider? provider)
             => Value;
 
-        long IConvertible.ToInt64(IFormatProvider provider)
+        long IConvertible.ToInt64(IFormatProvider? provider)
             => Convert.ToInt64(Value, provider);
 
-        ulong IConvertible.ToUInt64(IFormatProvider provider)
+        ulong IConvertible.ToUInt64(IFormatProvider? provider)
             => Convert.ToUInt64(Value, provider);
 
-        float IConvertible.ToSingle(IFormatProvider provider)
+        float IConvertible.ToSingle(IFormatProvider? provider)
             => Convert.ToSingle(Value, provider);
 
-        double IConvertible.ToDouble(IFormatProvider provider)
+        double IConvertible.ToDouble(IFormatProvider? provider)
             => Convert.ToDouble(Value, provider);
 
-        decimal IConvertible.ToDecimal(IFormatProvider provider)
+        decimal IConvertible.ToDecimal(IFormatProvider? provider)
             => Convert.ToDecimal(Value, provider);
 
-        DateTime IConvertible.ToDateTime(IFormatProvider provider)
+        DateTime IConvertible.ToDateTime(IFormatProvider? provider)
             => Convert.ToDateTime(Value, provider);
 
-        object IConvertible.ToType(Type type, IFormatProvider provider)
+        object IConvertible.ToType(Type type, IFormatProvider? provider)
             => Convert.ChangeType(Value, type, provider);
 
+        /// <inheritdoc/>
         public TypeCode GetTypeCode()
             => TypeCode.UInt32;
         #endregion IConvertible

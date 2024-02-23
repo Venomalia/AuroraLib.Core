@@ -105,7 +105,7 @@ namespace AuroraLib.Core.IO
             => InternalBufferAsSpan(start, (int)Length - start);
 
         /// <summary>
-        /// Returns a <see cref="Span{byte}"/> representing the data of the <see cref="PoolStream"/>, it should not be written to the stream while the span is in use.
+        /// Returns a Span of byte representing the data of the <see cref="PoolStream"/>, it should not be written to the stream while the span is in use.
         /// </summary>
         /// <param name="start">The index at which to begin the span.</param>
         /// <param name="length">The span representation of the array.</param>

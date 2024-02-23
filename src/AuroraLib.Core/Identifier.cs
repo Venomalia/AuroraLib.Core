@@ -34,10 +34,10 @@ namespace AuroraLib.Core
         public Span<byte> AsSpan() => Bytes.AsSpan();
 
         /// <inheritdoc />
-        public bool Equals(string other) => other == GetString();
+        public bool Equals(string? other) => other == GetString();
 
         /// <inheritdoc />
-        public bool Equals(IIdentifier other) => other != null && other.AsSpan().SequenceEqual(AsSpan());
+        public bool Equals(IIdentifier? other) => other != null && other.AsSpan().SequenceEqual(AsSpan());
 
         /// <inheritdoc />
         [DebuggerStepThrough]

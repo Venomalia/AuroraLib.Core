@@ -30,7 +30,7 @@ namespace AuroraLib.Core
         public static byte[] GetBytes<T>(ref T value) where T : unmanaged
         {
             byte[] result = new byte[Unsafe.SizeOf<T>()];
-            MemoryMarshal.Write(result,ref  value);
+            MemoryMarshal.Write(result, ref value);
             return result;
         }
 

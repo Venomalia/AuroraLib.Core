@@ -43,7 +43,7 @@ namespace AuroraLib.Core.Buffers
         /// <summary>
         /// Initializes a new instance of the CircularBuffer class with the specified ArrayPool and capacity.
         /// </summary>
-        /// <param name="aPool">The ArrayPool<byte> to use for buffer management.</param>
+        /// <param name="aPool">The ArrayPool of byte to use for buffer management.</param>
         /// <param name="capacity">The capacity of the circular buffer.</param>
         [DebuggerStepThrough]
         public CircularBuffer(ArrayPool<byte> aPool, int capacity) : base(aPool, aPool.Rent(capacity), capacity)

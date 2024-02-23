@@ -49,7 +49,7 @@ namespace AuroraLib.Core.IO
         { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with the specified <see cref="ArrayPool{byte}"/>.
+        /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with the specified ArrayPool/>.
         /// </summary>
         /// <param name="aPool">The ArrayPool used to rent and return byte arrays.</param>
         [DebuggerStepThrough]
@@ -70,7 +70,7 @@ namespace AuroraLib.Core.IO
         /// <summary>
         /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with a buffer from the specified ArrayPool.
         /// </summary>
-        /// <param name="aPool">The ArrayPool<byte> to use for buffer management.</param>
+        /// <param name="aPool">The ArrayPool of byte to use for buffer management.</param>
         /// <param name="buffer">The byte[] buffer to use for stream data storage.</param>
         /// <param name="length">The initial capacity of the stream.</param>
         [DebuggerStepThrough]
