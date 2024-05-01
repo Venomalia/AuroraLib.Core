@@ -226,6 +226,30 @@ namespace AuroraLib.Core.IO
         }
         #endregion
 
+        #region Skip
+        /// <summary>
+        /// Skips a specified number of bytes in the stream.
+        /// </summary>
+        /// <param name="stream">The stream to skip bytes from.</param>
+        /// <param name="count">The number of bytes to skip.</param>
+        [DebuggerStepThrough]
+        public static void Skip(this Stream stream, int count)
+        {
+            if (count < 1)
+                return;
+
+            if (stream.CanSeek)
+            {
+                stream.Seek(count, SeekOrigin.Current);
+            }
+            else
+            {
+                using SpanBuffer<byte> bytes = new(count);
+                stream.Read(bytes.Span);
+            }
+        }
+        #endregion
+
         #region Align
 
         /// <summary>
