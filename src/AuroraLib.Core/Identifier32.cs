@@ -1,6 +1,7 @@
 ﻿using AuroraLib.Core.Extensions;
 using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.Text;
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -121,7 +122,7 @@ namespace AuroraLib.Core
         public static explicit operator Identifier32(int v) => *(Identifier32*)&v;
         public static explicit operator int(Identifier32 v) => *(int*)&v;
 
-        public static explicit operator Identifier32(string v) => new(v);
+        public static explicit operator Identifier32(string v) => new Identifier32(v);
         public static explicit operator string(Identifier32 v) => v.GetString();
 
         /// <inheritdoc />

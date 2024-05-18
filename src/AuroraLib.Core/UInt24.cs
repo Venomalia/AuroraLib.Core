@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace AuroraLib.Core
 {
@@ -86,39 +87,39 @@ namespace AuroraLib.Core
             => Value < value ? -1 : Value > value ? 1 : 0;
 
         #region operators
-        public static UInt24 operator ++(UInt24 a) => new(a.Value + 1);
+        public static UInt24 operator ++(UInt24 a) => new UInt24(a.Value + 1);
 
-        public static UInt24 operator --(UInt24 a) => new(a.Value - 1);
+        public static UInt24 operator --(UInt24 a) => new UInt24(a.Value - 1);
 
-        public static implicit operator UInt24(byte x) => new((uint)x);
+        public static implicit operator UInt24(byte x) => new UInt24((uint)x);
 
         public static explicit operator byte(UInt24 x) => (byte)x.Value;
 
-        public static explicit operator UInt24(sbyte x) => new((uint)x);
+        public static explicit operator UInt24(sbyte x) => new UInt24((uint)x);
 
         public static explicit operator sbyte(UInt24 x) => (sbyte)x.Value;
 
-        public static explicit operator UInt24(short x) => new((uint)x);
+        public static explicit operator UInt24(short x) => new UInt24   ((uint)x);
 
         public static explicit operator short(UInt24 x) => (short)x.Value;
 
-        public static implicit operator UInt24(ushort x) => new((uint)x);
+        public static implicit operator UInt24(ushort x) => new UInt24((uint)x);
 
         public static explicit operator ushort(UInt24 x) => (ushort)x.Value;
 
-        public static explicit operator UInt24(int x) => new((uint)x);
+        public static explicit operator UInt24(int x) => new UInt24((uint)x);
 
         public static implicit operator int(UInt24 x) => (int)x.Value;
 
-        public static explicit operator UInt24(uint x) => new(x);
+        public static explicit operator UInt24(uint x) => new UInt24(x);
 
         public static implicit operator uint(UInt24 x) => x.Value;
 
-        public static explicit operator UInt24(long x) => new((uint)x);
+        public static explicit operator UInt24(long x) => new UInt24((uint)x);
 
         public static implicit operator long(UInt24 x) => x.Value;
 
-        public static explicit operator UInt24(ulong x) => new((uint)x);
+        public static explicit operator UInt24(ulong x) => new UInt24((uint)x);
 
         public static implicit operator ulong(UInt24 x) => x.Value;
 

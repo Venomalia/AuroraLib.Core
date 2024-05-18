@@ -1,6 +1,7 @@
 ﻿using AuroraLib.Core.Extensions;
 using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.Text;
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -95,8 +96,19 @@ namespace AuroraLib.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<byte> AsSpan()
         {
+#if NET5_0_OR_GREATER
+
             ref byte tRef = ref Unsafe.As<Identifier32, byte>(ref Lower);
             return MemoryMarshal.CreateSpan(ref tRef, 8);
+#else
+            unsafe
+            {
+                fixed (Identifier32* bytePtr = &Lower)
+                {
+                    return new Span<byte>((byte*)bytePtr, 8);
+                }
+            }
+#endif
         }
 
         /// <inheritdoc />
@@ -123,7 +135,7 @@ namespace AuroraLib.Core
         public static explicit operator Identifier64(long v) => *(Identifier64*)&v;
         public static explicit operator long(Identifier64 v) => *(long*)&v;
 
-        public static explicit operator Identifier64(string v) => new(v);
+        public static explicit operator Identifier64(string v) => new Identifier64(v);
         public static explicit operator string(Identifier64 v) => v.GetString();
 
         /// <inheritdoc />

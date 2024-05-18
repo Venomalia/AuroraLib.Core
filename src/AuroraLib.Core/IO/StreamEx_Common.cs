@@ -2,7 +2,11 @@
 using AuroraLib.Core.Exceptions;
 using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.Text;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace AuroraLib.Core.IO
@@ -56,7 +60,7 @@ namespace AuroraLib.Core.IO
             if (stream.Length > int.MaxValue)
                 throw new NotSupportedException($"Stream length exceeds the maximum supported length for {nameof(SpanBuffer<byte>)}.");
 
-            SpanBuffer<byte> copy = new((int)stream.Length);
+            SpanBuffer<byte> copy = new SpanBuffer<byte>((int)stream.Length);
             stream.Seek(0, SeekOrigin.Begin);
             stream.Read(copy.Span);
             return copy;
@@ -244,7 +248,7 @@ namespace AuroraLib.Core.IO
             }
             else
             {
-                using SpanBuffer<byte> bytes = new(count);
+                using SpanBuffer<byte> bytes = new SpanBuffer<byte>(count);
                 stream.Read(bytes.Span);
             }
         }

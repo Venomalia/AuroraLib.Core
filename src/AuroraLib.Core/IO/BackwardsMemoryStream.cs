@@ -1,5 +1,7 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace AuroraLib.Core.IO
@@ -56,7 +58,9 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         public override int Read(Span<byte> buffer)
         {
             int num = (int)(Length - Position);
@@ -77,7 +81,9 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         public override void Write(ReadOnlySpan<byte> buffer)
         {
             if (_Position - buffer.Length < _Buffer.Length - Length)
@@ -108,7 +114,9 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         protected override void ExpandBuffer(int minimumLength)
         {
             byte[] newBuffer = _APool.Rent(minimumLength);

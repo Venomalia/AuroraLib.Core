@@ -4,6 +4,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System;
 using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -161,11 +162,7 @@ namespace AuroraLib.Core.Text
 
             int remaining = _pos - index;
             _chars.Slice(index, remaining).CopyTo(_chars.Slice(index + count));
-            s
-#if !NETCOREAPP
-                .AsSpan()
-#endif
-                .CopyTo(_chars.Slice(index));
+            s.AsSpan().CopyTo(_chars.Slice(index));
             _pos += count;
         }
 
@@ -213,11 +210,7 @@ namespace AuroraLib.Core.Text
                 Grow(s.Length);
             }
 
-            s
-#if !NETCOREAPP
-                .AsSpan()
-#endif
-                .CopyTo(_chars.Slice(pos));
+            s.AsSpan().CopyTo(_chars.Slice(pos));
             _pos += s.Length;
         }
 
@@ -331,6 +324,7 @@ namespace AuroraLib.Core.Text
             }
         }
 
+#if NET6_0_OR_GREATER
         internal void AppendSpanFormattable<T>(T value, string? format = null, IFormatProvider? provider = null) where T : ISpanFormattable
         {
             if (value.TryFormat(_chars.Slice(_pos), out int charsWritten, format, provider))
@@ -342,5 +336,7 @@ namespace AuroraLib.Core.Text
                 Append(value.ToString(format, provider));
             }
         }
+#endif
     }
+
 }

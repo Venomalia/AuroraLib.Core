@@ -1,7 +1,10 @@
 ﻿using AuroraLib.Core.Exceptions;
 using AuroraLib.Core.Extensions;
 using AuroraLib.Core.Text;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -79,7 +82,11 @@ namespace AuroraLib.Core.IO
         public static string ReadString(this Stream stream, Predicate<byte> ifstopByte)
         {
             List<byte> bytes = ReadStringBytes(stream, ifstopByte);
+#if NET5_0_OR_GREATER
             return EncodingX.GetString(bytes.UnsaveAsSpan());
+#else
+            return EncodingX.GetString(bytes.ToArray());
+#endif
         }
 
         /// <summary>
@@ -94,12 +101,16 @@ namespace AuroraLib.Core.IO
         public static string ReadString(this Stream stream, Encoding encoding, Predicate<byte> ifstopByte)
         {
             List<byte> bytes = ReadStringBytes(stream, ifstopByte);
+#if NET5_0_OR_GREATER
             return encoding.GetString(bytes.UnsaveAsSpan());
+#else
+            return EncodingX.GetString(bytes.ToArray());
+#endif
         }
 
         private static List<byte> ReadStringBytes(this Stream stream, Predicate<byte> ifstopByte)
         {
-            List<byte> bytes = new();
+            List<byte> bytes = new List<byte>();
             int readByte;
             do
             {

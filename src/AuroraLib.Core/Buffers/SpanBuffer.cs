@@ -1,5 +1,7 @@
 ﻿using AuroraLib.Core.Extensions;
+using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -28,22 +30,42 @@ namespace AuroraLib.Core.Buffers
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
+#if NET5_0_OR_GREATER
                 ref T tRef = ref Unsafe.As<byte, T>(ref MemoryMarshal.GetArrayDataReference(_buffer));
                 return MemoryMarshal.CreateSpan(ref tRef, Length);
+#else
+                unsafe
+                {
+                    fixed (byte* bp = _buffer)
+                    {
+                        return new Span<T>(bp, Length);
+                    }
+                }
+#endif
             }
         }
 
         /// <summary>
         /// Gets a Span of bytes representing this <see cref="SpanBuffer{T}"/>.
         /// </summary>
-        public Span<byte> Bytes
+        public unsafe Span<byte> Bytes
         {
             [DebuggerStepThrough]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
+#if NET5_0_OR_GREATER
                 ref byte bRef = ref MemoryMarshal.GetArrayDataReference(_buffer);
-                return MemoryMarshal.CreateSpan(ref bRef, Length * Unsafe.SizeOf<T>());
+                return MemoryMarshal.CreateSpan(ref bRef, Length * sizeof(T));
+#else
+                unsafe
+                {
+                    fixed (byte* bp = _buffer)
+                    {
+                        return new Span<byte>(bp, Length * sizeof(T));
+                    }
+                }
+#endif
             }
         }
 
@@ -61,10 +83,10 @@ namespace AuroraLib.Core.Buffers
         /// <param name="length">The length of the buffer.</param>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SpanBuffer(int length)
+        public unsafe SpanBuffer(int length)
         {
             Length = length;
-            _buffer = length == 0 ? Array.Empty<byte>() : ArrayPool<byte>.Shared.Rent(length * Unsafe.SizeOf<T>());
+            _buffer = length == 0 ? Array.Empty<byte>() : ArrayPool<byte>.Shared.Rent(length * sizeof(T));
         }
 
         /// <inheritdoc cref="SpanBuffer{T}.SpanBuffer(int)"/>
@@ -80,6 +102,8 @@ namespace AuroraLib.Core.Buffers
         public SpanBuffer(ReadOnlySpan<T> span) : this(span.Length)
             => span.CopyTo(Span);
 
+
+#if NET5_0_OR_GREATER
         /// <summary>
         /// Initializes a new instance of the <see cref="SpanBuffer{T}"/> class with a copy of the specified <see cref="List{T}"/>.
         /// </summary>
@@ -88,6 +112,7 @@ namespace AuroraLib.Core.Buffers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SpanBuffer(List<T> list) : this(list.UnsaveAsSpan())
         { }
+#endif
 
         #endregion
 

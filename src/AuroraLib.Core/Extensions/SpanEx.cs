@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -163,6 +164,7 @@ namespace AuroraLib.Core.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SequenceGetHashCode<T>(this ReadOnlySpan<T> span) where T : unmanaged
         {
+#if NET6_0_OR_GREATER
             // If char use string implementation
             if (typeof(T) == typeof(char))
             {
@@ -170,9 +172,16 @@ namespace AuroraLib.Core.Extensions
                 return String.GetHashCode(chars);
             }
 
-            ReadOnlySpan<byte> buffer = MemoryMarshal.Cast<T, byte>(span);
             HashCode gen = default;
+            ReadOnlySpan<byte> buffer = MemoryMarshal.Cast<T, byte>(span);
             gen.AddBytes(buffer);
+#else
+            HashCode gen = default;
+            foreach (T b in span)
+            {
+                gen.Add(b);
+            }
+#endif
             return gen.ToHashCode();
         }
 
@@ -188,6 +197,7 @@ namespace AuroraLib.Core.Extensions
         public static int SequenceGetHashCode<T>(this T[] array) where T : unmanaged
             => SequenceGetHashCode(array.AsSpan());
 
+#if NET5_0_OR_GREATER
         /// <summary>
         /// Casts an array of one primitive type <typeparamref name="TFrom"/> to a span of another primitive type <typeparamref name="TTo"/>.
         /// </summary>
@@ -202,7 +212,7 @@ namespace AuroraLib.Core.Extensions
             ref TTo toRef = ref Unsafe.As<TFrom, TTo>(ref MemoryMarshal.GetArrayDataReference(buffer));
             return MemoryMarshal.CreateSpan(ref toRef, buffer.Length / Unsafe.SizeOf<TFrom>() * Unsafe.SizeOf<TTo>());
         }
-
+#endif
         /// <summary>
         /// Converts an instance of an unmanaged type to a span of bytes.
         /// </summary>
@@ -211,10 +221,21 @@ namespace AuroraLib.Core.Extensions
         /// <returns>A span of bytes representing the same memory as the original buffer.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#if NET5_0_OR_GREATER
         public static Span<byte> AsBytes<T>(this ref T buffer) where T : unmanaged
         {
             ref byte bRef = ref Unsafe.As<T, byte>(ref buffer);
             return MemoryMarshal.CreateSpan(ref bRef, Unsafe.SizeOf<T>());
         }
-    }
+        
+#else
+        public static Span<byte> AsBytes<T>(this T buffer) where T : unmanaged
+        {
+            unsafe
+            {
+                return new Span<byte>(&buffer, sizeof(T));
+            }
+        }
+#endif
+}
 }

@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace AuroraLib.Core.IO
@@ -124,6 +126,7 @@ namespace AuroraLib.Core.IO
         public static long ReadInt64(this Stream stream, Endian order = Endian.Little)
             => stream.Read<long>(order);
 
+#if NET5_0_OR_GREATER
         /// <summary>
         /// Returns a half-precision floating point number converted from two bytes at a specified position.
         /// </summary>
@@ -135,7 +138,7 @@ namespace AuroraLib.Core.IO
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Half ReadHalf(this Stream stream, Endian order = Endian.Little)
             => (Half)ReadInt16Helper<Half>(stream, order);
-
+#endif
         /// <summary>
         /// Returns a single-precision floating point number converted from four bytes at a specified position.
         /// </summary>
@@ -182,7 +185,9 @@ namespace AuroraLib.Core.IO
             return value;
         }
 
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         private static int ReadInt16Helper<T>(this Stream stream, Endian order)
         {
             int b1 = stream.ReadByte(), b2 = stream.ReadByteHelper<T>();
@@ -192,7 +197,9 @@ namespace AuroraLib.Core.IO
                 return b2 | b1 << 8;
         }
 
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         private static int ReadInt24Helper<T>(Stream stream, Endian order)
         {
             int b1 = stream.ReadByte(), b2 = stream.ReadByte(), b3 = stream.ReadByteHelper<T>();
@@ -202,7 +209,9 @@ namespace AuroraLib.Core.IO
                 return b3 | b2 << 8 | b1 << 16;
         }
 
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         private static int ReadInt32Helper<T>(Stream stream, Endian order)
         {
             int b1 = stream.ReadByte(), b2 = stream.ReadByte(), b3 = stream.ReadByte(), b4 = stream.ReadByteHelper<T>();

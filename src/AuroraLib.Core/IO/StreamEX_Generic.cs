@@ -1,7 +1,10 @@
 ﻿using AuroraLib.Core.Buffers;
 using AuroraLib.Core.Extensions;
 using AuroraLib.Core.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -28,6 +31,7 @@ namespace AuroraLib.Core.IO
         /// <returns>The value <typeparamref name="T"/> that were read.</returns>
         /// <inheritdoc cref="ThrowHelper{T}()"/>
         [DebuggerStepThrough]
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe T Read<T>(this Stream stream, Endian order = Endian.Little) where T : unmanaged
         {
@@ -36,12 +40,16 @@ namespace AuroraLib.Core.IO
 
             return stream.ReadGenericHelper<T>(order);
         }
+#else
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe T Read<T>(this Stream stream, Endian order = Endian.Little) where T : unmanaged => stream.ReadGenericHelper<T>(order);
+#endif
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private unsafe static T ReadGenericHelper<T>(this Stream stream, Endian order) where T : unmanaged
         {
             T value;
-            Span<byte> buffer = new(&value, sizeof(T));
+            Span<byte> buffer = new Span<byte>(&value, sizeof(T));
             if (stream.Read(buffer) != buffer.Length)
                 ThrowHelper<T>();
 
@@ -53,6 +61,7 @@ namespace AuroraLib.Core.IO
             return value;
         }
 
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private unsafe static T ReadPrimitiveHelper<T>(this Stream stream, Endian order) where T : unmanaged
         {
@@ -86,6 +95,7 @@ namespace AuroraLib.Core.IO
             }
             return stream.ReadGenericHelper<T>(order);
         }
+#endif
         /// <summary>
         /// Reads a span of <typeparamref name="T"/> from the <see cref="Stream"/>.
         /// </summary>
@@ -94,7 +104,9 @@ namespace AuroraLib.Core.IO
         /// <param name="values">The span of values to read into.</param>
         /// <param name="order">The endianness of the data in the stream. Default is <see cref="Endian.Little"/>.</param>
         /// <inheritdoc cref="ThrowHelper{T}()"/>
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         public unsafe static void Read<T>(this Stream stream, Span<T> values, Endian order = Endian.Little) where T : unmanaged
         {
             Span<byte> buffer = MemoryMarshal.Cast<T, byte>(values);
@@ -121,7 +133,7 @@ namespace AuroraLib.Core.IO
 
         #endregion
 
-        #endregion
+#endregion
 
         #region Write
         /// <summary>
@@ -132,10 +144,12 @@ namespace AuroraLib.Core.IO
         /// <param name="value">The value to write to the stream.</param>
         /// <param name="order">The endianness of the data to write. Default is <see cref="Endian.Little"/>.</param>
         [DebuggerStepThrough]
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         public static unsafe void Write<T>(this Stream stream, T value, Endian order = Endian.Little) where T : unmanaged
         {
-            Span<byte> buffer = new(&value, sizeof(T));
+            Span<byte> buffer = new Span<byte>(&value, sizeof(T));
             if (order != SystemOrder && buffer.Length > 1)
             {
                 BitConverterX.Swap(buffer, typeof(T));
@@ -154,7 +168,7 @@ namespace AuroraLib.Core.IO
         {
             if (order != SystemOrder && sizeof(T) > 1)
             {
-                using SpanBuffer<T> copy = new(span);
+                using SpanBuffer<T> copy = new SpanBuffer<T>(span);
                 Span<byte> buffer = MemoryMarshal.Cast<T, byte>(copy);
                 BitConverterX.Swap(buffer, typeof(T), copy.Length);
                 stream.Write(buffer);
@@ -166,6 +180,7 @@ namespace AuroraLib.Core.IO
             }
         }
 
+#if NET5_0_OR_GREATER
         /// <summary>
         /// Writes the data from the specified <see cref="List{T}"/> to the <see cref="Stream"/>.
         /// </summary>
@@ -175,6 +190,7 @@ namespace AuroraLib.Core.IO
         /// <param name="order">The byte order of the data. Default is Endian.Little.</param>
         public static void Write<T>(this Stream stream, List<T> list, Endian order = Endian.Little) where T : unmanaged
             => Write(stream, (ReadOnlySpan<T>)list.UnsaveAsSpan(), order);
+#endif
 
         /// <summary>
         /// Writes multiple instances of the specified <typeparamref name="T"/> <paramref name="objekt"/> to the <see cref="Stream"/>.
@@ -185,10 +201,12 @@ namespace AuroraLib.Core.IO
         /// <param name="count">The number of times to write the object.</param>
         /// <param name="order">The endianness of the data to write. Default is <see cref="Endian.Little"/>.</param>
         [DebuggerStepThrough]
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         public static unsafe void Write<T>(this Stream stream, T objekt, uint count, Endian order = Endian.Little) where T : unmanaged
         {
-            Span<byte> buffer = new(&objekt, sizeof(T));
+            Span<byte> buffer = new Span<byte>(&objekt, sizeof(T));
             if (order != SystemOrder && buffer.Length > 1)
             {
                 BitConverterX.Swap(buffer, typeof(T));
@@ -216,7 +234,7 @@ namespace AuroraLib.Core.IO
         /// <inheritdoc cref="ThrowHelper{T}()"/>
         public static T Read<T>(this Stream stream) where T : IBinaryObject, new()
         {
-            T value = new();
+            T value = new T();
             value.BinaryDeserialize(stream);
             return value;
         }

@@ -1,4 +1,5 @@
 using AuroraLib.Core.Extensions;
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -44,7 +45,7 @@ namespace AuroraLib.Core.Text
         {
             Span<char> chars = stackalloc char[bytes.Length];
             GetChars(bytes, chars);
-            return new(chars);
+            return new string(chars);
         }
 
         /// <summary>

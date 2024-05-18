@@ -1,6 +1,7 @@
 ﻿using AuroraLib.Core.Extensions;
 using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.Text;
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -51,7 +52,7 @@ namespace AuroraLib.Core
         public string GetString(Encoding encoding)
             => EncodingX.GetString(AsSpan(), encoding, 0x0);
 
-        public static explicit operator Identifier(byte[] v) => new(v);
+        public static explicit operator Identifier(byte[] v) => new Identifier(v);
         public static explicit operator byte[](Identifier v) => v.Bytes;
 
         /// <inheritdoc />

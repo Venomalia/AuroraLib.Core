@@ -1,4 +1,7 @@
-﻿namespace AuroraLib.Core.Interfaces
+﻿using System;
+using System.IO;
+
+namespace AuroraLib.Core.Interfaces
 {
     /// <summary>
     /// Defines an interface for format recognition.

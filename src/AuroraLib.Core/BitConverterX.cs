@@ -1,5 +1,7 @@
 ﻿using AuroraLib.Core.Buffers;
 using AuroraLib.Core.Extensions;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -27,9 +29,9 @@ namespace AuroraLib.Core
         /// <returns>A byte array representing the value.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static byte[] GetBytes<T>(ref T value) where T : unmanaged
+        public unsafe static byte[] GetBytes<T>(ref T value) where T : unmanaged
         {
-            byte[] result = new byte[Unsafe.SizeOf<T>()];
+            byte[] result = new byte[sizeof(T)];
             MemoryMarshal.Write(result, ref value);
             return result;
         }
@@ -87,7 +89,9 @@ namespace AuroraLib.Core
         /// <param name="buffer">The buffer containing the data to reverse.</param>
         /// <param name="type">The type of the data in the buffer.</param>
         [DebuggerStepThrough]
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         public static void Swap(Span<byte> buffer, Type type)
         {
             int offset = 0;
@@ -106,7 +110,9 @@ namespace AuroraLib.Core
         /// <param name="type">The type of the data in the buffer.</param>
         /// <param name="count">The number of elements.</param>
         [DebuggerStepThrough]
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         public static void Swap(Span<byte> buffer, Type type, int count)
         {
             int offset = 0;
@@ -144,10 +150,12 @@ namespace AuroraLib.Core
                 return NewPrimitiveTypeSizes(type);
             }
         }
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         private static ReadOnlySpan<int> NewPrimitiveTypeSizes(Type type)
         {
-            List<int> primList = new();
+            List<int> primList = new List<int>();
             if (type == typeof(Int24) || type == typeof(UInt24))
             {
                 primList.Add(3);
@@ -176,7 +184,7 @@ namespace AuroraLib.Core
             return primitives;
         }
 
-        private static readonly Dictionary<int, int[]> TypePrimitives = new();
+        private static readonly Dictionary<int, int[]> TypePrimitives = new Dictionary<int, int[]>();
         #endregion
 
         #region Swap
@@ -506,7 +514,7 @@ namespace AuroraLib.Core
         [DebuggerStepThrough]
         public static string ToString(ReadOnlySpan<byte> value)
         {
-            using SpanBuffer<byte> buffer = new(value);
+            using SpanBuffer<byte> buffer = new SpanBuffer<byte>(value);
             return BitConverter.ToString(buffer.GetBuffer(), 0, buffer.Length);
         }
         #endregion

@@ -1,4 +1,5 @@
 ﻿using AuroraLib.Core.Interfaces;
+using System;
 
 namespace AuroraLib.Core.Exceptions
 {

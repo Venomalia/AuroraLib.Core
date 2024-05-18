@@ -1,4 +1,6 @@
-﻿namespace AuroraLib.Core.Interfaces
+﻿using System.IO;
+
+namespace AuroraLib.Core.Interfaces
 {
     /// <summary>
     /// Interface for objects that support binary serialization and deserialization.

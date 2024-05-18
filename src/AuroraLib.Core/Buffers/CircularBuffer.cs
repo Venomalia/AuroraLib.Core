@@ -1,4 +1,5 @@
 ﻿using AuroraLib.Core.IO;
+using System;
 using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -57,7 +58,9 @@ namespace AuroraLib.Core.Buffers
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         public override int Read(Span<byte> buffer)
         {
             int total = 0;
@@ -87,7 +90,9 @@ namespace AuroraLib.Core.Buffers
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         public override void Write(ReadOnlySpan<byte> buffer)
         {
             if (Length >= Position + buffer.Length)

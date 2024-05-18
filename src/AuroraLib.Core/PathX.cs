@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace AuroraLib.Core
 {
@@ -59,7 +61,7 @@ namespace AuroraLib.Core
             }
             return path.TrimEnd(' ', '\\', '/');
         }
-        internal static readonly Regex illegalChars = new(@"^(.*(//|\\))?(?'X'PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*| )((//|\\).*)?$|[\x00-\x1f\x7F?*:""<>|]| ((//|\\).*)?$", RegexOptions.CultureInvariant);
+        internal static readonly Regex illegalChars = new Regex(@"^(.*(//|\\))?(?'X'PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*| )((//|\\).*)?$|[\x00-\x1f\x7F?*:""<>|]| ((//|\\).*)?$", RegexOptions.CultureInvariant);
 
         /// <summary>
         /// Converts a byte size into a human-readable string with size suffixes.

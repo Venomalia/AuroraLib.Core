@@ -1,4 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -25,6 +28,7 @@ namespace AuroraLib.Core.Extensions
             list.Insert(newIndex, item);
         }
 
+#if NET5_0_OR_GREATER
         /// <summary>
         /// Counts the occurrences of a specific <paramref name="value"/> of <typeparamref name="T"/> in a <see cref="List{T}"/>.
         /// </summary>
@@ -47,7 +51,9 @@ namespace AuroraLib.Core.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Span<T> UnsaveAsSpan<T>(this List<T> list)
             => CollectionsMarshal.AsSpan(list);
+#endif
 
+#if NET5_0_OR_GREATER
         /// <summary>
         /// Computes the hash code for the elements in the specified list.
         /// </summary>
@@ -58,6 +64,7 @@ namespace AuroraLib.Core.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SequenceGetHashCode<T>(this List<T> list) where T : unmanaged
             => SpanEx.SequenceGetHashCode(list.UnsaveAsSpan());
+#endif
 
         /// <summary>
         /// Computes the hash code for the elements in the specified collection./>.

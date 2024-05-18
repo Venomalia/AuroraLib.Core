@@ -1,5 +1,7 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace AuroraLib.Core.IO
@@ -85,8 +87,16 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         public MemoryPoolStream(Stream stream) : this((int)stream.Length, true)
         {
-            stream.Seek(0, SeekOrigin.Begin);
-            stream.Read(_Buffer.AsSpan(0, (int)stream.Length));
+            if (stream.CanSeek)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+                stream.At(0, s => s.Read(_Buffer.AsSpan(0, (int)stream.Length)));
+            }
+            else
+            {
+                this.SetLength(0);
+                stream.CopyTo(this);
+            }
         }
 
         /// <summary>
@@ -121,7 +131,9 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         public override int Read(Span<byte> buffer)
         {
             int num = (int)(Length - _Position);
@@ -159,7 +171,9 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         public override void Write(ReadOnlySpan<byte> buffer)
         {
             long newpos = _Position + buffer.Length;
@@ -174,7 +188,9 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
+#if NET5_0_OR_GREATER
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
         protected override void ExpandBuffer(int minimumLength)
         {
             byte[] newBuffer = _APool.Rent(minimumLength);
