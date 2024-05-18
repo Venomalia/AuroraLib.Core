@@ -131,7 +131,7 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-#if NET5_0_OR_GREATER
+#if !NETSTANDARD
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         public override int Read(Span<byte> buffer)
@@ -171,7 +171,7 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-#if NET5_0_OR_GREATER
+#if !NETSTANDARD
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         public override void Write(ReadOnlySpan<byte> buffer)
@@ -188,7 +188,7 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-#if NET5_0_OR_GREATER
+#if !NETSTANDARD
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         protected override void ExpandBuffer(int minimumLength)

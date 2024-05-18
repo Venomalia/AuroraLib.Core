@@ -51,9 +51,7 @@ namespace AuroraLib.Core.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Span<T> UnsaveAsSpan<T>(this List<T> list)
             => CollectionsMarshal.AsSpan(list);
-#endif
 
-#if NET5_0_OR_GREATER
         /// <summary>
         /// Computes the hash code for the elements in the specified list.
         /// </summary>

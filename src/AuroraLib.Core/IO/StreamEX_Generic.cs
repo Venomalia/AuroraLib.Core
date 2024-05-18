@@ -31,7 +31,7 @@ namespace AuroraLib.Core.IO
         /// <returns>The value <typeparamref name="T"/> that were read.</returns>
         /// <inheritdoc cref="ThrowHelper{T}()"/>
         [DebuggerStepThrough]
-#if NET5_0_OR_GREATER
+#if !NETSTANDARD
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe T Read<T>(this Stream stream, Endian order = Endian.Little) where T : unmanaged
         {
@@ -61,7 +61,7 @@ namespace AuroraLib.Core.IO
             return value;
         }
 
-#if NET5_0_OR_GREATER
+#if !NETSTANDARD
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private unsafe static T ReadPrimitiveHelper<T>(this Stream stream, Endian order) where T : unmanaged
         {
@@ -72,7 +72,11 @@ namespace AuroraLib.Core.IO
                     byte bVaule = (byte)ReadByteHelper<T>(stream);
                     return Unsafe.As<byte, T>(ref bVaule);
                 case 2:
+#if NET5_0_OR_GREATER
                     if (typeT == typeof(short) || typeT == typeof(ushort) || typeT == typeof(Half) || typeT.IsEnum)
+#else
+                    if (typeT == typeof(short) || typeT == typeof(ushort) || typeT.IsEnum)
+#endif
                     {
                         short iVaule = (short)ReadInt24Helper<T>(stream, order);
                         return Unsafe.As<short, T>(ref iVaule);
@@ -104,7 +108,7 @@ namespace AuroraLib.Core.IO
         /// <param name="values">The span of values to read into.</param>
         /// <param name="order">The endianness of the data in the stream. Default is <see cref="Endian.Little"/>.</param>
         /// <inheritdoc cref="ThrowHelper{T}()"/>
-#if NET5_0_OR_GREATER
+#if !NETSTANDARD
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         public unsafe static void Read<T>(this Stream stream, Span<T> values, Endian order = Endian.Little) where T : unmanaged
@@ -144,7 +148,7 @@ namespace AuroraLib.Core.IO
         /// <param name="value">The value to write to the stream.</param>
         /// <param name="order">The endianness of the data to write. Default is <see cref="Endian.Little"/>.</param>
         [DebuggerStepThrough]
-#if NET5_0_OR_GREATER
+#if !NETSTANDARD
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         public static unsafe void Write<T>(this Stream stream, T value, Endian order = Endian.Little) where T : unmanaged
@@ -201,7 +205,7 @@ namespace AuroraLib.Core.IO
         /// <param name="count">The number of times to write the object.</param>
         /// <param name="order">The endianness of the data to write. Default is <see cref="Endian.Little"/>.</param>
         [DebuggerStepThrough]
-#if NET5_0_OR_GREATER
+#if !NETSTANDARD
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         public static unsafe void Write<T>(this Stream stream, T objekt, uint count, Endian order = Endian.Little) where T : unmanaged

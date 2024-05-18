@@ -185,7 +185,7 @@ namespace AuroraLib.Core.IO
             return value;
         }
 
-#if NET5_0_OR_GREATER
+#if !NETSTANDARD
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         private static int ReadInt16Helper<T>(this Stream stream, Endian order)
@@ -197,7 +197,7 @@ namespace AuroraLib.Core.IO
                 return b2 | b1 << 8;
         }
 
-#if NET5_0_OR_GREATER
+#if !NETSTANDARD
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         private static int ReadInt24Helper<T>(Stream stream, Endian order)
@@ -209,7 +209,7 @@ namespace AuroraLib.Core.IO
                 return b3 | b2 << 8 | b1 << 16;
         }
 
-#if NET5_0_OR_GREATER
+#if !NETSTANDARD
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         private static int ReadInt32Helper<T>(Stream stream, Endian order)

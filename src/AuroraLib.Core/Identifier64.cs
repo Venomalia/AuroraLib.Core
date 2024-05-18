@@ -96,7 +96,7 @@ namespace AuroraLib.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<byte> AsSpan()
         {
-#if NET5_0_OR_GREATER
+#if !NETSTANDARD
 
             ref byte tRef = ref Unsafe.As<Identifier32, byte>(ref Lower);
             return MemoryMarshal.CreateSpan(ref tRef, 8);
