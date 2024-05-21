@@ -1,17 +1,16 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <AssemblyTitle>AuroraLib.Core</AssemblyTitle>
-    <TargetFrameworks>net7.0;net6.0;net5.0;netcoreapp3.1;netcoreapp3.0;netstandard2.1;</TargetFrameworks>
+    <TargetFrameworks>net6.0;net5.0;netcoreapp3.0;netstandard2.1;net472;</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
-    <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Title>AuroraLib.Core</Title>
 	<Version>1.3.3.0</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <PackageTags>StructureReader Hash Crc32 Modding uint24 int24 uint128 BigEndian</PackageTags>
+    <PackageTags>StructureReader Modding uint24 int24 uint128 BigEndian</PackageTags>
     <Description>High performance zero allocation structure reader and other tools for big and little-endian</Description>
     <Authors>Venomalia</Authors>
     <PackageIcon>icon.png</PackageIcon>
@@ -36,6 +35,14 @@
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
+	
+	<PropertyGroup>
+		<NETFrameworks>|net481|net48|net472|NET471|NET47|NET462|NET461|</NETFrameworks>
+	</PropertyGroup>
+
+	<ItemGroup Condition="$(NETFrameworks.Contains('|$(TargetFramework)|'))">
+		<PackageReference Include="System.Memory" Version="4.5.3" />
+	</ItemGroup>
 
   <ItemGroup>
     <None Update="icon.png">

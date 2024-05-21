@@ -58,7 +58,7 @@ namespace AuroraLib.Core.Buffers
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-#if NET5_0_OR_GREATER
+#if !(NETSTANDARD || NET20_OR_GREATER)
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         public override int Read(Span<byte> buffer)
@@ -90,7 +90,7 @@ namespace AuroraLib.Core.Buffers
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-#if NET5_0_OR_GREATER
+#if !(NETSTANDARD || NET20_OR_GREATER)
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         public override void Write(ReadOnlySpan<byte> buffer)

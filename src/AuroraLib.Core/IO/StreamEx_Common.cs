@@ -3,6 +3,7 @@ using AuroraLib.Core.Exceptions;
 using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.Text;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -16,6 +17,48 @@ namespace AuroraLib.Core.IO
     /// </summary>
     public static partial class StreamEx
     {
+#if NET20_OR_GREATER
+        /// <inheritdoc cref="Stream.Read(byte[], int, int)"/>
+        public static int Read(this Stream stream, Span<byte> buffer)
+        {
+            if (stream is PoolStream pool)
+                return pool.Read(buffer);
+
+            byte[] sharedBuffer = ArrayPool<byte>.Shared.Rent(buffer.Length);
+            try
+            {
+                int numRead = stream.Read(sharedBuffer, 0, buffer.Length);
+                sharedBuffer.AsSpan(0, numRead).CopyTo(buffer);
+                return numRead;
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(sharedBuffer);
+            }
+        }
+
+
+        /// <inheritdoc cref="Stream.Write(byte[], int, int)"/>
+        public static void Write(this Stream stream, ReadOnlySpan<byte> buffer)
+        {
+            if (stream is PoolStream pool)
+            {
+                pool.Write(buffer);
+                return;
+            }
+
+            byte[] sharedBuffer = ArrayPool<byte>.Shared.Rent(buffer.Length);
+            try
+            {
+                buffer.CopyTo(sharedBuffer);
+                stream.Write(sharedBuffer, 0, buffer.Length);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(sharedBuffer);
+            }
+        }
+#endif
 
         #region PeekByte
         /// <summary>
@@ -44,7 +87,7 @@ namespace AuroraLib.Core.IO
         {
             byte[] copy = new byte[stream.Length];
             stream.Seek(0, SeekOrigin.Begin);
-            stream.Read(copy);
+            stream.Read(copy, 0, copy.Length);
             return copy;
         }
 
@@ -248,8 +291,8 @@ namespace AuroraLib.Core.IO
             }
             else
             {
-                using SpanBuffer<byte> bytes = new SpanBuffer<byte>(count);
-                stream.Read(bytes.Span);
+                using (SpanBuffer<byte> bytes = new SpanBuffer<byte>(count))
+                    stream.Read(bytes.Span);
             }
         }
         #endregion
@@ -270,6 +313,21 @@ namespace AuroraLib.Core.IO
             if (boundary <= 1)
                 throw new ArgumentException($"{nameof(boundary)}: Must be 2 or more");
 
+#if NET20_OR_GREATER
+            switch (origin)
+            {
+                case SeekOrigin.Begin:
+                    offset += stream.Position;
+                    break;
+                case SeekOrigin.Current:
+                    break;
+                case SeekOrigin.End:
+                    offset = stream.Length - offset;
+                    break;
+                default:
+                    throw new AggregateException();
+            }
+#else
             offset = origin switch
             {
                 SeekOrigin.Begin => offset + stream.Position,
@@ -277,6 +335,7 @@ namespace AuroraLib.Core.IO
                 SeekOrigin.End => stream.Length - offset,
                 _ => throw new AggregateException(),
             };
+#endif
             return stream.Seek(AlignPosition(offset, boundary), SeekOrigin.Begin);
         }
 
@@ -318,7 +377,7 @@ namespace AuroraLib.Core.IO
             while (PadCount > 0)
             {
                 int i = Math.Min(PadCount, padding.Length);
-                stream.Write(padding[..i]);
+                stream.Write(padding.Slice(0, i));
                 PadCount -= i;
             }
         }

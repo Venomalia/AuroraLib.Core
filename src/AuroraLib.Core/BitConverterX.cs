@@ -514,8 +514,10 @@ namespace AuroraLib.Core
         [DebuggerStepThrough]
         public static string ToString(ReadOnlySpan<byte> value)
         {
-            using SpanBuffer<byte> buffer = new SpanBuffer<byte>(value);
-            return BitConverter.ToString(buffer.GetBuffer(), 0, buffer.Length);
+            using (SpanBuffer<byte> buffer = new SpanBuffer<byte>(value))
+            {
+                return BitConverter.ToString(buffer.GetBuffer(), 0, buffer.Length);
+            }
         }
         #endregion
 

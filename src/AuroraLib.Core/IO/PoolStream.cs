@@ -23,6 +23,7 @@ namespace AuroraLib.Core.IO
         private bool _open;
         private long _Length;
 
+        /// <inheritdoc cref="ArrayPool{T}"/>
         protected readonly ArrayPool<byte> _APool;
         protected byte[] _Buffer;
 
@@ -35,9 +36,37 @@ namespace AuroraLib.Core.IO
             Position = 0;
         }
 
+
+#if NET20_OR_GREATER
+        /// <inheritdoc cref="Stream.Read(byte[], int, int)"/>
+        public abstract int Read(Span<byte> buffer);
+        /// <inheritdoc cref="Stream.Write(byte[], int, int)"/>
+        public abstract void Write(ReadOnlySpan<byte> buffer);
+#endif
+
         /// <inheritdoc/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#if NET20_OR_GREATER
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            switch (origin)
+            {
+                case SeekOrigin.Begin:
+                    Position = offset;
+                    break;
+                case SeekOrigin.Current:
+                    Position += offset;
+                    break;
+                case SeekOrigin.End:
+                    Position = Length + offset;
+                    break;
+                default:
+                    throw new ArgumentException($"Origin {origin} is invalid.");
+            }
+            return Position;
+        }
+#else
         public override long Seek(long offset, SeekOrigin origin) => origin switch
         {
             SeekOrigin.Begin => Position = offset,
@@ -45,6 +74,7 @@ namespace AuroraLib.Core.IO
             SeekOrigin.End => Position = Length + offset,
             _ => throw new ArgumentException($"Origin {origin} is invalid."),
         };
+#endif
 
         /// <summary>
         /// Dummy
@@ -54,6 +84,7 @@ namespace AuroraLib.Core.IO
         public override void Flush()
         { }
 
+#if !NET20_OR_GREATER
         /// <inheritdoc />
         public override void CopyTo(Stream destination, int bufferSize)
         {
@@ -65,8 +96,10 @@ namespace AuroraLib.Core.IO
             {
                 throw new ArgumentNullException(nameof(destination), "Stream is null.");
             }
+
             destination.Write(UnsaveAsSpan((int)Position));
         }
+#endif
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
@@ -141,7 +174,11 @@ namespace AuroraLib.Core.IO
             {
                 throw new ArgumentNullException(nameof(stream), "Stream is null.");
             }
+#if NET20_OR_GREATER
+            stream.Write(_Buffer, 0, (int)Length);
+#else
             stream.Write(UnsaveAsSpan());
+#endif
         }
 
         /// <inheritdoc cref="MemoryStream.ToArray"/>

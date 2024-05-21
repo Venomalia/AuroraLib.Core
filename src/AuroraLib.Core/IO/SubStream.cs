@@ -102,6 +102,19 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
+#if NET20_OR_GREATER
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            int num = (int)Math.Min(count, _length - _position);
+            lock (_basestream)
+            {
+                BaseStream.Seek(_position + Offset, SeekOrigin.Begin);
+                BaseStream.Read(buffer, offset, num);
+            }
+            _position += num;
+            return num;
+        }
+#else
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int Read(byte[] buffer, int offset, int count)
             => Read(buffer.AsSpan(offset, count));
@@ -114,14 +127,35 @@ namespace AuroraLib.Core.IO
             lock (_basestream)
             {
                 BaseStream.Seek(_position + Offset, SeekOrigin.Begin);
-                BaseStream.Read(buffer[..num]);
+                BaseStream.Read(buffer.Slice(0,num));
             }
             _position += num;
             return num;
         }
+#endif
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
+#if NET20_OR_GREATER
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            switch (origin)
+            {
+                case SeekOrigin.Begin:
+                    Position = offset;
+                    break;
+                case SeekOrigin.Current:
+                    Position += offset;
+                    break;
+                case SeekOrigin.End:
+                    Position = Length + offset;
+                    break;
+                default:
+                    throw new ArgumentException($"Origin {origin} is invalid.");
+            }
+            return Position;
+        }
+#else
         public override long Seek(long offset, SeekOrigin origin) => origin switch
         {
             SeekOrigin.Begin => Position = offset,
@@ -129,10 +163,11 @@ namespace AuroraLib.Core.IO
             SeekOrigin.End => Position = Length + offset,
             _ => throw new ArgumentException($"Origin {origin} is invalid."),
         };
+#endif
 
         /// <inheritdoc/>
         public override void SetLength(long value)
-            => throw new NotSupportedException();
+                    => throw new NotSupportedException();
 
         /// <inheritdoc/>
         public override void Write(byte[] buffer, int offset, int count)

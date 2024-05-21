@@ -31,7 +31,7 @@ namespace AuroraLib.Core.IO
         /// <returns>The value <typeparamref name="T"/> that were read.</returns>
         /// <inheritdoc cref="ThrowHelper{T}()"/>
         [DebuggerStepThrough]
-#if !NETSTANDARD
+#if !(NETSTANDARD || NET20_OR_GREATER)
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public static unsafe T Read<T>(this Stream stream, Endian order = Endian.Little) where T : unmanaged
         {
@@ -61,7 +61,7 @@ namespace AuroraLib.Core.IO
             return value;
         }
 
-#if !NETSTANDARD
+#if !(NETSTANDARD || NET20_OR_GREATER)
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private unsafe static T ReadPrimitiveHelper<T>(this Stream stream, Endian order) where T : unmanaged
         {
@@ -108,7 +108,7 @@ namespace AuroraLib.Core.IO
         /// <param name="values">The span of values to read into.</param>
         /// <param name="order">The endianness of the data in the stream. Default is <see cref="Endian.Little"/>.</param>
         /// <inheritdoc cref="ThrowHelper{T}()"/>
-#if !NETSTANDARD
+#if !(NETSTANDARD || NET20_OR_GREATER)
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         public unsafe static void Read<T>(this Stream stream, Span<T> values, Endian order = Endian.Little) where T : unmanaged
@@ -137,7 +137,7 @@ namespace AuroraLib.Core.IO
 
         #endregion
 
-#endregion
+        #endregion
 
         #region Write
         /// <summary>
@@ -148,7 +148,7 @@ namespace AuroraLib.Core.IO
         /// <param name="value">The value to write to the stream.</param>
         /// <param name="order">The endianness of the data to write. Default is <see cref="Endian.Little"/>.</param>
         [DebuggerStepThrough]
-#if !NETSTANDARD
+#if !(NETSTANDARD || NET20_OR_GREATER)
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         public static unsafe void Write<T>(this Stream stream, T value, Endian order = Endian.Little) where T : unmanaged
@@ -172,10 +172,16 @@ namespace AuroraLib.Core.IO
         {
             if (order != SystemOrder && sizeof(T) > 1)
             {
-                using SpanBuffer<T> copy = new SpanBuffer<T>(span);
-                Span<byte> buffer = MemoryMarshal.Cast<T, byte>(copy);
-                BitConverterX.Swap(buffer, typeof(T), copy.Length);
-                stream.Write(buffer);
+                using (SpanBuffer<T> copy = new SpanBuffer<T>(span))
+                {
+                    Span<byte> buffer = MemoryMarshal.Cast<T, byte>(copy);
+                    BitConverterX.Swap(buffer, typeof(T), copy.Length);
+#if NET20_OR_GREATER
+                    stream.Write(copy.GetBuffer(), 0, sizeof(T) * span.Length);
+#else
+                    stream.Write(buffer);
+#endif
+                }
             }
             else
             {
@@ -205,7 +211,7 @@ namespace AuroraLib.Core.IO
         /// <param name="count">The number of times to write the object.</param>
         /// <param name="order">The endianness of the data to write. Default is <see cref="Endian.Little"/>.</param>
         [DebuggerStepThrough]
-#if !NETSTANDARD
+#if !(NETSTANDARD || NET20_OR_GREATER)
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         public static unsafe void Write<T>(this Stream stream, T objekt, uint count, Endian order = Endian.Little) where T : unmanaged

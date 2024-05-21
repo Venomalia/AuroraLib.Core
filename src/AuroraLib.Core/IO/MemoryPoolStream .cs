@@ -131,7 +131,7 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-#if !NETSTANDARD
+#if !(NETSTANDARD || NET20_OR_GREATER)
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         public override int Read(Span<byte> buffer)
@@ -161,7 +161,12 @@ namespace AuroraLib.Core.IO
         /// <inheritdoc/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override void WriteByte(byte value) => Write(stackalloc byte[1] { value });
+        public override void WriteByte(byte value)
+#if NET20_OR_GREATER
+            => Write(new byte[1] { value });
+#else
+            => Write(stackalloc byte[1] { value });
+#endif
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
@@ -171,7 +176,7 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-#if !NETSTANDARD
+#if !(NETSTANDARD || NET20_OR_GREATER)
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         public override void Write(ReadOnlySpan<byte> buffer)
@@ -188,7 +193,7 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-#if !NETSTANDARD
+#if !(NETSTANDARD || NET20_OR_GREATER)
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
         protected override void ExpandBuffer(int minimumLength)

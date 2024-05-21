@@ -45,7 +45,11 @@ namespace AuroraLib.Core.Text
         {
             Span<char> chars = stackalloc char[bytes.Length];
             GetChars(bytes, chars);
+#if NET20_OR_GREATER
+            return chars.ToString();
+#else
             return new string(chars);
+#endif
         }
 
         /// <summary>
@@ -61,7 +65,7 @@ namespace AuroraLib.Core.Text
         {
             int length = bytes.IndexOf(terminator);
             if (length == -1) length = bytes.Length;
-            return encoding.GetString(bytes[..length]);
+            return encoding.GetString(bytes.Slice(0, length));
         }
 
         /// <inheritdoc cref="GetString(ReadOnlySpan{byte}, Encoding, byte)"/>
@@ -70,7 +74,7 @@ namespace AuroraLib.Core.Text
         {
             int length = bytes.IndexOf(terminator);
             if (length == -1) length = bytes.Length;
-            return GetString(bytes[..length]);
+            return GetString(bytes.Slice(0, length));
         }
         #endregion
 
@@ -92,7 +96,7 @@ namespace AuroraLib.Core.Text
                 if (bytes[i] != 0)
                     return BitConverter.ToString(bytes.ToArray());
             }
-            return GetString(bytes[..length]);
+            return GetString(bytes.Slice(0, length));
         }
         #endregion
 
@@ -106,5 +110,45 @@ namespace AuroraLib.Core.Text
         public static int IndexOfInvalidByte(ReadOnlySpan<byte> bytes)
             => bytes.IndexOf(InvalidByte);
         #endregion
+
+#if NET20_OR_GREATER
+        /// <inheritdoc cref="Encoding.GetString(byte[])"/>
+        public static unsafe string GetString(this Encoding encoding, ReadOnlySpan<byte> bytes)
+        {
+            fixed (byte* bytePtr = bytes)
+            {
+                return encoding.GetString(bytePtr, bytes.Length);
+            }
+        }
+
+        /// <inheritdoc cref="Encoding.GetBytes(char*, int, byte*, int)"/>
+        public static unsafe int GetBytes(this Encoding encoding, ReadOnlySpan<char> chars, Span<byte> bytes)
+        {
+            fixed (char* charPtr = chars)
+            fixed (byte* bytePtr = bytes)
+            {
+               return encoding.GetBytes(charPtr, chars.Length, bytePtr, bytes.Length);
+            }
+        }
+
+        /// <inheritdoc cref="Encoding.GetChars(byte*, int, char*, int)"/>
+        public static unsafe int GetChars(this Encoding encoding, Span<byte> bytes, ReadOnlySpan<char> chars)
+        {
+            fixed (char* charPtr = chars)
+            fixed (byte* bytePtr = bytes)
+            {
+                return encoding.GetChars(bytePtr, bytes.Length, charPtr, chars.Length);
+            }
+        }
+
+        /// <inheritdoc cref="Encoding.GetByteCount(char[])"/>
+        public static unsafe int GetByteCount(this Encoding encoding, ReadOnlySpan<char> chars)
+        {
+            fixed (char* charPtr = chars)
+            {
+                return encoding.GetByteCount(charPtr, chars.Length);
+            }
+        }
+#endif
     }
 }

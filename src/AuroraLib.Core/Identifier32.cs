@@ -3,6 +3,7 @@ using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.Text;
 using System;
 using System.Diagnostics;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -15,7 +16,10 @@ namespace AuroraLib.Core
     [Serializable]
     public unsafe struct Identifier32 : IIdentifier
     {
+#pragma warning disable IDE0044
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private byte b0, b1, b2, b3;
+#pragma warning restore IDE0044
 
         /// <inheritdoc />
         public byte this[int index]
@@ -80,7 +84,7 @@ namespace AuroraLib.Core
         /// <param name="span">The character span to initialize the identifier. Only the first 4 characters will be considered.</param>
         public Identifier32(ReadOnlySpan<char> span)
         {
-            ReadOnlySpan<char> span32 = span[..Math.Min(span.Length, 4)];
+            ReadOnlySpan<char> span32 = span.Slice(0,Math.Min(span.Length, 4));
             Span<byte> bytes = stackalloc byte[4];
             Encoding.GetEncoding(28591).GetBytes(span32, bytes);
 
@@ -96,7 +100,16 @@ namespace AuroraLib.Core
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<byte> AsSpan()
+#if NET20_OR_GREATER
+        {
+            fixed (byte* bytePtr = &b0)
+            {
+                return new Span<byte>(bytePtr, 4);
+            }
+        }
+#else
             => MemoryMarshal.CreateSpan(ref b0, 4);
+#endif
 
         /// <inheritdoc />
         [DebuggerStepThrough]
@@ -111,10 +124,10 @@ namespace AuroraLib.Core
             => EncodingX.GetString(AsSpan(), encoding, 0x0);
 
         /// <inheritdoc />
-        public bool Equals(string? other) => other == GetString();
+        public bool Equals(string other) => other == GetString();
 
         /// <inheritdoc />
-        public bool Equals(IIdentifier? other) => other != null && other.AsSpan().SequenceEqual(AsSpan());
+        public bool Equals(IIdentifier other) => other != null && other.AsSpan().SequenceEqual(AsSpan());
 
         public static implicit operator Identifier32(uint v) => *(Identifier32*)&v;
         public static implicit operator uint(Identifier32 v) => *(uint*)&v;
@@ -122,7 +135,7 @@ namespace AuroraLib.Core
         public static explicit operator Identifier32(int v) => *(Identifier32*)&v;
         public static explicit operator int(Identifier32 v) => *(int*)&v;
 
-        public static explicit operator Identifier32(string v) => new Identifier32(v);
+        public static explicit operator Identifier32(string v) => new Identifier32(v.AsSpan());
         public static explicit operator string(Identifier32 v) => v.GetString();
 
         /// <inheritdoc />

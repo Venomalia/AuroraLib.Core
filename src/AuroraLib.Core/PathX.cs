@@ -17,7 +17,7 @@ namespace AuroraLib.Core
         public static ReadOnlySpan<char> GetRelativePath(ReadOnlySpan<char> path, in ReadOnlySpan<char> MainPath)
         {
             if (path.StartsWith(MainPath))
-                return path[MainPath.Length..].TrimStart(Path.DirectorySeparatorChar);
+                return path.Slice(MainPath.Length, path.Length).TrimStart(Path.DirectorySeparatorChar);
             return path;
         }
 
@@ -29,7 +29,7 @@ namespace AuroraLib.Core
         public static ReadOnlySpan<char> GetFileWithoutExtension(ReadOnlySpan<char> path)
         {
             if (path.LastIndexOf(ExtensionSeparatorChar) > path.LastIndexOf(Path.DirectorySeparatorChar))
-                return path[..path.LastIndexOf(ExtensionSeparatorChar)];
+                return path.Slice(0, path.LastIndexOf(ExtensionSeparatorChar));
             return path;
         }
 

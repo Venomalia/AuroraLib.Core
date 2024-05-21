@@ -164,6 +164,18 @@ namespace AuroraLib.Core.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SequenceGetHashCode<T>(this ReadOnlySpan<T> span) where T : unmanaged
         {
+#if NET20_OR_GREATER
+            unchecked
+            {
+                int hash = 17;
+                foreach (T item in span)
+                {
+                    hash = hash * 31 + item.GetHashCode();
+                }
+                return hash;
+            }
+#else
+
 #if !NETSTANDARD
             // If char use string implementation
             if (typeof(T) == typeof(char))
@@ -183,6 +195,7 @@ namespace AuroraLib.Core.Extensions
             }
 #endif
             return gen.ToHashCode();
+#endif
         }
 
         /// <inheritdoc cref="SequenceGetHashCode{T}(ReadOnlySpan{T})"/>
@@ -221,15 +234,20 @@ namespace AuroraLib.Core.Extensions
         /// <returns>A span of bytes representing the same memory as the original buffer.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#if !NETSTANDARD
+#if !(NETSTANDARD || NET20_OR_GREATER)
         public static Span<byte> AsBytes<T>(this ref T buffer) where T : unmanaged
         {
             ref byte bRef = ref Unsafe.As<T, byte>(ref buffer);
             return MemoryMarshal.CreateSpan(ref bRef, Unsafe.SizeOf<T>());
         }
 #else
-        public unsafe static Span<byte> AsBytes<T>(this T buffer) where T : unmanaged
-            => new Span<byte>(&buffer, sizeof(T));
+        public unsafe static Span<byte> AsBytes<T>(this ref T buffer) where T : unmanaged
+        {
+            fixed (T* bytePtr = &buffer)
+            {
+                return new Span<byte>(bytePtr, sizeof(T));
+            }
+        }
 #endif
     }
 }

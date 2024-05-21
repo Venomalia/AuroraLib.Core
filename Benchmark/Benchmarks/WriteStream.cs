@@ -6,16 +6,16 @@ namespace Benchmark.Benchmarks
     [MemoryDiagnoser]
     public class WriteStream
     {
-        [Params(100, 10000, 100000)]
-        public int N;
+        [Params(1, 10, 100)]
+        public int MB;
 
-        private readonly byte[] data = new byte[10];
+        private readonly byte[] data = new byte[1048576];
 
         [Benchmark]
         public void MemoryStream_Write()
         {
             using MemoryStream ms = new();
-            for (int i = 0; i < N; i++)
+            for (int i = 0; i < MB; i++)
             {
                 ms.Write(data);
             }
@@ -25,7 +25,7 @@ namespace Benchmark.Benchmarks
         public void MemoryPoolStream_Write()
         {
             using MemoryPoolStream ms = new();
-            for (int i = 0; i < N; i++)
+            for (int i = 0; i < MB; i++)
             {
                 ms.Write(data);
             }

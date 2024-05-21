@@ -110,7 +110,12 @@ namespace AuroraLib.Core.IO
         /// <inheritdoc/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public override void WriteByte(byte value) => Write(stackalloc byte[1] { value });
+        public override void WriteByte(byte value)
+#if NET20_OR_GREATER
+            => Write(new byte[1] { value });
+#else
+            => Write(stackalloc byte[1] { value });
+#endif
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
