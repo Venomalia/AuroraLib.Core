@@ -264,5 +264,18 @@ namespace AuroraLib.Core.Extensions
             }
         }
 #endif
+
+        /// <summary>
+        /// Converts a ReadOnlySpan of bytes to an <see cref="UnmanagedMemoryStream"/>.
+        /// </summary>
+        /// <param name="data">The ReadOnlySpan of bytes to be converted.</param>
+        /// <returns>An <see cref="UnmanagedMemoryStream"/> that allows read-only access to the data.</returns>
+        public unsafe static UnmanagedMemoryStream AsReadOnlyStream(this ReadOnlySpan<byte> data)
+        {
+            fixed (byte* ptr = &data.GetPinnableReference())
+            {
+                return new UnmanagedMemoryStream(ptr, data.Length);
+            }
+        }
     }
 }
