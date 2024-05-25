@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -210,7 +211,6 @@ namespace AuroraLib.Core.Extensions
         public static int SequenceGetHashCode<T>(this T[] array) where T : unmanaged
             => SequenceGetHashCode(array.AsSpan());
 
-#if NET5_0_OR_GREATER
         /// <summary>
         /// Casts an array of one primitive type <typeparamref name="TFrom"/> to a span of another primitive type <typeparamref name="TTo"/>.
         /// </summary>
@@ -219,13 +219,28 @@ namespace AuroraLib.Core.Extensions
         /// <param name="buffer">The source array to convert.</param>
         /// <returns>A span containing the elements converted from the source array.</returns>
         [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Span<TTo> ToSpan<TFrom, TTo>(this TFrom[] buffer) where TFrom : unmanaged where TTo : unmanaged
+        public unsafe static Span<TTo> ToSpan<TFrom, TTo>(this TFrom[] buffer) where TFrom : unmanaged where TTo : unmanaged
         {
+            int fromSize = sizeof(TFrom);
+            int toSize = sizeof(TTo);
+
+            if (fromSize == 0 || toSize == 0)
+                throw new ArgumentException("Size of types must be non-zero.");
+
+            int toLength = buffer.Length * fromSize / toSize;
+            if (toLength * toSize != buffer.Length * fromSize)
+                throw new ArgumentException("Buffer length is not a multiple of the target type size.");
+
+#if NET5_0_OR_GREATER
             ref TTo toRef = ref Unsafe.As<TFrom, TTo>(ref MemoryMarshal.GetArrayDataReference(buffer));
-            return MemoryMarshal.CreateSpan(ref toRef, buffer.Length / Unsafe.SizeOf<TFrom>() * Unsafe.SizeOf<TTo>());
-        }
+            return MemoryMarshal.CreateSpan(ref toRef, toLength);
+#else
+            fixed (TFrom* ptr = buffer)
+            {
+                return new Span<TTo>(ptr, toLength);
+            }
 #endif
+        }
         /// <summary>
         /// Converts an instance of an unmanaged type to a span of bytes.
         /// </summary>
