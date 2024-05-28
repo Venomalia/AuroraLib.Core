@@ -1,6 +1,7 @@
 ﻿using AuroraLib.Core.Buffers;
 using AuroraLib.Core.Extensions;
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -15,12 +16,6 @@ namespace AuroraLib.Core
     public static class BitConverterX
     {
         #region ConvertGeneric
-        /// <inheritdoc cref="MemoryMarshal.Read{T}(ReadOnlySpan{byte})"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T Read<T>(ReadOnlySpan<byte> source) where T : unmanaged
-            => MemoryMarshal.Read<T>(source);
-
         /// <summary>
         /// Converts a instance of <typeparamref name="T"/> to a byte array.
         /// </summary>
@@ -40,12 +35,6 @@ namespace AuroraLib.Core
         [DebuggerStepThrough]
         public static byte[] GetBytes<T>(T value) where T : unmanaged
             => GetBytes(ref value);
-
-        /// <inheritdoc cref="MemoryMarshal.TryWrite{T}(Span{byte}, ref T)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryWrite<T>(Span<byte> destination, ref T value) where T : unmanaged
-            => MemoryMarshal.TryWrite(destination, ref value);
         #endregion
 
         #region SwapGeneric
@@ -228,66 +217,41 @@ namespace AuroraLib.Core
         public static sbyte SwapAlternateBits(sbyte value)
             => (sbyte)SwapAlternateBits((byte)value);
 
-        /// <summary>
-        /// Swaps the bytes in the 16-bit unsigned integer.
-        /// </summary>
-        /// <param name="value">The ushort value to swap the bytes for.</param>
-        /// <returns>The ushort value with swapped bytes.</returns>
+        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(ushort)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ushort Swap(ushort value)
-            => (ushort)((value & 0xFF) << 8 | value >> 8 & 0xFF);
+            => BinaryPrimitives.ReverseEndianness(value);
 
-        /// <summary>
-        /// Swaps the bytes in the 16-bit signed integer.
-        /// </summary>
-        /// <param name="value">The short value to swap the bytes for.</param>
-        /// <returns>The short value with swapped bytes.</returns>
+        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(short)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static short Swap(short value)
-            => (short)Swap((ushort)value);
+            => BinaryPrimitives.ReverseEndianness(value);
 
-        /// <summary>
-        /// Swaps the bytes in the 32-bit unsigned integer.
-        /// </summary>
-        /// <param name="value">The uint value to swap the bytes for.</param>
-        /// <returns>The uint value with swapped bytes.</returns>
+        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(uint)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint Swap(uint value)
-            => (value & 0x000000ff) << 24 | (value & 0x0000ff00) << 8 | (value & 0x00ff0000) >> 8 | (value & 0xff000000) >> 24;
+            => BinaryPrimitives.ReverseEndianness(value);
 
-        /// <summary>
-        /// Swaps the bytes in the 32-bit signed integer.
-        /// </summary>
-        /// <param name="value">The int value to swap the bytes for.</param>
-        /// <returns>The int value with swapped bytes.</returns>
+        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(int)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Swap(int value)
-            => (int)Swap((uint)value);
+            => BinaryPrimitives.ReverseEndianness(value);
 
-        /// <summary>
-        /// Swaps the bytes in the 64-bit unsigned integer.
-        /// </summary>
-        /// <param name="value">The ulong value to swap the bytes for.</param>
-        /// <returns>The ulong value with swapped bytes.</returns>
+        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(ulong)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong Swap(ulong value)
-            => 0x00000000000000FF & value >> 56 | 0x000000000000FF00 & value >> 40 | 0x0000000000FF0000 & value >> 24 | 0x00000000FF000000 & value >> 8 |
-            0x000000FF00000000 & value << 8 | 0x0000FF0000000000 & value << 24 | 0x00FF000000000000 & value << 40 | 0xFF00000000000000 & value << 56;
+            => BinaryPrimitives.ReverseEndianness(value);
 
-        /// <summary>
-        /// Swaps the bytes in the 64-bit signed integer.
-        /// </summary>
-        /// <param name="value">The long value to swap the bytes for.</param>
-        /// <returns>The long value with swapped bytes.</returns>
+        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(long)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long Swap(long value)
-            => (long)Swap((ulong)value);
+            => BinaryPrimitives.ReverseEndianness(value);
         #endregion
 
         #region GetBit
@@ -416,27 +380,6 @@ namespace AuroraLib.Core
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static void GetBitsThrowHelper(int length)
             => throw new ArgumentOutOfRangeException("GetBits", $"Length & index must be between 1 and {length}.");
-
-        /// <summary>
-        /// Read single bits as steam of bools
-        /// </summary>
-        /// <param name="b"></param>
-        /// <param name="byteorder">Byte order, in which bytes are read</param>
-        /// <returns></returns>
-        [DebuggerStepThrough]
-        public static IEnumerable<bool> GetBits(byte b, Endian byteorder = Endian.Little)
-        {
-            if (byteorder == Endian.Little)
-            {
-                for (int i = 0; i < 8; i++)
-                    yield return GetBit(b, i);
-            }
-            else
-            {
-                for (int i = 7; i >= 0; i--)
-                    yield return GetBit(b, i);
-            }
-        }
         #endregion
 
         #region SetBit

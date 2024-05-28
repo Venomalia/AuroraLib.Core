@@ -14,7 +14,7 @@ namespace AuroraLib.Core
         /// <param name="path">The path for which to obtain the relative path.</param>
         /// <param name="MainPath">The main path to which the relative path should be determined.</param>
         /// <returns>The relative path from the given path to the main path.</returns>
-        public static ReadOnlySpan<char> GetRelativePath(ReadOnlySpan<char> path, in ReadOnlySpan<char> MainPath)
+        public static ReadOnlySpan<char> GetRelativePath(ReadOnlySpan<char> path, ReadOnlySpan<char> MainPath)
         {
             if (path.StartsWith(MainPath))
                 return path.Slice(MainPath.Length, path.Length).TrimStart(Path.DirectorySeparatorChar);
