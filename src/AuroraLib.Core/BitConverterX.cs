@@ -264,7 +264,7 @@ namespace AuroraLib.Core
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool GetBit(byte b, int index = 0)
-            => (b & 1 << index) != 0;
+            => (b >> index & 1) != 0;
 
         /// <summary>
         /// Get a bit from a 16-bit signed integer.
@@ -274,8 +274,8 @@ namespace AuroraLib.Core
         /// <returns>bit as bool</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool GetBit(short b, int index = 0)
-            => (b & 1 << index) != 0;
+        public static bool GetBit(ushort b, int index = 0)
+            => (b >> index & 1) != 0;
 
         /// <summary>
         /// Get a bit from a 32-bit signed integer.
@@ -285,8 +285,8 @@ namespace AuroraLib.Core
         /// <returns>bit as bool</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool GetBit(int b, int index = 0)
-            => (b & 1 << index) != 0;
+        public static bool GetBit(uint b, int index = 0)
+            => (b >> index & 1) != 0;
 
         /// <summary>
         /// Get a bit from a 64-bit signed integer.
@@ -296,8 +296,8 @@ namespace AuroraLib.Core
         /// <returns>bit as bool</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool GetBit(long b, int index = 0)
-            => (b & 1 << index) != 0;
+        public static bool GetBit(ulong b, int index = 0)
+            => (b >> index & 1) != 0;
         #endregion
 
         #region GetBits
@@ -316,7 +316,7 @@ namespace AuroraLib.Core
             {
                 GetBitsThrowHelper(8);
             }
-            return (byte)(b >> index - length & (1 << length) - 1);
+            return (byte)(b >> index & (1 << length) - 1);
         }
 
         /// <summary>
@@ -328,13 +328,13 @@ namespace AuroraLib.Core
         /// <returns></returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static short GetBits(short b, short index, short length)
+        public static ushort GetBits(ushort b, short index, short length)
         {
             if (index + length > 16)
             {
                 GetBitsThrowHelper(16);
             }
-            return (short)(b >> index - length & (1 << length) - 1);
+            return (ushort)(b >> index & (1 << length) - 1);
         }
 
         /// <summary>
@@ -346,13 +346,13 @@ namespace AuroraLib.Core
         /// <returns></returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int GetBits(int b, int index, int length)
+        public static uint GetBits(uint b, int index, int length)
         {
             if (index + length > 32)
             {
                 GetBitsThrowHelper(32);
             }
-            return b >> index - length & (int)((1L << length) - 1);
+            return b >> index & (uint)(1 << length) - 1;
         }
 
         /// <summary>
@@ -364,22 +364,18 @@ namespace AuroraLib.Core
         /// <returns></returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long GetBits(long b, int index, int length)
+        public static ulong GetBits(ulong b, int index, int length)
         {
             if (length > 64 || index > 64)
             {
                 GetBitsThrowHelper(64);
             }
-            if (length == 64)
-            {
-                return b;
-            }
-            return b >> index - length & (1L << length) - 1;
+            return b >> index & (1ul << length) - 1;
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static void GetBitsThrowHelper(int length)
-            => throw new ArgumentOutOfRangeException("GetBits", $"Length & index must be between 1 and {length}.");
+            => throw new ArgumentOutOfRangeException("GetBits", $"Length + index must be between 1 and {length}.");
         #endregion
 
         #region SetBit
@@ -391,12 +387,11 @@ namespace AuroraLib.Core
         /// <param name="value"></param>
         /// <returns></returns>
         [DebuggerStepThrough]
-        public static byte SetBit(this byte b, int index, bool value)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static byte SetBit(byte b, int index, bool value)
         {
-            if (value)
-                return (byte)(b | 1 << index);
-            else
-                return (byte)(b & ~(1 << index));
+            int bitmask = 1 << index;
+            return value ? (byte)(b | bitmask) : (byte)(b & ~bitmask);
         }
 
         /// <summary>
@@ -407,12 +402,11 @@ namespace AuroraLib.Core
         /// <param name="value"></param>
         /// <returns></returns>
         [DebuggerStepThrough]
-        public static int SetBit(this int b, int index, bool value)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int SetBit(int b, int index, bool value)
         {
-            if (value)
-                return b | 1 << index;
-            else
-                return b & ~(1 << index);
+            int bitmask = 1 << index;
+            return value ? (b | bitmask) : (b & ~bitmask);
         }
         #endregion
 
