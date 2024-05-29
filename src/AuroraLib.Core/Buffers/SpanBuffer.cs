@@ -183,9 +183,5 @@ namespace AuroraLib.Core.Buffers
         public static implicit operator Span<T>(SpanBuffer<T> x) => x.Span;
 
         public static implicit operator ReadOnlySpan<T>(SpanBuffer<T> x) => x.Span;
-
-        public static implicit operator Span<byte>(SpanBuffer<T> x) => x.Bytes;
-
-        public static implicit operator ReadOnlySpan<byte>(SpanBuffer<T> x) => x.Bytes;
     }
 }

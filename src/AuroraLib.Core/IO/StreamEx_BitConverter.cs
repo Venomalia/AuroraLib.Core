@@ -63,7 +63,7 @@ namespace AuroraLib.Core.IO
         /// <inheritdoc cref="ThrowHelper{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UInt24 ReadUInt24(Stream stream, Endian order = Endian.Little)
+        public static UInt24 ReadUInt24(this Stream stream, Endian order = Endian.Little)
             => (UInt24)ReadInt24Helper<UInt24>(stream, order);
 
         /// <summary>
