@@ -68,7 +68,7 @@ namespace CoreUnitTest
                     stream.WriteByte((byte)(value ? 128 : 127));
                 stream.Position = 0;
 
-                BitReader reader = new BitReader(stream, Endian.Little, bitOrder);
+                BitReader reader = new BitReader(stream, bitOrder);
                 bool actualvalue = reader.ReadBit();
 
                 Assert.AreEqual(value, actualvalue);
@@ -84,11 +84,11 @@ namespace CoreUnitTest
         {
             using (MemoryPoolStream stream = new MemoryPoolStream())
             {
-                BitWriter writer = new BitWriter(stream, bitOrder, bitOrder);
+                BitWriter writer = new BitWriter(stream, bitOrder);
                 writer.Write(value);
                 for (int i = 1; i < 8; i++)
                 {
-                    writer.Write(!value);
+                    writer.Write(value);
                 }
                 writer.Flush();
                 stream.Position = 0;
@@ -112,19 +112,25 @@ namespace CoreUnitTest
         [DataRow(5, Endian.Little)]
         [DataRow(7, Endian.Big)]
         [DataRow(7, Endian.Little)]
-        public void BitReader_ReadBits(int bits, Endian bitOrder)
+        [DataRow(9, Endian.Big)]
+        [DataRow(9, Endian.Little)]
+        [DataRow(11, Endian.Big)]
+        [DataRow(11, Endian.Little)]
+        [DataRow(15, Endian.Big)]
+        [DataRow(15, Endian.Little)]
+        public void BitReader_ReadBitsAsUInt(int bits, Endian bitOrder)
         {
-            byte value = (byte)(bits << bits);
+            uint value = (uint)((1 << bits) - 2);
             using (MemoryPoolStream stream = new MemoryPoolStream())
             {
                 if (bitOrder == Endian.Little)
-                    stream.WriteByte(value);
+                    stream.Write(value);
                 else
-                    stream.WriteByte((byte)(bits << (8 - bits)));
+                    stream.Write((value << (32 - bits)), Endian.Big);
                 stream.Position = 0;
 
-                BitReader reader = new BitReader(stream, bitOrder, bitOrder);
-                byte actualvalue = (byte)reader.ReadInt(bits);
+                BitReader reader = new BitReader(stream, bitOrder);
+                uint actualvalue = (uint)reader.ReadUInt(bits);
 
                 Assert.AreEqual(value, actualvalue);
             }
@@ -137,23 +143,128 @@ namespace CoreUnitTest
         [DataRow(5, Endian.Little)]
         [DataRow(7, Endian.Big)]
         [DataRow(7, Endian.Little)]
-        public void BitWriter_WriteBits(int bits, Endian bitOrder)
+        [DataRow(9, Endian.Big)]
+        [DataRow(9, Endian.Little)]
+        [DataRow(11, Endian.Big)]
+        [DataRow(11, Endian.Little)]
+        [DataRow(15, Endian.Big)]
+        [DataRow(15, Endian.Little)]
+        public void BitWriter_WriteBitsAsUInt(int bits, Endian bitOrder)
         {
-            byte value = (byte)(bits << bits);
+            uint value = (uint)((1 << bits) - 2);
             using (MemoryPoolStream stream = new MemoryPoolStream())
             {
-                BitWriter writer = new BitWriter(stream, bitOrder, bitOrder);
+                BitWriter writer = new BitWriter(stream, bitOrder);
                 writer.Write(value, bits);
+                writer.Write(0, 32 - bits);
                 writer.Flush();
                 stream.Position = 0;
 
-                byte actualvalue;
+                uint actualvalue;
                 if (bitOrder == Endian.Little)
-                    actualvalue = (byte)stream.ReadByte();
+                    actualvalue = stream.ReadUInt32();
                 else
-                    actualvalue = (byte)(stream.ReadByte() >> (8 - bits));
+                    actualvalue = stream.ReadUInt32(Endian.Big) >> (32 - bits);
 
                 Assert.AreEqual(value, actualvalue);
+            }
+        }
+        [TestMethod]
+        [DataRow(3, Endian.Big)]
+        [DataRow(3, Endian.Little)]
+        [DataRow(5, Endian.Big)]
+        [DataRow(5, Endian.Little)]
+        [DataRow(7, Endian.Big)]
+        [DataRow(7, Endian.Little)]
+        [DataRow(9, Endian.Big)]
+        [DataRow(9, Endian.Little)]
+        [DataRow(11, Endian.Big)]
+        [DataRow(11, Endian.Little)]
+        [DataRow(15, Endian.Big)]
+        [DataRow(15, Endian.Little)]
+        public void BitReader_ReadBitsAsInt(int bits, Endian bitOrder)
+        {
+            int value = (1 << bits - 1) * -1;
+            using (MemoryPoolStream stream = new MemoryPoolStream())
+            {
+                if (bitOrder == Endian.Little)
+                    stream.Write(value);
+                else
+                    stream.Write((value << (32 - bits)), Endian.Big);
+                stream.Position = 0;
+
+                BitReader reader = new BitReader(stream, bitOrder);
+                int actualvalue = (int)reader.ReadInt(bits);
+
+                Assert.AreEqual(value, actualvalue);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(3, Endian.Big)]
+        [DataRow(3, Endian.Little)]
+        [DataRow(5, Endian.Big)]
+        [DataRow(5, Endian.Little)]
+        [DataRow(7, Endian.Big)]
+        [DataRow(7, Endian.Little)]
+        [DataRow(9, Endian.Big)]
+        [DataRow(9, Endian.Little)]
+        [DataRow(11, Endian.Big)]
+        [DataRow(11, Endian.Little)]
+        [DataRow(15, Endian.Big)]
+        [DataRow(15, Endian.Little)]
+        public void BitWriter_WriteBitsAsInt(int bits, Endian bitOrder)
+        {
+            int value = (1 << bits-1) * -1;
+            using (MemoryPoolStream stream = new MemoryPoolStream())
+            {
+                BitWriter writer = new BitWriter(stream, bitOrder);
+                writer.Write(value, bits);
+                writer.Write(0, 32 - bits);
+                writer.Flush();
+                stream.Position = 0;
+
+                BitReader reader = new BitReader(stream, bitOrder);
+                int actualvalue = (int)reader.ReadInt(bits);
+
+                Assert.AreEqual(value, actualvalue);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(3, Endian.Big)]
+        [DataRow(3, Endian.Little)]
+        [DataRow(5, Endian.Big)]
+        [DataRow(5, Endian.Little)]
+        [DataRow(7, Endian.Big)]
+        [DataRow(7, Endian.Little)]
+        [DataRow(9, Endian.Big)]
+        [DataRow(9, Endian.Little)]
+        [DataRow(11, Endian.Big)]
+        [DataRow(11, Endian.Little)]
+        [DataRow(15, Endian.Big)]
+        [DataRow(15, Endian.Little)]
+        [DataRow(62, Endian.Big)]
+        [DataRow(62, Endian.Little)]
+        public void BitWriterBitReader_CrossCheck(int bits, Endian bitOrder)
+        {
+            ulong value = (1ul << bits-1) + 1;
+            using (MemoryPoolStream stream = new MemoryPoolStream())
+            {
+                BitWriter writer = new BitWriter(stream, bitOrder);
+                for (int i = 0; i < 4; i++)
+                    writer.Write(value, bits);
+                writer.Flush();
+                stream.Position = 0;
+
+                BitReader reader = new BitReader(stream, bitOrder);
+
+                for (int i = 0; i < 4; i++)
+                {
+                    ulong actualvalue = reader.ReadUInt(bits);
+
+                    Assert.AreEqual(value, actualvalue);
+                }
             }
         }
         #endregion

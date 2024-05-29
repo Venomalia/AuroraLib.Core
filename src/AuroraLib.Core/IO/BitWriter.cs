@@ -13,21 +13,15 @@ namespace AuroraLib.Core.IO
         private byte _buffer = 0;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BitWriter"/> class.
+        /// Initializes a new instance of the <see cref="BitWriter"/>  class with the specified stream.
         /// </summary>
-        /// <param name="stream">The output stream to write bits to.</param>
-        /// <param name="byteOrder">The byte order to use when writing multi-byte values.</param>
-        /// <param name="bitOrder">The bit order to use when writing individual bits within bytes.</param>
+        /// <param name="stream">The stream to write to.</param>
+        /// <param name="order">The byte order to use when writing bits.</param>
         /// <param name="leaveOpen">true leave the base stream open when disposing.</param>
         /// <exception cref="ArgumentNullException">Thrown if the provided stream is null.</exception>
         [DebuggerStepThrough]
-        public BitWriter(Stream stream, Endian byteOrder = Endian.Big, Endian bitOrder = Endian.Little, bool leaveOpen = true)
-        {
-            BaseStream = stream ?? throw new ArgumentNullException(nameof(stream));
-            Protectbase = leaveOpen;
-            ByteOrder = byteOrder;
-            BitOrder = bitOrder;
-        }
+        public BitWriter(Stream stream, Endian order = Endian.Little, bool leaveOpen = true) : base(stream, order, leaveOpen)
+        { }
 
         /// <summary>
         /// Writes a single boolean bit to the underlying stream.
@@ -36,21 +30,89 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         public void Write(bool bit)
         {
-            if (bit)
-            {
-                _buffer |= (byte)(1 << BitPosition);
-            }
+            _buffer = BitConverterX.SetBit(_buffer, BitPosition, bit);
 
             if (BitPosition == 7)
-            {
                 Flush();
-            }
             else
-            {
                 BitPosition++;
+        }
+
+        /// <summary>
+        /// Flushes any remaining bits in the buffer to the underlying stream.
+        /// </summary>
+        [DebuggerStepThrough]
+        public void Flush() => FlushBuffer();
+
+        /// <inheritdoc/>
+        protected override void FlushBuffer()
+        {
+            if (BitPosition != 0)
+            {
+                if (Order != Endian.Little)
+                    _buffer = BitConverterX.Swap(_buffer);
+
+                BaseStream.WriteByte(_buffer);
+                BitPosition = _buffer = 0;
             }
         }
 
+        [DebuggerStepThrough]
+#if !(NETSTANDARD || NET20_OR_GREATER)
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
+        private void WriteInternally(ulong value, int bitCount, int intLength)
+        {
+            if (bitCount > intLength)
+                throw new ArgumentOutOfRangeException(nameof(bitCount), $"Length must be between 1 and {intLength}.");
+
+            int i = 0;
+
+            if (Order == Endian.Little)
+            {
+                while (i < bitCount)
+                {
+                    if (BitPosition != 0 || bitCount - i < 8)
+                    {
+                        Write(BitConverterX.GetBit(value, i++));
+                    }
+                    else
+                    {
+                        byte byteToWrite = (byte)(value >> i);
+                        BaseStream.WriteByte(byteToWrite);
+                        i += 8;
+                    }
+                }
+            }
+            else
+            {
+                while (i < bitCount)
+                {
+                    if (BitPosition != 0 || bitCount - i < 8)
+                    {
+                        Write(BitConverterX.GetBit(value, bitCount - i++ - 1));
+                    }
+                    else
+                    {
+                        byte byteToWrite = (byte)(value >> (bitCount - i - 8));
+                        BaseStream.WriteByte(byteToWrite);
+                        i += 8;
+                    }
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        [DebuggerStepThrough]
+        protected override void ResetBuffer()
+        {
+            if (BitPosition != 0 && BaseStream.CanSeek)
+                _buffer = BaseStream.Peek<byte>();
+            else
+                _buffer = 0;
+        }
+
+        #region Write
         /// <summary>
         /// Writes a specified number of bits from the given unsigned 8-bit integer value to the underlying stream.
         /// </summary>
@@ -81,13 +143,7 @@ namespace AuroraLib.Core.IO
         /// <exception cref="ArgumentOutOfRangeException">Thrown if 'length' is less than 1 or greater than 16.</exception>
         [DebuggerStepThrough]
         public void Write(ushort value, int length = 16)
-        {
-            if (ByteOrder == Endian.Big)
-            {
-                value = BitConverterX.Swap(value);
-            }
-            WriteInternally(value, length, 16);
-        }
+            => WriteInternally(value, length, 16);
 
         /// <summary>
         /// Writes a specified number of bits from the given signed 16-bit integer value to the underlying stream.
@@ -108,13 +164,7 @@ namespace AuroraLib.Core.IO
         /// <exception cref="ArgumentOutOfRangeException">Thrown if 'length' is less than 1 or greater than 24.</exception>
         [DebuggerStepThrough]
         public void Write(UInt24 value, int length = 24)
-        {
-            if (ByteOrder == Endian.Big)
-            {
-                value = BitConverterX.Swap(value);
-            }
-            WriteInternally(value, length, 24);
-        }
+            => WriteInternally(value, length, 24);
         /// <summary>
         /// Writes a specified number of bits from the given 24-bit signed integer value to the underlying stream.
         /// </summary>
@@ -134,13 +184,7 @@ namespace AuroraLib.Core.IO
         /// <exception cref="ArgumentOutOfRangeException">Thrown if 'length' is less than 1 or greater than 32.</exception>
         [DebuggerStepThrough]
         public void Write(uint value, int length = 32)
-        {
-            if (ByteOrder == Endian.Big)
-            {
-                value = BitConverterX.Swap(value);
-            }
-            WriteInternally(value, length, 32);
-        }
+            => WriteInternally(value, length, 32);
 
         /// <summary>
         /// Writes a specified number of bits from the given signed 32-bit integer value to the underlying stream.
@@ -161,13 +205,7 @@ namespace AuroraLib.Core.IO
         /// <exception cref="ArgumentOutOfRangeException">Thrown if 'length' is less than 1 or greater than 64.</exception>
         [DebuggerStepThrough]
         public void Write(ulong value, int length = 64)
-        {
-            if (ByteOrder == Endian.Big)
-            {
-                value = BitConverterX.Swap(value);
-            }
-            WriteInternally(value, length, 64);
-        }
+            => WriteInternally(value, length, 64);
 
         /// <summary>
         /// Writes a specified number of bits from the given signed 64-bit integer value to the underlying stream.
@@ -179,61 +217,6 @@ namespace AuroraLib.Core.IO
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(long value, int length = 64)
             => Write((ulong)value, length);
-
-        /// <summary>
-        /// Flushes any remaining bits in the buffer to the underlying stream.
-        /// </summary>
-        [DebuggerStepThrough]
-        public void Flush()
-        {
-            if (BitPosition != 0)
-            {
-                if (BitOrder == Endian.Little)
-                    BaseStream.Write(_buffer);
-                else
-                    BaseStream.Write(BitConverterX.Swap(_buffer));
-                BitPosition = _buffer = 0;
-            }
-        }
-
-        [DebuggerStepThrough]
-        private void WriteInternally(ulong value, int length, int intlength)
-        {
-            if (length > intlength)
-            {
-                throw new ArgumentOutOfRangeException(nameof(length), $"Length must be between 1 and {intlength}.");
-            }
-
-            int i = 0;
-            while (i < length)
-            {
-                if (BitPosition == 0 && length - i >= 8)
-                {
-                    byte int8 = (byte)(value >> i & 0xFF);
-                    if (BitOrder == Endian.Little)
-                        BaseStream.Write(int8);
-                    else
-                        BaseStream.Write(BitConverterX.Swap(int8));
-                    i += 8;
-                }
-                else
-                {
-                    Write(((value >> i) & 1) == 1);
-                    i++;
-                }
-
-            }
-        }
-
-        [DebuggerStepThrough]
-        protected override void ResetBuffer()
-        {
-            _buffer = 0;
-
-            if (BitPosition != 0)
-            {
-                _buffer = BitConverterX.GetBits(BaseStream.Peek<byte>(), 0, BitPosition);
-            }
-        }
+        #endregion
     }
 }

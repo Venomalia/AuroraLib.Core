@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 
 namespace AuroraLib.Core.IO
 {
+    /// <summary>
+    /// Basic class for <see cref="BitReader"/> and <see cref="BitWriter"/>
+    /// </summary>
     public abstract class BitStreamProcessor : IDisposable
     {
         /// <summary>
@@ -22,20 +26,18 @@ namespace AuroraLib.Core.IO
         }
         private Stream basestream;
 
-        /// <summary>
-        /// A long value representing the length of the stream in bytes.
-        /// </summary>
+        /// <inheritdoc cref="Stream.Length"/>
         public long Length => basestream.Length;
 
-        /// <summary>
-        /// The current position within the stream.
-        /// </summary>
-        public long Position
+
+        /// <inheritdoc cref="Stream.Position"/>
+        public virtual long Position
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => Buffered ? basestream.Position - 1 : basestream.Position;
+            get => basestream.Position;
             set
             {
+                FlushBuffer();
                 basestream.Seek(value, SeekOrigin.Begin);
                 ResetBuffer();
             }
@@ -54,7 +56,7 @@ namespace AuroraLib.Core.IO
                 {
                     int shift = value / 8;
 
-                    if (Buffered)
+                    if (BitPosition != 0)
                         shift--;
 
                     value %= 8;
@@ -64,46 +66,25 @@ namespace AuroraLib.Core.IO
                 _bit = value;
             }
         }
-        private int _bit = 0;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private int _bit;
 
         /// <summary>
-        /// Byte Order, in which blocks of Bits are read & write.
-        /// Endian.Little [0][1][2][3]...->
-        /// Endian.Big    <-...[3][2][1][0]
+        /// Byte Order, in which blocks of Bits are read and write.
+        /// Endian.Little   [0][1][2][3] [0,1,2,3,4,5,6,7]
+        /// Endian.Big      [3][2][1][0] [7,6,5,4,3,2,1,0]
         /// </summary>
-        public Endian ByteOrder = Endian.Little;
+        public Endian Order = Endian.Little;
 
-        /// <summary>
-        /// Bit Order, in which Bit are read & write.
-        /// Endian.Little [0,1,2,3,4,5,6,7]...->
-        /// Endian.Big    <-...[7,6,5,4,3,2,1,0]
-        /// </summary>
-        public Endian BitOrder
+        private readonly bool Protectbase;
+
+        protected BitStreamProcessor(Stream stream, Endian order = Endian.Little, bool leaveOpen = true)
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _bitOrder;
-            set
-            {
-                if (_bitOrder != value)
-                {
-                    _bitOrder = value;
-                    if (Buffered)
-                        ResetBuffer();
-                }
-            }
+            BaseStream = stream ?? throw new ArgumentNullException(nameof(stream));
+            Protectbase = leaveOpen;
+            Order = order;
+            _bit = 0;
         }
-
-        private Endian _bitOrder = Endian.Little;
-
-        /// <summary>
-        /// Indicates that the buffer has read one byte ahead and this byte is not fully processed yet.
-        /// </summary>
-        protected bool Buffered = false;
-
-        /// <summary>
-        /// when true leave the base stream open when disposing.
-        /// </summary>
-        protected bool Protectbase = true;
 
         /// <summary>
         /// Resets the buffer.
@@ -111,13 +92,14 @@ namespace AuroraLib.Core.IO
         protected abstract void ResetBuffer();
 
         /// <summary>
-        /// When overridden in a derived class, sets the position within the current stream.
+        /// Flush the buffer.
         /// </summary>
-        /// <param name="offset">A byte offset relative to the origin parameter.</param>
-        /// <param name="origin">A value of type SeekOrigin indicating the reference point used to obtain the new position.</param>
-        /// <param name="bitposition"></param>
+        protected abstract void FlushBuffer();
+
+        /// <inheritdoc cref="Stream.Seek(long, SeekOrigin)"/>
         public virtual void Seek(long offset, SeekOrigin origin, int bitposition = 0)
         {
+            FlushBuffer();
             BaseStream.Seek(offset, origin);
             ResetBuffer();
             BitPosition = bitposition;
