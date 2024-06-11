@@ -124,11 +124,14 @@ namespace AuroraLib.Core.IO
 #endif
         protected override void ExpandBuffer(int minimumLength)
         {
+#if !NET6_0_OR_GREATER
+            minimumLength = Math.Max(minimumLength, _Buffer.Length * 2);
+#endif
             byte[] newBuffer = _APool.Rent(minimumLength);
             _Position += newBuffer.Length - _Buffer.Length;
             if (_Buffer.Length != 0)
             {
-                _Buffer.AsSpan().CopyTo(newBuffer.AsSpan(newBuffer.Length - _Buffer.Length));
+                Buffer.BlockCopy(_Buffer, 0, newBuffer, newBuffer.Length - _Buffer.Length, _Buffer.Length);
                 _APool.Return(_Buffer);
             }
             _Buffer = newBuffer;

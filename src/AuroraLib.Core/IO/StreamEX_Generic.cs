@@ -33,6 +33,8 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
 #if !(NETSTANDARD || NET20_OR_GREATER)
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
+#if !(NETSTANDARD)
         public static unsafe T Read<T>(this Stream stream, Endian order = Endian.Little) where T : unmanaged
         {
             if (sizeof(T) <= 4)
@@ -63,6 +65,8 @@ namespace AuroraLib.Core.IO
 
 #if !(NETSTANDARD || NET20_OR_GREATER)
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
+#endif
+#if !(NETSTANDARD)
         private unsafe static T ReadPrimitiveHelper<T>(this Stream stream, Endian order) where T : unmanaged
         {
             Type typeT = typeof(T);

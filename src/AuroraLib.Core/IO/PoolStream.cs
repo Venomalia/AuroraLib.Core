@@ -84,35 +84,37 @@ namespace AuroraLib.Core.IO
         public override void Flush()
         { }
 
-#if !NET20_OR_GREATER
+#if NET20_OR_GREATER
+        /// <inheritdoc cref="Stream.CopyTo(Stream)"/>
+        public new void CopyTo(Stream destination) => CopyTo(destination, 81920);
+
+        /// <inheritdoc cref="Stream.CopyTo(Stream, int)"/>
+        public new virtual void CopyTo(Stream destination, int bufferSize)
+#else
         /// <inheritdoc />
         public override void CopyTo(Stream destination, int bufferSize)
+#endif
         {
             if (!CanRead)
-            {
-                throw new ObjectDisposedException(nameof(MemoryPoolStream));
-            }
+                throw new ObjectDisposedException(nameof(PoolStream));
             if (destination is null)
-            {
                 throw new ArgumentNullException(nameof(destination), "Stream is null.");
-            }
 
+#if NET20_OR_GREATER
+            destination.Write(_Buffer, (int)Position, (int)Length);
+#else
             destination.Write(UnsaveAsSpan((int)Position));
-        }
 #endif
+        }
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
         public override void SetLength(long length)
         {
             if (!_open)
-            {
-                throw new ObjectDisposedException(nameof(MemoryPoolStream));
-            }
+                throw new ObjectDisposedException(nameof(PoolStream));
             if (length < 0 || length > int.MaxValue)
-            {
                 throw new ArgumentOutOfRangeException(nameof(length), $"Maximum supported size {int.MaxValue}.");
-            }
 
             if (_Buffer.Length < length)
             {
@@ -168,7 +170,7 @@ namespace AuroraLib.Core.IO
         {
             if (!CanRead)
             {
-                throw new ObjectDisposedException(nameof(MemoryPoolStream));
+                throw new ObjectDisposedException(nameof(PoolStream));
             }
             if (stream is null)
             {
