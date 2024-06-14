@@ -63,7 +63,7 @@ namespace AuroraLib.Core.IO
 #endif
         private void WriteInternally(ulong value, int bitCount, int intLength)
         {
-            if (bitCount > intLength)
+            if (bitCount <= 0 || bitCount > intLength)
                 throw new ArgumentOutOfRangeException(nameof(bitCount), $"Length must be between 1 and {intLength}.");
 
             int i = 0;

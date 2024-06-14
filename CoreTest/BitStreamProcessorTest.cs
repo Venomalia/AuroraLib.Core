@@ -215,7 +215,7 @@ namespace CoreUnitTest
         [DataRow(15, Endian.Little)]
         public void BitWriter_WriteBitsAsInt(int bits, Endian bitOrder)
         {
-            int value = (1 << bits-1) * -1;
+            int value = (1 << bits - 1) * -1;
             using (MemoryPoolStream stream = new MemoryPoolStream())
             {
                 BitWriter writer = new BitWriter(stream, bitOrder);
@@ -246,9 +246,11 @@ namespace CoreUnitTest
         [DataRow(15, Endian.Little)]
         [DataRow(62, Endian.Big)]
         [DataRow(62, Endian.Little)]
+        [DataRow(64, Endian.Big)]
+        [DataRow(64, Endian.Little)]
         public void BitWriterBitReader_CrossCheck(int bits, Endian bitOrder)
         {
-            ulong value = (1ul << bits-1) + 1;
+            ulong value = (1ul << bits - 1) + 1;
             using (MemoryPoolStream stream = new MemoryPoolStream())
             {
                 BitWriter writer = new BitWriter(stream, bitOrder);

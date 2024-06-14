@@ -35,19 +35,22 @@ namespace AuroraLib.Core.IO
         /// <summary>
         /// Reads an unsigned integer of the specified length from the stream.
         /// </summary>
-        /// <param name="length">The number of bits to read.</param>
+        /// <param name="bitCount">The number of bits to read.</param>
         /// <returns>The unsigned integer value read from the stream.</returns>
         [DebuggerStepThrough]
 #if !(NETSTANDARD || NET20_OR_GREATER)
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
-        public ulong ReadUInt(int length)
+        public ulong ReadUInt(int bitCount)
         {
+            if (bitCount <= 0 || bitCount > 64)
+                throw new ArgumentOutOfRangeException(nameof(bitCount), $"Length must be between 1 and 64.");
+
             int currentPosition = BitPosition;
-            int bitsInBuffer = currentPosition + length;
+            int bitsInBuffer = currentPosition + bitCount;
             int index;
             ulong value;
-            FillBuffer(length);
+            FillBuffer(bitCount);
 
             if (Order == Endian.Little)
             {
@@ -84,7 +87,10 @@ namespace AuroraLib.Core.IO
             // Align the buffer for the next read
             _buffer[0] = _buffer[(bitsInBuffer - 1) >> 3];
 
-            return value >> index & (1uL << length) - 1;
+            if (bitCount == 64)
+                return value;
+
+            return value >> index & (1uL << bitCount) - 1;
         }
 
         /// <summary>
