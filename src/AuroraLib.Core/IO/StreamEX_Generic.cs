@@ -82,7 +82,7 @@ namespace AuroraLib.Core.IO
                     if (typeT == typeof(short) || typeT == typeof(ushort) || typeT.IsEnum)
 #endif
                     {
-                        short iVaule = (short)ReadInt24Helper<T>(stream, order);
+                        short iVaule = (short)ReadInt16Helper<T>(stream, order);
                         return Unsafe.As<short, T>(ref iVaule);
                     }
                     break;

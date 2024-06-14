@@ -33,15 +33,45 @@ namespace CoreUnitTest
         }
 
         [TestMethod]
+        [DataRow((short)10, Endian.Little)]
+        [DataRow((short)10, Endian.Big)]
+        public void ReadGenericShort(short vaule, Endian order)
+        {
+            using (MemoryPoolStream stream = new MemoryPoolStream())
+            {
+                stream.Write(vaule, order);
+                stream.Position = 0;
+                short actualVaule = stream.Read<short>(order);
+
+                Assert.AreEqual(vaule, actualVaule);
+            }
+        }
+
+        [TestMethod]
         [DataRow(10, Endian.Little)]
         [DataRow(10, Endian.Big)]
-        public void ReadGeneric(int vaule, Endian order)
+        public void ReadGenericInt(int vaule, Endian order)
         {
             using (MemoryPoolStream stream = new MemoryPoolStream())
             {
                 stream.Write(vaule, order);
                 stream.Position = 0;
                 int actualVaule = stream.Read<int>(order);
+
+                Assert.AreEqual(vaule, actualVaule);
+            }
+        }
+
+        [TestMethod]
+        [DataRow((long)10, Endian.Little)]
+        [DataRow((long)10, Endian.Big)]
+        public void ReadGenericLong(long vaule, Endian order)
+        {
+            using (MemoryPoolStream stream = new MemoryPoolStream())
+            {
+                stream.Write(vaule, order);
+                stream.Position = 0;
+                long actualVaule = stream.Read<long>(order);
 
                 Assert.AreEqual(vaule, actualVaule);
             }
