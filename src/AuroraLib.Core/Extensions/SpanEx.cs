@@ -272,7 +272,7 @@ namespace AuroraLib.Core.Extensions
         /// <returns>An <see cref="UnmanagedMemoryStream"/> that allows read-only access to the data.</returns>
         public unsafe static UnmanagedMemoryStream AsReadOnlyStream(this ReadOnlySpan<byte> data)
         {
-            fixed (byte* ptr = &data.GetPinnableReference())
+            fixed (byte* ptr = data)
             {
                 return new UnmanagedMemoryStream(ptr, data.Length);
             }
