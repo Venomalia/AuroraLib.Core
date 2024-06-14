@@ -90,24 +90,6 @@ namespace AuroraLib.Core.IO
             stream.Read(copy, 0, copy.Length);
             return copy;
         }
-
-        /// <summary>
-        /// Writes the stream contents to a SpanBuffer, regardless of the <see cref="Stream.Position"/>.
-        /// </summary>
-        /// <param name="stream">The stream to convert.</param>
-        /// <returns>A SpanBuffer containing the content of the stream.</returns>
-        /// <exception cref="NotSupportedException"></exception>
-        [DebuggerStepThrough]
-        public static SpanBuffer<byte> ToSpanBuffer(this Stream stream)
-        {
-            if (stream.Length > int.MaxValue)
-                throw new NotSupportedException($"Stream length exceeds the maximum supported length for {nameof(SpanBuffer<byte>)}.");
-
-            SpanBuffer<byte> copy = new SpanBuffer<byte>((int)stream.Length);
-            stream.Seek(0, SeekOrigin.Begin);
-            stream.Read(copy.Span);
-            return copy;
-        }
         #endregion
 
         #region Match
