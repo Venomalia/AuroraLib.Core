@@ -44,13 +44,13 @@ namespace AuroraLib.Core
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string GetString()
-            => EncodingX.GetString(AsSpan(), 0x0);
+            => EncodingX.GetCString(AsSpan());
 
         /// <inheritdoc />
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string GetString(Encoding encoding)
-            => EncodingX.GetString(AsSpan(), encoding, 0x0);
+            => EncodingX.GetCString(AsSpan(), encoding, 0x0);
 
         public static explicit operator Identifier(byte[] v) => new Identifier(v);
         public static explicit operator byte[](Identifier v) => v.Bytes;

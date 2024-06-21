@@ -16,11 +16,17 @@ namespace AuroraLib.Core.IO
         #region Read Span<char>
         /// <inheritdoc cref=" Read(Stream,Span{char}, Encoding)"/>
         [DebuggerStepThrough]
-        public static void Read(this Stream stream, Span<char> chars)
+        public static int Read(this Stream stream, Span<char> chars)
         {
+#if NET20_OR_GREATER
+            byte[] bytes = new byte[chars.Length];
+            int r = stream.Read(bytes, 0, bytes.Length);
+#else
             Span<byte> bytes = stackalloc byte[chars.Length];
-            stream.Read(bytes);
+            int r = stream.Read(bytes);
+#endif
             EncodingX.GetChars(bytes, chars);
+            return r;
         }
 
         /// <summary>
@@ -30,38 +36,137 @@ namespace AuroraLib.Core.IO
         /// <param name="chars">The span to write the characters into.</param>
         /// <param name="encoding">The encoding used to decode the bytes read from the stream.</param>
         [DebuggerStepThrough]
-        public static void Read(this Stream stream, Span<char> chars, Encoding encoding)
+        public static int Read(this Stream stream, Span<char> chars, Encoding encoding)
         {
+#if NET20_OR_GREATER
+            byte[] bytes = new byte[encoding.GetByteCount(chars)];
+            int r = stream.Read(bytes, 0, bytes.Length);
+#else
             Span<byte> bytes = stackalloc byte[encoding.GetByteCount(chars)];
-            stream.Read(bytes);
+            int r = stream.Read(bytes);
+#endif
             encoding.GetChars(bytes, chars);
+            return r;
         }
         #endregion
 
-        #region ReadString
-        /// <inheritdoc cref=" ReadString(Stream, Encoding)"/>
+        #region Write ReadOnlySpan<char>
+        /// <inheritdoc cref="Write(Stream, ReadOnlySpan{char}, Encoding)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReadString(this Stream stream)
-            => ReadString(stream, EncodingX.InvalidByte);
+        public static void Write(this Stream stream, ReadOnlySpan<char> chars)
+            => stream.Write(chars, EncodingX.DefaultEncoding);
+
+        /// <summary>
+        /// Writes a sequence of characters to the <paramref name="stream"/>.
+        /// won't be null terminated.
+        /// </summary>
+        /// <param name="stream">The stream to write to.</param>
+        /// <param name="chars">The characters to write.</param>
+        /// <param name="encoding">The encoding to use for converting characters to bytes.</param>
+        [DebuggerStepThrough]
+        public static void Write(this Stream stream, ReadOnlySpan<char> chars, Encoding encoding)
+        {
+#if NET20_OR_GREATER
+            byte[] buffer = new byte[encoding.GetByteCount(chars)];
+#else
+            Span<byte> buffer = stackalloc byte[encoding.GetByteCount(chars)];
+#endif
+            encoding.GetBytes(chars, buffer);
+#if NET20_OR_GREATER
+            stream.Write(buffer, 0, buffer.Length);
+#else
+            stream.Write(buffer);
+#endif
+        }
+
+        #endregion
+
+        #region ReadString
+
+        /// <inheritdoc cref="ReadString(Stream, int, Encoding, byte)"/>
+        [DebuggerStepThrough]
+        public static string ReadString(this Stream stream, int length, byte padding = 0x0)
+            => ReadString(stream, length, EncodingX.DefaultEncoding, padding);
+
+        /// <summary>
+        /// Reads a string by reading the specified number of bytes from the specified <paramref name="stream"/>.
+        /// <paramref name="padding"/> bytes are removed from the resulting string.
+        /// </summary>
+        /// <param name="stream">The stream to read from.</param>
+        /// <param name="length">The number of bytes to read.</param>
+        /// <param name="encoding">The encoding to use for converting the read bytes to a string.</param>
+        /// <param name="padding">The byte to be removed from the resulting string if found (optional).</param>
+        /// <returns>The string read from the stream with the terminator byte removed if present.</returns>
+        [DebuggerStepThrough]
+        public static string ReadString(this Stream stream, int length, Encoding encoding, byte padding = 0x0)
+        {
+#if NET20_OR_GREATER
+            byte[] bytes = new byte[length];
+            stream.Read(bytes, 0, bytes.Length);
+#else
+            Span<byte> bytes = stackalloc byte[length];
+            stream.Read(bytes);
+#endif
+            return EncodingX.GetCString(bytes, encoding, padding);
+        }
+
+        #endregion
+
+        #region WriteString
+
+        /// <inheritdoc cref="Write(Stream, ReadOnlySpan{char}, Encoding)"/>
+        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars)
+            => stream.Write(chars, EncodingX.DefaultEncoding);
+
+        /// <inheritdoc cref="Write(Stream, ReadOnlySpan{char}, Encoding)"/>
+        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars, Encoding encoding)
+            => stream.Write(chars, encoding);
+
+        /// <summary>
+        /// Writes a specified number of characters to the <paramref name="stream"/> and adds a <paramref name="padding"/> <see cref="byte"/> at the end.
+        /// </summary>
+        /// <param name="stream">The stream to write to.</param>
+        /// <param name="chars">The characters to write.</param>
+        /// <param name="encoding">The encoding to use for converting characters to bytes.</param>
+        /// <param name="length">The maximum number of bytes to write.</param>
+        /// <param name="padding">The padding byte to add at the end (default is 0x0).</param>
+        /// <exception cref="ArgumentException">Thrown when the encoded bytes exceed the specified length.</exception>
+        [DebuggerStepThrough]
+        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars, Encoding encoding, int length, byte padding = 0x0)
+        {
+            if (encoding.GetByteCount(chars) > length)
+            {
+                throw new ArgumentException();
+            }
+
+            Span<byte> buffer = stackalloc byte[length];
+            buffer.Fill(padding);
+            encoding.GetBytes(chars, buffer);
+            stream.Write(buffer);
+        }
+
+        /// <inheritdoc cref="WriteString(Stream, ReadOnlySpan{char}, Encoding,int,byte)"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars, int length, byte padding)
+            => stream.WriteString(chars, EncodingX.DefaultEncoding, length, padding);
+
+        #endregion
+
+        #region ReadCString
 
         /// <summary>
         /// Reads a string from the specified <paramref name="stream"/>.
-        /// The string is read until an invalid byte is encountered.
+        /// The string is read until an terminator byte is encountered.
         /// </summary>
         /// <param name="stream">The stream to read from.</param>
-        /// <param name="encoding">The encoding to use when getting the string.</param>
+        /// <param name="terminator">The byte that indicates the end of the string.</param>
         /// <returns>The string read from the stream.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReadString(this Stream stream, Encoding encoding)
-            => ReadString(stream, encoding, EncodingX.InvalidByte);
-
-        /// <inheritdoc cref=" ReadString(Stream, Encoding,byte)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReadString(this Stream stream, byte terminator)
-            => ReadString(stream, s => s == terminator);
+        public static string ReadCString(this Stream stream, byte terminator = 0x0)
+            => ReadCString(stream, s => s == terminator);
 
         /// <summary>
         /// Reads a string from the specified <paramref name="stream"/>.
@@ -73,15 +178,15 @@ namespace AuroraLib.Core.IO
         /// <returns>The string read from the stream.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReadString(this Stream stream, Encoding encoding, byte terminator)
-            => ReadString(stream, encoding, s => s == terminator);
+        public static string ReadCString(this Stream stream, Encoding encoding, byte terminator = 0x0)
+            => ReadCString(stream, encoding, s => s == terminator);
 
-        ///  <inheritdoc cref="ReadString(Stream, Encoding, Predicate{byte})"/>
+        ///  <inheritdoc cref="ReadCString(Stream, Encoding, Predicate{byte})"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReadString(this Stream stream, Predicate<byte> ifstopByte)
+        public static string ReadCString(this Stream stream, Predicate<byte> ifstopByte)
         {
-            List<byte> bytes = ReadStringBytes(stream, ifstopByte);
+            List<byte> bytes = ReadCStringBytes(stream, ifstopByte);
 #if NET5_0_OR_GREATER
             return EncodingX.GetString(bytes.UnsaveAsSpan());
 #else
@@ -98,17 +203,17 @@ namespace AuroraLib.Core.IO
         /// <returns>The string read from the stream.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReadString(this Stream stream, Encoding encoding, Predicate<byte> ifstopByte)
+        public static string ReadCString(this Stream stream, Encoding encoding, Predicate<byte> ifstopByte)
         {
-            List<byte> bytes = ReadStringBytes(stream, ifstopByte);
+            List<byte> bytes = ReadCStringBytes(stream, ifstopByte);
 #if NET5_0_OR_GREATER
             return encoding.GetString(bytes.UnsaveAsSpan());
 #else
-            return EncodingX.GetString(bytes.ToArray());
+            return encoding.GetString(bytes.ToArray());
 #endif
         }
 
-        private static List<byte> ReadStringBytes(this Stream stream, Predicate<byte> ifstopByte)
+        private static List<byte> ReadCStringBytes(this Stream stream, Predicate<byte> ifstopByte)
         {
             List<byte> bytes = new List<byte>();
             int readByte;
@@ -127,99 +232,31 @@ namespace AuroraLib.Core.IO
 
             return bytes;
         }
-
-        /// <inheritdoc cref="ReadString(Stream, int, Encoding, byte)"/>
-        [DebuggerStepThrough]
-        public static string ReadString(this Stream stream, int length, byte Padding = 0)
-        {
-            Span<byte> bytes = stackalloc byte[length];
-            stream.Read(bytes);
-            return EncodingX.GetString(bytes, Padding);
-        }
-
-        /// <summary>
-        /// Reads a string by reading the specified number of bytes from the specified <paramref name="stream"/>.
-        /// <paramref name="Padding"/> bytes are removed from the resulting string.
-        /// </summary>
-        /// <param name="stream">The stream to read from.</param>
-        /// <param name="length">The number of bytes to read.</param>
-        /// <param name="encoding">The encoding to use for converting the read bytes to a string.</param>
-        /// <param name="Padding">The byte to be removed from the resulting string if found (optional).</param>
-        /// <returns>The string read from the stream with the terminator byte removed if present.</returns>
-        [DebuggerStepThrough]
-        public static string ReadString(this Stream stream, int length, Encoding encoding, byte Padding = 0)
-        {
-            Span<byte> bytes = stackalloc byte[length];
-            stream.Read(bytes);
-            return EncodingX.GetString(bytes, encoding, Padding);
-        }
-
         #endregion
 
-        #region WriteString
-        /// <summary>
-        /// Writes a sequence of characters to the <paramref name="stream"/>.
-        /// won't be null terminated.
-        /// </summary>
-        /// <param name="stream">The stream to write to.</param>
-        /// <param name="chars">The characters to write.</param>
-        /// <param name="encoding">The encoding to use for converting characters to bytes.</param>
-        [DebuggerStepThrough]
-        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars, Encoding encoding)
-        {
-            Span<byte> buffer = stackalloc byte[encoding.GetByteCount(chars)];
-            encoding.GetBytes(chars, buffer);
-            stream.Write(buffer);
-        }
+        #region WriteCString
 
-        /// <inheritdoc cref="WriteString(Stream, ReadOnlySpan{char}, Encoding)"/>
+        /// <inheritdoc cref="WriteCString(Stream, ReadOnlySpan{char}, Encoding, byte)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars)
-            => stream.WriteString(chars, EncodingX.DefaultEncoding);
+        public static void WriteCString(this Stream stream, ReadOnlySpan<char> chars, byte terminator = 0x0)
+            => stream.WriteCString(chars, EncodingX.DefaultEncoding, terminator);
 
         /// <summary>
-        /// Writes a specified number of characters to the <paramref name="stream"/> and adds a <paramref name="terminator"/> <see cref="byte"/> at the end.
+        /// Writes a string to the given stream using the specified encoding, followed by a <paramref name="terminator"/> byte.
         /// </summary>
         /// <param name="stream">The stream to write to.</param>
-        /// <param name="chars">The characters to write.</param>
-        /// <param name="encoding">The encoding to use for converting characters to bytes.</param>
-        /// <param name="length">The maximum number of bytes to write.</param>
-        /// <param name="terminator">The terminator byte to add at the end (default is 0x0).</param>
-        /// <exception cref="ArgumentException">Thrown when the encoded bytes exceed the specified length.</exception>
-        [DebuggerStepThrough]
-        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars, Encoding encoding, int length, byte terminator)
-        {
-            if (encoding.GetByteCount(chars) > length)
-            {
-                throw new ArgumentException();
-            }
-
-            Span<byte> buffer = stackalloc byte[length];
-            buffer.Fill(terminator);
-            encoding.GetBytes(chars, buffer);
-            stream.Write(buffer);
-        }
-
-        /// <inheritdoc cref="WriteString(Stream, ReadOnlySpan{char}, Encoding,int,byte)"/>
+        /// <param name="chars">The characters to be written.</param>
+        /// <param name="encoding">The encoding to use for the characters.</param>
+        /// <param name="terminator">The terminator byte to append after the string. Default is 0x0.</param>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars, int length, byte terminator)
-            => stream.WriteString(chars, EncodingX.DefaultEncoding, length, terminator);
-
-        /// <summary>
-        /// Writes the characters from the specified character span to the stream, followed by a terminator byte.
-        /// </summary>
-        /// <param name="stream">The stream to write to.</param>
-        /// <param name="chars">The characters to write.</param>
-        /// <param name="terminator">The terminator byte to add at the end (default is 0x0).</param>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars, byte terminator)
+        public static void WriteCString(this Stream stream, ReadOnlySpan<char> chars, Encoding encoding, byte terminator = 0x0)
         {
-            stream.WriteString(chars);
+            stream.Write(chars, encoding);
             stream.WriteByte(terminator);
         }
+
         #endregion
 
         #region MatchString

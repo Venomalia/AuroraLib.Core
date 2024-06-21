@@ -29,7 +29,7 @@ namespace AuroraLib.Core.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void GetChars(ReadOnlySpan<byte> bytes, Span<char> chars)
         {
-            for (int i = 0; i < chars.Length; i++)
+            for (int i = 0; i < bytes.Length; i++)
                 chars[i] = (char)bytes[i];
         }
         #endregion
@@ -61,16 +61,16 @@ namespace AuroraLib.Core.Text
         /// <returns>The resulting string.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string GetString(ReadOnlySpan<byte> bytes, Encoding encoding, byte terminator = 0x0)
+        public static string GetCString(ReadOnlySpan<byte> bytes, Encoding encoding, byte terminator = 0x0)
         {
             int length = bytes.IndexOf(terminator);
             if (length == -1) length = bytes.Length;
             return encoding.GetString(bytes.Slice(0, length));
         }
 
-        /// <inheritdoc cref="GetString(ReadOnlySpan{byte}, Encoding, byte)"/>
+        /// <inheritdoc cref="GetCString(ReadOnlySpan{byte}, Encoding, byte)"/>
         [DebuggerStepThrough]
-        public static string GetString(ReadOnlySpan<byte> bytes, byte terminator)
+        public static string GetCString(ReadOnlySpan<byte> bytes, byte terminator = 0x0)
         {
             int length = bytes.IndexOf(terminator);
             if (length == -1) length = bytes.Length;
@@ -100,17 +100,6 @@ namespace AuroraLib.Core.Text
         }
         #endregion
 
-        #region IndexOfInvalidByte
-        /// <summary>
-        /// Determines the first index of a byte that cannot be displayed.
-        /// </summary>
-        /// <param name="bytes">The span of bytes to check.</param>
-        /// <returns>The zero-based index of the first occurrence, if found; otherwise, -1.</returns>
-        [DebuggerStepThrough]
-        public static int IndexOfInvalidByte(ReadOnlySpan<byte> bytes)
-            => bytes.IndexOf(InvalidByte);
-        #endregion
-
 #if NET20_OR_GREATER
         /// <inheritdoc cref="Encoding.GetString(byte[])"/>
         public static unsafe string GetString(this Encoding encoding, ReadOnlySpan<byte> bytes)
@@ -132,7 +121,7 @@ namespace AuroraLib.Core.Text
         }
 
         /// <inheritdoc cref="Encoding.GetChars(byte*, int, char*, int)"/>
-        public static unsafe int GetChars(this Encoding encoding, Span<byte> bytes, ReadOnlySpan<char> chars)
+        public static unsafe int GetChars(this Encoding encoding, ReadOnlySpan<byte> bytes, Span<char> chars)
         {
             fixed (char* charPtr = chars)
             fixed (byte* bytePtr = bytes)
