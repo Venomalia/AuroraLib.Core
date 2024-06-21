@@ -228,7 +228,7 @@ namespace CoreUnitTest
                 stream.WriteByte(0);
                 stream.Position = 0;
 
-                string vaule = stream.ReadString();
+                string vaule = stream.ReadCString();
                 Assert.AreEqual(vaule, actualVaule);
             }
         }
@@ -239,7 +239,7 @@ namespace CoreUnitTest
         {
             using (MemoryPoolStream stream = new MemoryPoolStream())
             {
-                stream.WriteString(actualVaule.AsSpan(), 0);
+                stream.WriteCString(actualVaule.AsSpan(), 0);
                 stream.Position = 0;
 
                 Span<char> chars = stackalloc char[actualVaule.Length];
