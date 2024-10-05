@@ -282,42 +282,31 @@ namespace AuroraLib.Core.IO
         #region Align
 
         /// <summary>
-        /// sets the position within the current stream to the nearest possible boundary.
+        /// Align the position within the current stream to the nearest possible boundary.
         /// </summary>
         /// <param name="stream">the current stream</param>
         /// <param name="offset">A byte offset relative to the origin parameter.</param>
         /// <param name="origin">A value of type <see cref="SeekOrigin"/> indicating the reference point used to obtain the new position.</param>
         /// <param name="boundary">The byte boundary to Seek to.</param>
         /// <returns>The new position within the current stream.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when boundary is less than or equal to 0 or not a power of 2.</exception>
         [DebuggerStepThrough]
         public static long Align(this Stream stream, long offset, SeekOrigin origin, int boundary = 32)
         {
-            if (boundary <= 1)
-                throw new ArgumentException($"{nameof(boundary)}: Must be 2 or more");
-
-#if NET20_OR_GREATER
             switch (origin)
             {
                 case SeekOrigin.Begin:
-                    offset += stream.Position;
                     break;
                 case SeekOrigin.Current:
+                    offset += stream.Position;
                     break;
                 case SeekOrigin.End:
                     offset = stream.Length - offset;
                     break;
                 default:
-                    throw new AggregateException();
+                    throw new ArgumentOutOfRangeException(nameof(origin), "Invalid SeekOrigin value.");
             }
-#else
-            offset = origin switch
-            {
-                SeekOrigin.Begin => offset + stream.Position,
-                SeekOrigin.Current => offset,
-                SeekOrigin.End => stream.Length - offset,
-                _ => throw new AggregateException(),
-            };
-#endif
+
             return stream.Seek(AlignPosition(offset, boundary), SeekOrigin.Begin);
         }
 
@@ -337,25 +326,35 @@ namespace AuroraLib.Core.IO
         /// <param name="stream">The stream to write to.</param>
         /// <param name="boundary">The boundary to align the position of the stream with.</param>
         /// <param name="Padding">The byte value to use for padding (default is 0x00).</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when boundary is less than or equal to 0 or not a power of 2.</exception>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteAlign(this Stream stream, int boundary = 32, byte Padding = 0x00)
         {
-            Span<byte> bytes = stackalloc byte[(int)(boundary - (stream.Position % boundary))];
+            int remainder = GetAlignmentRemainder(stream.Position, boundary);
+            if (remainder == 0)
+                return;
+
+            Span<byte> bytes = stackalloc byte[boundary - remainder];
             bytes.Fill(Padding);
             stream.Write(bytes);
         }
 
         /// <summary>
-        /// Writes <paramref name="Padding"/> to the <paramref name="stream"/> to align the position to the specified <paramref name="boundary"/>.
+        /// Writes <paramref name="padding"/> to the <paramref name="stream"/> to align the position to the specified <paramref name="boundary"/>.
         /// </summary>
         /// <param name="stream">The stream to write to.</param>
         /// <param name="boundary">The desired alignment boundary.</param>
         /// <param name="padding">The padding characters to write.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when boundary is less than or equal to 0 or not a power of 2.</exception>
         [DebuggerStepThrough]
         public static void WriteAlign(this Stream stream, int boundary, ReadOnlySpan<byte> padding)
         {
-            int PadCount = (int)(boundary - (stream.Position % boundary));
+            int remainder = GetAlignmentRemainder(stream.Position, boundary);
+            if (remainder == 0)
+                return;
+
+            int PadCount = boundary - remainder;
             while (PadCount > 0)
             {
                 int i = Math.Min(PadCount, padding.Length);
@@ -372,14 +371,21 @@ namespace AuroraLib.Core.IO
         /// <param name="position">The position to align.</param>
         /// <param name="boundary">The alignment boundary (default is 32).</param>
         /// <returns>The aligned position.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when boundary is less than or equal to 0 or not a power of 2.</exception>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long AlignPosition(long position, int boundary = 32)
         {
-            long remainder = position % boundary;
-            if (remainder != 0)
-                return position + boundary - remainder;
-            return position;
+            int remainder = GetAlignmentRemainder(position, boundary);
+            return remainder == 0 ? position : position + boundary - remainder;
+        }
+
+        private static int GetAlignmentRemainder(long position, int boundary)
+        {
+            if (boundary <= 0 || (boundary & (boundary - 1)) != 0)
+                throw new ArgumentOutOfRangeException(nameof(boundary), "Boundary must be a positive power of 2.");
+
+            return (int)(position & (boundary - 1));
         }
     }
 }
