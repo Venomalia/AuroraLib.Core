@@ -149,7 +149,7 @@ namespace AuroraLib.Core.IO
         /// <inheritdoc cref="WriteString(Stream, ReadOnlySpan{char}, Encoding,int,byte)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars, int length, byte padding)
+        public static void WriteString(this Stream stream, ReadOnlySpan<char> chars, int length, byte padding = 0x0)
             => stream.WriteString(chars, EncodingX.DefaultEncoding, length, padding);
 
         #endregion
