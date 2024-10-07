@@ -100,7 +100,7 @@ namespace AuroraLib.Core
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<byte> AsSpan()
-#if NET20_OR_GREATER
+#if NET20_OR_GREATER || NETSTANDARD2_0
         {
             fixed (byte* bytePtr = &b0)
             {

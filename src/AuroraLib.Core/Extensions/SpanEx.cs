@@ -165,7 +165,7 @@ namespace AuroraLib.Core.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SequenceGetHashCode<T>(this ReadOnlySpan<T> span) where T : unmanaged
         {
-#if NET20_OR_GREATER
+#if NET20_OR_GREATER || NETSTANDARD2_0
             unchecked
             {
                 int hash = 17;

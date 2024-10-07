@@ -45,7 +45,7 @@ namespace AuroraLib.Core.Text
         {
             Span<char> chars = stackalloc char[bytes.Length];
             GetChars(bytes, chars);
-#if NET20_OR_GREATER
+#if NET20_OR_GREATER || NETSTANDARD2_0
             return chars.ToString();
 #else
             return new string(chars);
@@ -100,7 +100,7 @@ namespace AuroraLib.Core.Text
         }
         #endregion
 
-#if NET20_OR_GREATER
+#if NET20_OR_GREATER || NETSTANDARD2_0
         /// <inheritdoc cref="Encoding.GetString(byte[])"/>
         public static unsafe string GetString(this Encoding encoding, ReadOnlySpan<byte> bytes)
         {

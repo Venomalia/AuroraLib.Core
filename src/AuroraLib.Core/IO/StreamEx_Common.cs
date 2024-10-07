@@ -17,7 +17,7 @@ namespace AuroraLib.Core.IO
     /// </summary>
     public static partial class StreamEx
     {
-#if NET20_OR_GREATER
+#if NET20_OR_GREATER || NETSTANDARD2_0
         /// <inheritdoc cref="Stream.Read(byte[], int, int)"/>
         public static int Read(this Stream stream, Span<byte> buffer)
         {

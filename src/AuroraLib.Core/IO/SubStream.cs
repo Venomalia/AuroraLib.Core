@@ -102,7 +102,7 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-#if NET20_OR_GREATER
+#if NET20_OR_GREATER || NETSTANDARD2_0
         public override int Read(byte[] buffer, int offset, int count)
         {
             int num = (int)Math.Min(count, _length - _position);
@@ -136,7 +136,7 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-#if NET20_OR_GREATER
+#if NET20_OR_GREATER || NETSTANDARD2_0
         public override long Seek(long offset, SeekOrigin origin)
         {
             switch (origin)

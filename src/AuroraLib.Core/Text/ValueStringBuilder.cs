@@ -14,7 +14,7 @@ namespace AuroraLib.Core.Text
 {
     public ref partial struct ValueStringBuilder
     {
-#if NET20_OR_GREATER
+#if NET20_OR_GREATER || NETSTANDARD2_0
         private char[] _arrayToReturnToPool;
 #else
         private char[]? _arrayToReturnToPool;

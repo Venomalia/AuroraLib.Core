@@ -37,7 +37,7 @@ namespace AuroraLib.Core.IO
         }
 
 
-#if NET20_OR_GREATER
+#if NET20_OR_GREATER || NETSTANDARD2_0
         /// <inheritdoc cref="Stream.Read(byte[], int, int)"/>
         public abstract int Read(Span<byte> buffer);
         /// <inheritdoc cref="Stream.Write(byte[], int, int)"/>
@@ -47,7 +47,7 @@ namespace AuroraLib.Core.IO
         /// <inheritdoc/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#if NET20_OR_GREATER
+#if NET20_OR_GREATER || NETSTANDARD2_0
         public override long Seek(long offset, SeekOrigin origin)
         {
             switch (origin)
@@ -84,7 +84,7 @@ namespace AuroraLib.Core.IO
         public override void Flush()
         { }
 
-#if NET20_OR_GREATER
+#if NET20_OR_GREATER || NETSTANDARD2_0
         /// <inheritdoc cref="Stream.CopyTo(Stream)"/>
         public new void CopyTo(Stream destination) => CopyTo(destination, 81920);
 
@@ -100,7 +100,7 @@ namespace AuroraLib.Core.IO
             if (destination is null)
                 throw new ArgumentNullException(nameof(destination), "Stream is null.");
 
-#if NET20_OR_GREATER
+#if NET20_OR_GREATER || NETSTANDARD2_0
             destination.Write(_Buffer, (int)Position, (int)Length);
 #else
             destination.Write(UnsaveAsSpan((int)Position));
@@ -176,7 +176,7 @@ namespace AuroraLib.Core.IO
             {
                 throw new ArgumentNullException(nameof(stream), "Stream is null.");
             }
-#if NET20_OR_GREATER
+#if NET20_OR_GREATER || NETSTANDARD2_0
             stream.Write(_Buffer, 0, (int)Length);
 #else
             stream.Write(UnsaveAsSpan());
