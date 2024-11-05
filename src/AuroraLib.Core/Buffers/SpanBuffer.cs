@@ -76,6 +76,14 @@ namespace AuroraLib.Core.Buffers
         [DebuggerStepThrough]
         public byte[] GetBuffer() => _buffer;
 
+        /// <summary>
+        /// Retrieves the underlying buffer as a byte memory.
+        /// </summary>
+        /// <returns>The underlying buffer.</returns>
+        [DebuggerStepThrough]
+        public Memory<byte> AsMemory()
+            => _buffer.AsMemory(0, Length);
+
         #region constructor
         /// <summary>
         /// Initializes a new instance of the <see cref="SpanBuffer{T}"/> class with the specified length.
@@ -159,7 +167,7 @@ namespace AuroraLib.Core.Buffers
         public Span<T> Slice(int start)
             => Span.Slice(start);
 
-        /// <inheritdoc cref="Span{T}.Slice(int)"/>
+        /// <inheritdoc cref="Span{T}.Slice(int,int)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<T> Slice(int start, int length)
