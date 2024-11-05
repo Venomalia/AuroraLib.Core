@@ -157,7 +157,7 @@ namespace AuroraLib.Core.Buffers
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<T> Slice(int start)
-            => Span.Slice(start, Span.Length);
+            => Span.Slice(start);
 
         /// <inheritdoc cref="Span{T}.Slice(int)"/>
         [DebuggerStepThrough]
