@@ -32,18 +32,18 @@ High performance zero allocation structure reader and other tools for big and li
 [ReadStruct](https://github.com/Venomalia/AuroraLib.Core/blob/main/Benchmark/Benchmarks/ReadStruct.cs)
 |                     Method |      Mean |     Error |    StdDev | Allocated |
 |--------------------------- |----------:|----------:|----------:|----------:|
-|          BinaryReader_Read | 55.620 us | 0.2378 us | 0.2225 us |     160 B |
-|      BinaryPrimitives_Read | 17.876 us | 0.2764 us | 0.2586 us |         - |
-|            AuroraCore_Read | 33.744 us | 0.4052 us | 0.3790 us |         - |
-|           AuroraCore_ReadT | 18.449 us | 0.0933 us | 0.0872 us |         - |
-| AuroraCore_ReadSpanBufferT |  2.138 us | 0.0342 us | 0.0320 us |         - |
+|          BinaryReader_Read | 52.570 us | 0.6446 us | 0.6030 us |     160 B |
+|      BinaryPrimitives_Read | 17.222 us | 0.3287 us | 0.3785 us |         - |
+|            AuroraCore_Read | 31.588 us | 0.6117 us | 0.7045 us |         - |
+|           AuroraCore_ReadT | 16.855 us | 0.0501 us | 0.0391 us |         - |
+| AuroraCore_ReadSpanBufferT |  2.179 us | 0.0426 us | 0.0437 us |         - |
 
 [WriteStream](https://github.com/Venomalia/AuroraLib.Core/blob/main/Benchmark/Benchmarks/WriteStream.cs)
-|                 Method |  MB |         Mean |      Error |     StdDev |      Gen0 |      Gen1 |      Gen2 |   Allocated |
-|----------------------- |---- |-------------:|-----------:|-----------:|----------:|----------:|----------:|------------:|
-|     MemoryStream_Write |   1 |    124.16 us |   2.234 us |   1.865 us |  199.4629 |  199.2188 |  199.2188 |   1049128 B |
-| MemoryPoolStream_Write |   1 |     21.24 us |   0.257 us |   0.240 us |         - |         - |         - |        64 B |
-|     MemoryStream_Write |  10 | 11,166.33 us | 206.271 us | 192.946 us | 1328.1250 | 1328.1250 | 1328.1250 |  32506479 B |
-| MemoryPoolStream_Write |  10 |  1,586.54 us |  25.563 us |  22.661 us |         - |         - |         - |        66 B |
-|     MemoryStream_Write | 100 | 83,138.23 us | 460.102 us | 384.206 us | 1166.6667 | 1166.6667 | 1166.6667 | 267387709 B |
-| MemoryPoolStream_Write | 100 | 21,697.72 us | 188.423 us | 157.341 us |         - |         - |         - |        92 B |
+|                 Method |  MB |         Mean |        Error |     StdDev |      Gen0 |      Gen1 |      Gen2 |   Allocated |
+|----------------------- |---- |-------------:|-------------:|-----------:|----------:|----------:|----------:|------------:|
+|     MemoryStream_Write |   1 |     84.80 us |     1.399 us |   1.308 us |  208.8623 |  208.4961 |  208.4961 |   1048750 B |
+| MemoryPoolStream_Write |   1 |     21.64 us |     0.421 us |   0.394 us |         - |         - |         - |        64 B |
+|     MemoryStream_Write |  10 |  9,307.01 us |    62.965 us |  55.817 us | 1328.1250 | 1328.1250 | 1328.1250 |  32506476 B |
+| MemoryPoolStream_Write |  10 |  1,780.05 us |    30.305 us |  41.482 us |         - |         - |         - |        65 B |
+|     MemoryStream_Write | 100 | 69,133.05 us | 1,005.067 us | 940.140 us | 3875.0000 | 3875.0000 | 3875.0000 | 267388464 B |
+| MemoryPoolStream_Write | 100 | 23,530.49 us |   437.096 us | 429.287 us |         - |         - |         - |           - |
