@@ -24,7 +24,7 @@ namespace AuroraLib.Core.IO
             }
             protected set => basestream = value;
         }
-        private Stream basestream;
+        private Stream basestream = Stream.Null;
 
         /// <inheritdoc cref="Stream.Length"/>
         public long Length => basestream.Length;
