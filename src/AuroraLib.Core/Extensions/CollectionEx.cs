@@ -76,13 +76,21 @@ namespace AuroraLib.Core.Extensions
             if (list == null || list.Count() == 0)
                 return 0;
 
+#if NET20_OR_GREATER || NETSTANDARD2_0
             int hashCode = 17;
             foreach (var item in list)
             {
                 hashCode = hashCode * 23 + (item == null ? 0 : item.GetHashCode());
             }
-
             return hashCode;
+#else
+            HashCode gen = default;
+            foreach (T b in list)
+            {
+                gen.Add(b);
+            }
+            return gen.ToHashCode();
+#endif
         }
     }
 }
