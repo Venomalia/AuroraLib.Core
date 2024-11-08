@@ -39,7 +39,7 @@ namespace AuroraLib.Core.Extensions
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Count<T>(this List<T> list, T value) where T : IEquatable<T>
-            => SpanEx.Count(list.UnsaveAsSpan(), value);
+            => list.UnsaveAsSpan().Count(value);
 
         /// <summary>
         /// Gets a <see cref="Span{T}"/> view over the data in a list. Items should not be added or removed from the <see cref="List{T}"/> while the <see cref="Span{T}"/> is in use.

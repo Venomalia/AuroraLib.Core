@@ -79,6 +79,7 @@ namespace AuroraLib.Core.Extensions
         public static int MaxMatch<T>(this Span<T> span, ReadOnlySpan<T> sequence2) where T : IEquatable<T>
             => MaxMatch((ReadOnlySpan<T>)span, sequence2);
 
+#if !NET8_0_OR_GREATER
         /// <summary>
         /// Counts the occurrences of a specific <paramref name="value"/> of <typeparamref name="T"/> in a <see cref="ReadOnlySpan{T}"/>.
         /// </summary>
@@ -106,6 +107,7 @@ namespace AuroraLib.Core.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Count<T>(this Span<T> span, T value) where T : IEquatable<T>
             => Count((ReadOnlySpan<T>)span, value);
+#endif
 
         /// <summary>
         /// Finds the index of the first element in the specified span that matches the condition.
