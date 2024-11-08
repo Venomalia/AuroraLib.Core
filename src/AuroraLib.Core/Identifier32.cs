@@ -124,10 +124,10 @@ namespace AuroraLib.Core
             => EncodingX.GetCString(AsSpan(), encoding, 0x0);
 
         /// <inheritdoc />
-        public bool Equals(string other) => other == GetString();
+        public bool Equals(string? other) => other == GetString();
 
         /// <inheritdoc />
-        public bool Equals(IIdentifier other) => other != null && other.AsSpan().SequenceEqual(AsSpan());
+        public bool Equals(IIdentifier? other) => other != null && other.AsSpan().SequenceEqual(AsSpan());
 
         public static implicit operator Identifier32(uint v) => *(Identifier32*)&v;
         public static implicit operator uint(Identifier32 v) => *(uint*)&v;

@@ -4,6 +4,7 @@
     <AssemblyTitle>AuroraLib.Core</AssemblyTitle>
     <TargetFrameworks>net8.0;net6.0;netstandard2.0;net472;</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Title>AuroraLib.Core</Title>
 	<Version>1.4.2.3</Version>
@@ -39,6 +40,10 @@
 	<PropertyGroup>
 		<NETFrameworks>|netstandard2.0|net481|net48|net472|NET471|NET47|NET462|NET461|</NETFrameworks>
 	</PropertyGroup>
+
+  <PropertyGroup Condition="$(NETFrameworks.Contains('|$(TargetFramework)|'))">
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
 
 	<ItemGroup Condition="$(NETFrameworks.Contains('|$(TargetFramework)|'))">
 		<PackageReference Include="System.Memory" Version="4.5.5" />

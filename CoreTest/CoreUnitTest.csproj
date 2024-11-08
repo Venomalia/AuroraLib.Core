@@ -3,8 +3,13 @@
   <PropertyGroup>
 	<TargetFrameworks>net8.0;net6.0;net472;</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net472'">
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

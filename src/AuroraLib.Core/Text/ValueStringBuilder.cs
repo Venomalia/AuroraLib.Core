@@ -14,11 +14,7 @@ namespace AuroraLib.Core.Text
 {
     public ref partial struct ValueStringBuilder
     {
-#if NET20_OR_GREATER || NETSTANDARD2_0
-        private char[] _arrayToReturnToPool;
-#else
         private char[]? _arrayToReturnToPool;
-#endif
         private Span<char> _chars;
         private int _pos;
 
@@ -309,7 +305,7 @@ namespace AuroraLib.Core.Text
 
             _chars.Slice(0, _pos).CopyTo(poolArray);
 
-            char[] toReturn = _arrayToReturnToPool;
+            char[]? toReturn = _arrayToReturnToPool;
             _chars = _arrayToReturnToPool = poolArray;
             if (toReturn != null)
             {
@@ -320,7 +316,7 @@ namespace AuroraLib.Core.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
-            char[] toReturn = _arrayToReturnToPool;
+            char[]? toReturn = _arrayToReturnToPool;
             this = default; // for safety, to avoid using pooled array if this instance is erroneously appended to again
             if (toReturn != null)
             {

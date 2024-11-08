@@ -133,7 +133,7 @@ namespace AuroraLib.Core
         {
             lock (TypePrimitives)
             {
-                if (TypePrimitives.TryGetValue(type.GetHashCode(), out int[] primitives))
+                if (TypePrimitives.TryGetValue(type.GetHashCode(), out int[]? primitives))
                     return primitives;
 
                 return NewPrimitiveTypeSizes(type);

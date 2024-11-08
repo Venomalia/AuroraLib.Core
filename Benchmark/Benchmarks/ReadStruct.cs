@@ -12,7 +12,7 @@ namespace Benchmark.Benchmarks
         private const int n = 1000;
         private const int SIZE = 16;
 
-        private Stream stream;
+        private Stream stream = Stream.Null;
 
         [GlobalSetup]
         public void GlobalSetup()
