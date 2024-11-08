@@ -24,9 +24,17 @@ namespace AuroraLib.Core
         /// <returns>A byte array representing the value.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe static byte[] GetBytes<T>(ref T value) where T : unmanaged
+#if NET8_0_OR_GREATER
+        public static byte[] GetBytes<T>(in T value) where T : unmanaged
         {
-            byte[] result = new byte[sizeof(T)];
+            byte[] result = new byte[Unsafe.SizeOf<T>()];
+            MemoryMarshal.Write(result, in value);
+            return result;
+        }
+#else
+        public static byte[] GetBytes<T>(ref T value) where T : unmanaged
+        {
+            byte[] result = new byte[Unsafe.SizeOf<T>()];
             MemoryMarshal.Write(result, ref value);
             return result;
         }
@@ -35,6 +43,7 @@ namespace AuroraLib.Core
         [DebuggerStepThrough]
         public static byte[] GetBytes<T>(T value) where T : unmanaged
             => GetBytes(ref value);
+#endif
         #endregion
 
         #region SwapGeneric
