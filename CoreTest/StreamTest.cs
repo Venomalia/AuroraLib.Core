@@ -1,9 +1,11 @@
-﻿using AuroraLib.Core;
+using AuroraLib.Core;
 using AuroraLib.Core.Buffers;
+using AuroraLib.Core.Extensions;
 using AuroraLib.Core.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Buffers.Binary;
+using System.Collections.Generic;
 
 namespace CoreUnitTest
 {
@@ -318,6 +320,24 @@ namespace CoreUnitTest
                 bool vaule = stream.Match(expected.AsSpan());
 
                 Assert.AreEqual(vaule, expected == actual);
+            }
+        }
+
+        [TestMethod]
+        public void WriteList()
+        {
+            List<uint> list = new List<uint>() { 5, 10, 6, 8, 6 };
+
+            using (MemoryPoolStream stream = new MemoryPoolStream())
+            {
+                stream.Write(list, Endian.Little);
+
+                stream.Position = 0;
+                for (int i = 0; i < list.Count; i++)
+                {
+                    uint vaule = stream.ReadUInt32(Endian.Little);
+                    Assert.AreEqual(list[i], vaule);
+                }
             }
         }
     }

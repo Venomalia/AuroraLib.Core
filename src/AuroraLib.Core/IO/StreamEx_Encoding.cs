@@ -1,4 +1,4 @@
-﻿using AuroraLib.Core.Exceptions;
+using AuroraLib.Core.Exceptions;
 using AuroraLib.Core.Extensions;
 using AuroraLib.Core.Text;
 using System;
@@ -188,7 +188,7 @@ namespace AuroraLib.Core.IO
         {
             List<byte> bytes = ReadCStringBytes(stream, ifstopByte);
 #if NET5_0_OR_GREATER
-            return EncodingX.GetString(bytes.UnsaveAsSpan());
+            return EncodingX.GetString(bytes.UnsafeAsSpan());
 #else
             return EncodingX.GetString(bytes.ToArray());
 #endif
@@ -207,7 +207,7 @@ namespace AuroraLib.Core.IO
         {
             List<byte> bytes = ReadCStringBytes(stream, ifstopByte);
 #if NET5_0_OR_GREATER
-            return encoding.GetString(bytes.UnsaveAsSpan());
+            return encoding.GetString(bytes.UnsafeAsSpan());
 #else
             return encoding.GetString(bytes.ToArray());
 #endif

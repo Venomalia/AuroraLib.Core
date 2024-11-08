@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -28,7 +29,6 @@ namespace AuroraLib.Core.Extensions
             list.Insert(newIndex, item);
         }
 
-#if NET5_0_OR_GREATER
         /// <summary>
         /// Counts the occurrences of a specific <paramref name="value"/> of <typeparamref name="T"/> in a <see cref="List{T}"/>.
         /// </summary>
@@ -39,7 +39,7 @@ namespace AuroraLib.Core.Extensions
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Count<T>(this List<T> list, T value) where T : IEquatable<T>
-            => list.UnsaveAsSpan().Count(value);
+            => list.UnsafeAsSpan().Count(value);
 
         /// <summary>
         /// Gets a <see cref="Span{T}"/> view over the data in a list. Items should not be added or removed from the <see cref="List{T}"/> while the <see cref="Span{T}"/> is in use.
@@ -49,8 +49,16 @@ namespace AuroraLib.Core.Extensions
         /// <returns>A Span representing the elements of the List.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Span<T> UnsaveAsSpan<T>(this List<T> list)
+        public static Span<T> UnsafeAsSpan<T>(this List<T> list)
+#if NET5_0_OR_GREATER
             => CollectionsMarshal.AsSpan(list);
+#else
+        {
+            FieldInfo itemsField = typeof(List<T>).GetField("_items", BindingFlags.NonPublic | BindingFlags.Instance);
+            T[] items = (T[])itemsField.GetValue(list);
+            return items.AsSpan(0, list.Count);
+        }
+#endif
 
         /// <summary>
         /// Computes the hash code for the elements in the specified list.
@@ -61,8 +69,7 @@ namespace AuroraLib.Core.Extensions
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SequenceGetHashCode<T>(this List<T> list) where T : unmanaged
-            => SpanEx.SequenceGetHashCode(list.UnsaveAsSpan());
-#endif
+            => SpanEx.SequenceGetHashCode(list.UnsafeAsSpan());
 
         /// <summary>
         /// Computes the hash code for the elements in the specified collection./>.

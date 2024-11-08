@@ -1,4 +1,4 @@
-﻿using AuroraLib.Core.Buffers;
+using AuroraLib.Core.Buffers;
 using AuroraLib.Core.Extensions;
 using AuroraLib.Core.Interfaces;
 using System;
@@ -194,7 +194,6 @@ namespace AuroraLib.Core.IO
             }
         }
 
-#if NET5_0_OR_GREATER
         /// <summary>
         /// Writes the data from the specified <see cref="List{T}"/> to the <see cref="Stream"/>.
         /// </summary>
@@ -203,8 +202,7 @@ namespace AuroraLib.Core.IO
         /// <param name="list">The List containing the data to write.</param>
         /// <param name="order">The byte order of the data. Default is Endian.Little.</param>
         public static void Write<T>(this Stream stream, List<T> list, Endian order = Endian.Little) where T : unmanaged
-            => Write(stream, (ReadOnlySpan<T>)list.UnsaveAsSpan(), order);
-#endif
+            => Write(stream, (ReadOnlySpan<T>)list.UnsafeAsSpan(), order);
 
         /// <summary>
         /// Writes multiple instances of the specified <typeparamref name="T"/> <paramref name="objekt"/> to the <see cref="Stream"/>.

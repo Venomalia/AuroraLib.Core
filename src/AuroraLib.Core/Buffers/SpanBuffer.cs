@@ -1,4 +1,4 @@
-﻿using AuroraLib.Core.Extensions;
+using AuroraLib.Core.Extensions;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -110,18 +110,14 @@ namespace AuroraLib.Core.Buffers
         public SpanBuffer(ReadOnlySpan<T> span) : this(span.Length)
             => span.CopyTo(Span);
 
-
-#if NET5_0_OR_GREATER
         /// <summary>
         /// Initializes a new instance of the <see cref="SpanBuffer{T}"/> class with a copy of the specified <see cref="List{T}"/>.
         /// </summary>
         /// <param name="list">The List from which to initialize the buffer's data.</param>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SpanBuffer(List<T> list) : this(list.UnsaveAsSpan())
+        public SpanBuffer(List<T> list) : this(list.UnsafeAsSpan())
         { }
-#endif
-
         #endregion
 
         #region Span
