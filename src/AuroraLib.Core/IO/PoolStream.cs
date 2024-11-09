@@ -103,7 +103,7 @@ namespace AuroraLib.Core.IO
 #if NET20_OR_GREATER || NETSTANDARD2_0
             destination.Write(_Buffer, (int)Position, (int)Length);
 #else
-            destination.Write(UnsaveAsSpan((int)Position));
+            destination.Write(UnsafeAsSpan((int)Position));
 #endif
         }
 
@@ -129,16 +129,16 @@ namespace AuroraLib.Core.IO
 
         protected abstract void ExpandBuffer(int minimumLength);
 
-        /// <inheritdoc cref="UnsaveAsSpan(int, int)"/>
+        /// <inheritdoc cref="UnsafeAsSpan(int, int)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Span<byte> UnsaveAsSpan()
+        public Span<byte> UnsafeAsSpan()
             => InternalBufferAsSpan(0, (int)Length);
 
-        /// <inheritdoc cref="UnsaveAsSpan(int, int)"/>
+        /// <inheritdoc cref="UnsafeAsSpan(int, int)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Span<byte> UnsaveAsSpan(int start)
+        public Span<byte> UnsafeAsSpan(int start)
             => InternalBufferAsSpan(start, (int)Length - start);
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace AuroraLib.Core.IO
         /// <returns>The span representation of the <see cref="PoolStream"/>.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Span<byte> UnsaveAsSpan(int start, int length)
+        public Span<byte> UnsafeAsSpan(int start, int length)
             => InternalBufferAsSpan(start, length);
 
         protected abstract Span<byte> InternalBufferAsSpan(int start, int length);
@@ -160,7 +160,7 @@ namespace AuroraLib.Core.IO
         /// <returns>The byte buffer of the <see cref="PoolStream"/>.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public byte[] UnsaveGetBuffer()
+        public byte[] UnsafeGetBuffer()
             => _Buffer;
 
         /// <inheritdoc cref="MemoryStream.WriteTo(Stream)"/>
@@ -179,7 +179,7 @@ namespace AuroraLib.Core.IO
 #if NET20_OR_GREATER || NETSTANDARD2_0
             stream.Write(_Buffer, 0, (int)Length);
 #else
-            stream.Write(UnsaveAsSpan());
+            stream.Write(UnsafeAsSpan());
 #endif
         }
 
@@ -187,7 +187,7 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] ToArray()
-            => UnsaveAsSpan().ToArray();
+            => UnsafeAsSpan().ToArray();
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
