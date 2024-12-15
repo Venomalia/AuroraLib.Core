@@ -1,4 +1,4 @@
-﻿using AuroraLib.Core.Buffers;
+using AuroraLib.Core.Buffers;
 using AuroraLib.Core.Extensions;
 using System;
 using System.Buffers.Binary;
@@ -237,6 +237,16 @@ namespace AuroraLib.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static short Swap(short value)
             => BinaryPrimitives.ReverseEndianness(value);
+
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static UInt24 Swap(UInt24 value)
+            => new UInt24((value.Value >> 16) | ((value.Value & 0xFF00) << 8) | (value.Value << 16));
+
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Int24 Swap(Int24 value)
+            => new Int24((value.Value >> 16) | ((value.Value & 0xFF00) << 8) | (value.Value << 16));
 
         /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(uint)"/>
         [DebuggerStepThrough]
