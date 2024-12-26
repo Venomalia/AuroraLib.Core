@@ -1,4 +1,4 @@
-﻿using AuroraLib.Core.Buffers;
+using AuroraLib.Core.Buffers;
 using AuroraLib.Core.Exceptions;
 using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.Text;
@@ -135,7 +135,7 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void MatchThrow(this Stream stream, IIdentifier expected)
-            => stream.Match(expected.AsSpan());
+            => stream.MatchThrow(expected.AsSpan());
 
         #endregion
 
