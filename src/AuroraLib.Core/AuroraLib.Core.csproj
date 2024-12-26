@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Title>AuroraLib.Core</Title>
-	<Version>1.4.2.5</Version>
+	<Version>1.4.3.0</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
