@@ -12,7 +12,7 @@ namespace AuroraLib.Core.Buffers
     /// Represents a buffer of <typeparamref name="T"/> that allocated from ArrayPool of bytes and provides save access of its elements.
     /// </summary>
     /// <typeparam name="T">The type of elements in the buffer.</typeparam>
-    public readonly struct SpanBuffer<T> : IDisposable where T : unmanaged
+    public readonly struct SpanBuffer<T> : IMemoryOwner<T> where T : unmanaged
     {
         private readonly byte[] _buffer;
 
@@ -45,29 +45,8 @@ namespace AuroraLib.Core.Buffers
             }
         }
 
-        /// <summary>
-        /// Gets a Span of bytes representing this <see cref="SpanBuffer{T}"/>.
-        /// </summary>
-        public unsafe Span<byte> Bytes
-        {
-            [DebuggerStepThrough]
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get
-            {
-#if NET5_0_OR_GREATER
-                ref byte bRef = ref MemoryMarshal.GetArrayDataReference(_buffer);
-                return MemoryMarshal.CreateSpan(ref bRef, Length * sizeof(T));
-#else
-                unsafe
-                {
-                    fixed (byte* bp = _buffer)
-                    {
-                        return new Span<byte>(bp, Length * sizeof(T));
-                    }
-                }
-#endif
-            }
-        }
+        /// <inheritdoc/>
+        public Memory<T> Memory => new MemoryCastManager<byte, T>(_buffer.AsMemory(0, Length * Unsafe.SizeOf<T>())).Memory;
 
         /// <summary>
         /// Retrieves the underlying buffer as a byte array.
@@ -75,14 +54,6 @@ namespace AuroraLib.Core.Buffers
         /// <returns>The underlying buffer.</returns>
         [DebuggerStepThrough]
         public byte[] GetBuffer() => _buffer;
-
-        /// <summary>
-        /// Retrieves the underlying buffer as a byte memory.
-        /// </summary>
-        /// <returns>The underlying buffer.</returns>
-        [DebuggerStepThrough]
-        public Memory<byte> AsMemory()
-            => _buffer.AsMemory(0, Length);
 
         #region constructor
         /// <summary>
