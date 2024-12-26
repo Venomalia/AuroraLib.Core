@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -227,11 +227,11 @@ namespace AuroraLib.Core.Extensions
             int toSize = sizeof(TTo);
 
             if (fromSize == 0 || toSize == 0)
-                throw new ArgumentException("Size of types must be non-zero.");
+                throw new ArgumentException($"Size of {nameof(TFrom)} and {nameof(TTo)} must be non-zero.");
 
             int toLength = buffer.Length * fromSize / toSize;
             if (toLength * toSize != buffer.Length * fromSize)
-                throw new ArgumentException("Buffer length is not a multiple of the target type size.");
+                throw new ArgumentException($"Buffer length is not a multiple of the target type size of {nameof(TTo)}.");
 
 #if NET5_0_OR_GREATER
             ref TTo toRef = ref Unsafe.As<TFrom, TTo>(ref MemoryMarshal.GetArrayDataReference(buffer));
