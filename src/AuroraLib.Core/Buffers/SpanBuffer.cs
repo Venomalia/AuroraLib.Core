@@ -120,62 +120,6 @@ namespace AuroraLib.Core.Buffers
         { }
         #endregion
 
-        #region Span
-
-        /// <summary>
-        ///  Gets the element at the specified zero-based index
-        /// </summary>
-        /// <param name="index"> The zero-based index of the element.</param>
-        /// <returns>The element at the specified index.</returns>
-        public ref T this[int index]
-        {
-            [DebuggerStepThrough]
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => ref Span[index];
-        }
-
-        /// <inheritdoc cref="Span{T}.Clear"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Clear() => Span.Clear();
-
-        /// <inheritdoc cref="Span{T}.Clear"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void CopyTo(Span<T> destination)
-            => Span.CopyTo(destination);
-
-        /// <inheritdoc cref="Span{T}.Fill"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Fill(T value)
-            => Span.Fill(value);
-
-        /// <inheritdoc cref="Span{T}.GetEnumerator"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Span<T>.Enumerator GetEnumerator()
-            => Span.GetEnumerator();
-
-        /// <inheritdoc cref="Span{T}.Slice(int)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Span<T> Slice(int start)
-            => Span.Slice(start);
-
-        /// <inheritdoc cref="Span{T}.Slice(int,int)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Span<T> Slice(int start, int length)
-            => Span.Slice(start, length);
-
-        /// <inheritdoc cref="Span{T}.ToArray"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T[] ToArray()
-            => Span.ToArray();
-        #endregion
-
         /// <inheritdoc/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
