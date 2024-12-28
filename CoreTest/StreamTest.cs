@@ -155,7 +155,7 @@ namespace CoreUnitTest
                 stream.Read(buffer.Span, order);
 
                 for (int i = 0; i < length; i++)
-                    Assert.AreEqual(i, buffer[i]);
+                    Assert.AreEqual(i, buffer.Span[i]);
             }
         }
 
@@ -168,7 +168,7 @@ namespace CoreUnitTest
             using (SpanBuffer<int> buffer = new SpanBuffer<int>(length))
             {
                 for (int i = 0; i < length; i++)
-                    buffer[i] = i;
+                    buffer.Span[i] = i;
 
                 stream.Write<int>(buffer, order);
                 stream.Position = 0;

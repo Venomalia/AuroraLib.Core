@@ -306,7 +306,7 @@ namespace AuroraLib.Core.IO
 
         #region WriteAlignString
         /// <summary>
-        /// Writes padding to the <paramref name="stream"/> to align the position to the specified <paramref name="boundary"/>, using the provided characters and <paramref name="encoding"/>.
+        /// Writes padding to the <paramref name="stream"/> to align the position to the specified <paramref name="boundary"/>, using the provided characters.
         /// </summary>
         /// <param name="stream">The stream to write to.</param>
         /// <param name="boundary">The desired alignment boundary.</param>
@@ -320,12 +320,7 @@ namespace AuroraLib.Core.IO
             stream.WriteAlign(boundary, buffer);
         }
 
-        /// <summary>
-        /// Writes padding to the <paramref name="stream"/> to align the position to the specified <paramref name="boundary"/>, using the provided characters.
-        /// </summary>
-        /// <param name="stream">The stream to write to.</param>
-        /// <param name="boundary">The desired alignment boundary.</param>
-        /// <param name="chars">The characters to use for padding.</param>
+        /// <inheritdoc cref="WriteAlign(Stream,int, ReadOnlySpan{char},Encoding)"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteAlign(this Stream stream, int boundary, ReadOnlySpan<char> chars)

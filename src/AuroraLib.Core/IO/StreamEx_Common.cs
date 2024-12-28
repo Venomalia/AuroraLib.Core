@@ -1,4 +1,3 @@
-using AuroraLib.Core.Buffers;
 using AuroraLib.Core.Exceptions;
 using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.Text;
@@ -17,49 +16,6 @@ namespace AuroraLib.Core.IO
     /// </summary>
     public static partial class StreamEx
     {
-#if NET20_OR_GREATER || NETSTANDARD2_0
-        /// <inheritdoc cref="Stream.Read(byte[], int, int)"/>
-        public static int Read(this Stream stream, Span<byte> buffer)
-        {
-            if (stream is PoolStream pool)
-                return pool.Read(buffer);
-
-            byte[] sharedBuffer = ArrayPool<byte>.Shared.Rent(buffer.Length);
-            try
-            {
-                int numRead = stream.Read(sharedBuffer, 0, buffer.Length);
-                sharedBuffer.AsSpan(0, numRead).CopyTo(buffer);
-                return numRead;
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(sharedBuffer);
-            }
-        }
-
-
-        /// <inheritdoc cref="Stream.Write(byte[], int, int)"/>
-        public static void Write(this Stream stream, ReadOnlySpan<byte> buffer)
-        {
-            if (stream is PoolStream pool)
-            {
-                pool.Write(buffer);
-                return;
-            }
-
-            byte[] sharedBuffer = ArrayPool<byte>.Shared.Rent(buffer.Length);
-            try
-            {
-                buffer.CopyTo(sharedBuffer);
-                stream.Write(sharedBuffer, 0, buffer.Length);
-            }
-            finally
-            {
-                ArrayPool<byte>.Shared.Return(sharedBuffer);
-            }
-        }
-#endif
-
         #region PeekByte
         /// <summary>
         /// Peek the next byte
@@ -273,8 +229,26 @@ namespace AuroraLib.Core.IO
             }
             else
             {
-                using (SpanBuffer<byte> bytes = new SpanBuffer<byte>(count))
-                    stream.Read(bytes.Span);
+#if NET5_0_OR_GREATER
+                if (count > 2048)
+                {
+#endif
+                    byte[] sharedBuffer = ArrayPool<byte>.Shared.Rent(count);
+                    try
+                    {
+                        stream.Read(sharedBuffer, 0, count);
+                    }
+                    finally
+                    {
+                        ArrayPool<byte>.Shared.Return(sharedBuffer);
+                    }
+#if NET5_0_OR_GREATER
+                }
+                else
+                {
+                    stream.Read(stackalloc byte[count]);
+                }
+#endif
             }
         }
         #endregion
