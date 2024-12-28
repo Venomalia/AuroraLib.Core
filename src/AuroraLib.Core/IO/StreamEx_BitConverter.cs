@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -181,7 +181,7 @@ namespace AuroraLib.Core.IO
         {
             int value = stream.ReadByte();
             if (value == -1)
-                ThrowHelper<T>();
+                ThrowHelper.EndOfStreamException<T>();
             return value;
         }
 

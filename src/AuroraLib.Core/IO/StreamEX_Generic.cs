@@ -53,7 +53,7 @@ namespace AuroraLib.Core.IO
             T value;
             Span<byte> buffer = new Span<byte>(&value, sizeof(T));
             if (stream.Read(buffer) != buffer.Length)
-                ThrowHelper<T>();
+                ThrowHelper.EndOfStreamException<T>();
 
             if (order != SystemOrder)
             {
@@ -120,27 +120,11 @@ namespace AuroraLib.Core.IO
             Span<byte> buffer = MemoryMarshal.Cast<T, byte>(values);
 
             if (stream.Read(buffer) != buffer.Length)
-                ThrowHelper<T>(values.Length);
+                ThrowHelper.EndOfStreamException<T>(values.Length);
 
             if (order != SystemOrder && sizeof(T) > 1)
                 BitConverterX.Swap(buffer, typeof(T), values.Length);
         }
-
-        #region Throw
-        /// <exception cref="EndOfStreamException">Thrown when attempting to read beyond the end of the stream.</exception>
-        /// <exception cref="NotSupportedException">The stream does not support reading.</exception>
-        /// <exception cref="IOException">An I/O error occurred.</exception>
-        /// <exception cref="ObjectDisposedException">Methods were called after the stream was closed.</exception>
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void ThrowHelper<T>()
-            => throw new EndOfStreamException($"Cannot read {typeof(T)} is beyond the end of the stream.");
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private static void ThrowHelper<T>(int count)
-            => throw new EndOfStreamException($"Cannot read {typeof(T)}[{count}] is beyond the end of the stream.");
-
-        #endregion
-
         #endregion
 
         #region Write
