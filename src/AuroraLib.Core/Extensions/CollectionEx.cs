@@ -80,7 +80,7 @@ namespace AuroraLib.Core.Extensions
         [DebuggerStepThrough]
         public static int SequenceGetHashCode<T>(this IEnumerable<T> list)
         {
-            if (list == null || list.Count() == 0)
+            if (list == null || !list.Any())
                 return 0;
 
 #if NET20_OR_GREATER || NETSTANDARD2_0
@@ -98,6 +98,131 @@ namespace AuroraLib.Core.Extensions
             }
             return gen.ToHashCode();
 #endif
+        }
+
+#if !NET5_0_OR_GREATER
+
+        /// <summary>
+        /// Attempts to add the specified <paramref name="key"/> and <paramref name="value"/> to the dictionary.
+        /// </summary>
+        /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+        /// <param name="dictionary">The dictionary to which the key-value pair will be added.</param>
+        /// <param name="key">The key of the element to add.</param>
+        /// <param name="value">The value of the element to add.</param>
+        /// <returns><c>true</c> if the key-value pair was added successfully; otherwise, <c>false</c> if the key already exists.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dictionary"/> is <c>null</c>.</exception>
+        public static bool TryAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue value) where TKey : notnull
+        {
+            ThrowIf.Null(dictionary, nameof(dictionary));
+
+            if (!dictionary.ContainsKey(key))
+            {
+                dictionary.Add(key, value);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Attempts to remove a value with the specified key from the given dictionary.
+        /// </summary>
+        /// <typeparam name="TKey">The type of keys in the dictionary.</typeparam>
+        /// <typeparam name="TValue">The type of values in the dictionary.</typeparam>
+        /// <param name="dictionary">The dictionary from which to remove the value.</param>
+        /// <param name="key">The key of the element to remove.</param>
+        /// <param name="value">The value associated with the specified key if found; otherwise, the default value.</param>
+        /// <returns><c>true</c> if the element is successfully found and removed; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="dictionary"/> is <c>null</c>.</exception>
+        public static bool Remove<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, out TValue value) where TKey : notnull
+        {
+            ThrowIf.Null(dictionary);
+
+            if (dictionary.TryGetValue(key, out value))
+            {
+                dictionary.Remove(key);
+                return true;
+            }
+
+            value = default!;
+            return false;
+        }
+
+#endif
+
+        /// <summary>
+        /// Adds a range of elements from the specified sequence to the <paramref name="collection"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the collection.</typeparam>
+        /// <param name="collection">The collection to which elements will be added.</param>
+        /// <param name="span">A read-only span containing the elements to add to the collection.</param>
+        public static void AddRange<T>(this ICollection<T> collection, ReadOnlySpan<T> span)
+        {
+            if (collection is List<T> list)
+                list.Capacity = list.Count + span.Length;
+
+            foreach (T value in span)
+                collection.Add(value);
+        }
+
+        /// <inheritdoc cref="AddRange{T}(ICollection{T}, ReadOnlySpan{T})"/>
+        public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> enumerable)
+        {
+            if (collection is List<T> inlist)
+            {
+                inlist.AddRange(collection);
+            }
+            else if (enumerable is T[] array)
+            {
+                collection.AddRange(array.AsSpan());
+            }
+            else if (enumerable is List<T> list)
+            {
+                collection.AddRange(list.UnsafeAsSpan());
+            }
+            else
+            {
+                foreach (T pair in enumerable)
+                    collection.Add(pair);
+            }
+        }
+
+        /// <summary>
+        /// Adds a range of key-value pairs to the <paramref name="dictionary"/>, ensuring that only entries with unique keys are added.
+        /// </summary>
+        /// <typeparam name="TKey">The type of the keys in the dictionary. Must be non-nullable.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+        /// <param name="dictionary">The dictionary to which the key-value pairs are added.</param>
+        /// <param name="span">A read-only span of key-value pairs to add to the dictionary.</param>
+        public static void AddUniqueRange<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, ReadOnlySpan<KeyValuePair<TKey, TValue>> span) where TKey : notnull
+        {
+            foreach (KeyValuePair<TKey, TValue> pair in span)
+            {
+                if (!dictionary.ContainsKey(pair.Key))
+                    dictionary.Add(pair);
+            }
+        }
+
+        /// <inheritdoc cref="AddUniqueRange{TKey, TValue}(IDictionary{TKey, TValue}, ReadOnlySpan{KeyValuePair{TKey, TValue}})"/>
+        public static void AddUniqueRange<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, IEnumerable<KeyValuePair<TKey, TValue>> enumerable) where TKey : notnull
+        {
+            if (enumerable is KeyValuePair<TKey, TValue>[] array)
+            {
+                AddUniqueRange(dictionary, array.AsSpan());
+            }
+            else if (enumerable is List<KeyValuePair<TKey, TValue>> list)
+            {
+                AddUniqueRange(dictionary, list.UnsafeAsSpan());
+            }
+            else
+            {
+                foreach (KeyValuePair<TKey, TValue> pair in enumerable)
+                {
+                    if (!dictionary.ContainsKey(pair.Key))
+                        dictionary.Add(pair);
+                }
+            }
         }
     }
 }
