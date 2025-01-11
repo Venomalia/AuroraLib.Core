@@ -29,7 +29,7 @@ namespace AuroraLib.Core.IO
         /// <param name="stream">The stream to read from.</param>
         /// <param name="order">The endianness of the data in the stream. Default is <see cref="Endian.Little"/>.</param>
         /// <returns>The value <typeparamref name="T"/> that were read.</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
 #if !(NETSTANDARD || NET20_OR_GREATER)
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -111,7 +111,7 @@ namespace AuroraLib.Core.IO
         /// <param name="stream">The stream to read from.</param>
         /// <param name="values">The span of values to read into.</param>
         /// <param name="order">The endianness of the data in the stream. Default is <see cref="Endian.Little"/>.</param>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
 #if !(NETSTANDARD || NET20_OR_GREATER)
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
 #endif
@@ -227,7 +227,7 @@ namespace AuroraLib.Core.IO
         /// <typeparam name="T">The type of object to read.</typeparam>
         /// <param name="stream">The stream from which to read the object.</param>
         /// <returns>The deserialized object of type T.</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         public static T Read<T>(this Stream stream) where T : IBinaryObject, new()
         {
             T value = new T();

@@ -1,4 +1,5 @@
-﻿using System;
+using AuroraLib.Core.Extensions;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -45,8 +46,8 @@ namespace AuroraLib.Core.IO
             [DebuggerStepThrough]
             set
             {
-                if (value < 0 || value > Length)
-                    throw new ArgumentOutOfRangeException(nameof(value));
+                ThrowIf.Negative(value);
+                ThrowIf.GreaterThan(value, Length);
                 _position = value;
             }
         }
@@ -64,10 +65,12 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         public SubStream(Stream stream, long length, long offset, bool protectBaseStream = true)
         {
-            _basestream = stream ?? throw new ArgumentNullException(nameof(stream));
-            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
-            if (length < 0 || length > BaseStream.Length - offset) throw new ArgumentOutOfRangeException(nameof(length));
+            ThrowIf.Null(stream, nameof(stream));
+            ThrowIf.Negative(offset);
+            ThrowIf.Negative(length);
+            ThrowIf.GreaterThan(length, stream.Length - offset);
 
+            _basestream = stream;
             _length = length;
             Offset = offset;
             ProtectBaseStream = protectBaseStream;
@@ -151,7 +154,7 @@ namespace AuroraLib.Core.IO
                     Position = Length + offset;
                     break;
                 default:
-                    throw new ArgumentException($"Origin {origin} is invalid.");
+                    throw new ArgumentOutOfRangeException(nameof(origin), origin, ThrowIf.InvalidEnumMessage(origin, nameof(origin)));
             }
             return Position;
         }
@@ -161,7 +164,7 @@ namespace AuroraLib.Core.IO
             SeekOrigin.Begin => Position = offset,
             SeekOrigin.Current => Position += offset,
             SeekOrigin.End => Position = Length + offset,
-            _ => throw new ArgumentException($"Origin {origin} is invalid."),
+            _ => throw new ArgumentOutOfRangeException(nameof(origin), origin, ThrowIf.InvalidEnumMessage(origin, nameof(origin)))
         };
 #endif
 

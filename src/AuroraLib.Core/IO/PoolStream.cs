@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Buffers;
 using System.Diagnostics;
 using System.IO;
@@ -29,6 +29,9 @@ namespace AuroraLib.Core.IO
 
         protected PoolStream(ArrayPool<byte> aPool, byte[] buffer, int length = 0)
         {
+            ThrowIf.Null(aPool);
+            ThrowIf.Null(buffer);
+
             _APool = aPool;
             _Buffer = buffer;
             _Length = length;
@@ -62,7 +65,7 @@ namespace AuroraLib.Core.IO
                     Position = Length + offset;
                     break;
                 default:
-                    throw new ArgumentException($"Origin {origin} is invalid.");
+                    throw new ArgumentOutOfRangeException(nameof(origin), origin, ThrowIf.InvalidEnumMessage(origin, nameof(origin)));
             }
             return Position;
         }
@@ -72,7 +75,7 @@ namespace AuroraLib.Core.IO
             SeekOrigin.Begin => Position = offset,
             SeekOrigin.Current => Position += offset,
             SeekOrigin.End => Position = Length + offset,
-            _ => throw new ArgumentException($"Origin {origin} is invalid."),
+            _ => throw new ArgumentOutOfRangeException(nameof(origin), origin, ThrowIf.InvalidEnumMessage(origin, nameof(origin)))
         };
 #endif
 
@@ -95,10 +98,8 @@ namespace AuroraLib.Core.IO
         public override void CopyTo(Stream destination, int bufferSize)
 #endif
         {
-            if (!CanRead)
-                throw new ObjectDisposedException(nameof(PoolStream));
-            if (destination is null)
-                throw new ArgumentNullException(nameof(destination), "Stream is null.");
+            ThrowIf.Disposed(!CanRead, this);
+            ThrowIf.Null(destination, nameof(destination));
 
 #if NET20_OR_GREATER || NETSTANDARD2_0
             destination.Write(_Buffer, (int)Position, (int)Length);
@@ -111,10 +112,9 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         public override void SetLength(long length)
         {
-            if (!_open)
-                throw new ObjectDisposedException(nameof(PoolStream));
-            if (length < 0 || length > int.MaxValue)
-                throw new ArgumentOutOfRangeException(nameof(length), $"Maximum supported size {int.MaxValue}.");
+            ThrowIf.Disposed(!_open, this);
+            ThrowIf.Negative(length, nameof(length));
+            ThrowIf.GreaterThan(length, int.MaxValue);
 
             if (_Buffer.Length < length)
             {
@@ -168,14 +168,8 @@ namespace AuroraLib.Core.IO
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteTo(Stream stream)
         {
-            if (!CanRead)
-            {
-                throw new ObjectDisposedException(nameof(PoolStream));
-            }
-            if (stream is null)
-            {
-                throw new ArgumentNullException(nameof(stream), "Stream is null.");
-            }
+            ThrowIf.Disposed(!CanRead, this);
+            ThrowIf.Null(stream, nameof(stream));
 #if NET20_OR_GREATER || NETSTANDARD2_0
             stream.Write(_Buffer, 0, (int)Length);
 #else

@@ -278,7 +278,7 @@ namespace AuroraLib.Core.IO
                     offset = stream.Length - offset;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(origin), "Invalid SeekOrigin value.");
+                    throw new ArgumentOutOfRangeException(nameof(origin), origin, ThrowIf.InvalidEnumMessage(origin, nameof(origin)));
             }
 
             return stream.Seek(AlignPosition(offset, boundary), SeekOrigin.Begin);

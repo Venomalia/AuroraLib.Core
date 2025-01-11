@@ -13,7 +13,7 @@ namespace AuroraLib.Core.IO
         /// </summary>
         /// <param name="stream"></param>
         /// <returns>A 8-bit unsigned integer.</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static byte ReadUInt8(this Stream stream)
@@ -24,7 +24,7 @@ namespace AuroraLib.Core.IO
         /// </summary>
         /// <param name="stream"></param>
         /// <returns>A 8-bit signed integer.</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static sbyte ReadInt8(this Stream stream)
@@ -36,7 +36,7 @@ namespace AuroraLib.Core.IO
         /// <param name="stream"></param>
         /// <param name="order">Byte order</param>
         /// <returns>A 16-bit unsigned integer.</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ushort ReadUInt16(this Stream stream, Endian order = Endian.Little)
@@ -48,7 +48,7 @@ namespace AuroraLib.Core.IO
         /// <param name="stream"></param>
         /// <param name="order">Byte order</param>
         /// <returns>A 16-bit signed integer.</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static short ReadInt16(this Stream stream, Endian order = Endian.Little)
@@ -60,7 +60,7 @@ namespace AuroraLib.Core.IO
         /// <param name="stream"></param>
         /// <param name="order">Byte order</param>
         /// <returns>A 24-bit unsigned integer.</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static UInt24 ReadUInt24(this Stream stream, Endian order = Endian.Little)
@@ -72,7 +72,7 @@ namespace AuroraLib.Core.IO
         /// <param name="stream"></param>
         /// <param name="order">Byte order</param>
         /// <returns>A 24-bit signed integer.</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Int24 ReadInt24(this Stream stream, Endian order = Endian.Little)
@@ -84,7 +84,7 @@ namespace AuroraLib.Core.IO
         /// <param name="stream"></param>
         /// <param name="order">Byte order</param>
         /// <returns>A 32-bit unsigned integer.</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint ReadUInt32(this Stream stream, Endian order = Endian.Little)
@@ -96,7 +96,7 @@ namespace AuroraLib.Core.IO
         /// <param name="stream"></param>
         /// <param name="order">Byte order</param>
         /// <returns>A 32-bit signed integer.</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int ReadInt32(this Stream stream, Endian order = Endian.Little)
@@ -108,7 +108,7 @@ namespace AuroraLib.Core.IO
         /// <param name="stream"></param>
         /// <param name="order">Byte order</param>
         /// <returns>A 64-bit unsigned integer.</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong ReadUInt64(this Stream stream, Endian order = Endian.Little)
@@ -120,7 +120,7 @@ namespace AuroraLib.Core.IO
         /// <param name="stream"></param>
         /// <param name="order">Byte order</param>
         /// <returns>A 64-bit signed integer.</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ReadInt64(this Stream stream, Endian order = Endian.Little)
@@ -133,7 +133,7 @@ namespace AuroraLib.Core.IO
         /// <param name="stream"></param>
         /// <param name="order">Byte order</param>
         /// <returns>A half-precision floating point number.</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Half ReadHalf(this Stream stream, Endian order = Endian.Little)
@@ -145,7 +145,7 @@ namespace AuroraLib.Core.IO
         /// <param name="stream"></param>
         /// <param name="order">Byte order</param>
         /// <returns>A single-precision floating point number.</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float ReadSingle(this Stream stream, Endian order = Endian.Little)
@@ -157,7 +157,7 @@ namespace AuroraLib.Core.IO
         /// <param name="stream"></param>
         /// <param name="order">Byte order</param>
         /// <returns>A double-precision floating point number.</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double ReadDouble(this Stream stream, Endian order = Endian.Little)
@@ -168,7 +168,7 @@ namespace AuroraLib.Core.IO
         /// </summary>
         /// <param name="stream">The stream to read from.</param>
         /// <returns>The endianness represented by the BOM</returns>
-        /// <inheritdoc cref="ThrowHelper{T}()"/>
+        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Endian ReadBOM(this Stream stream)

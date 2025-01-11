@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Buffers;
 using System.Diagnostics;
 using System.IO;
@@ -21,8 +21,8 @@ namespace AuroraLib.Core.IO
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
-                if (value < 0 || value > Length)
-                    throw new ArgumentOutOfRangeException(nameof(value));
+                ThrowIf.Negative(value);
+                ThrowIf.GreaterThan(value, Length);
                 _Position = _Buffer.Length - value;
             }
         }
