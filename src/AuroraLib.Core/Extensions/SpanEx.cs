@@ -279,5 +279,71 @@ namespace AuroraLib.Core.Extensions
                 return new UnmanagedMemoryStream(ptr, data.Length);
             }
         }
+
+#if NET5_0_OR_GREATER
+        /// <inheritdoc cref="string.Concat(ReadOnlySpan{char}, ReadOnlySpan{char})"/>
+        public static string StringConcat(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2)
+            => string.Concat(path1, path2);
+
+        /// <inheritdoc cref="string.Concat(ReadOnlySpan{char}, ReadOnlySpan{char}, ReadOnlySpan{char})"/>
+        public static string StringConcat(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2, ReadOnlySpan<char> path3)
+            => string.Concat(path1, path2, path3);
+            
+        /// <inheritdoc cref="string.Concat(ReadOnlySpan{char}, ReadOnlySpan{char}, ReadOnlySpan{char}, ReadOnlySpan{char})"/>
+        public static string StringConcat(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2, ReadOnlySpan<char> path3, ReadOnlySpan<char> path4)
+            => string.Concat(path1, path2, path3, path4);
+#else
+
+        public static string StringConcat(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2)
+        {
+            int capacity = path1.Length + path2.Length;
+            string str = CreateStringWithCapacity(capacity, out Span<char> strSpan);
+
+            path1.CopyTo(strSpan);
+            strSpan = strSpan.Slice(path1.Length);
+            path2.CopyTo(strSpan);
+            return str;
+        }
+
+        public static string StringConcat(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2, ReadOnlySpan<char> path3)
+        {
+            int capacity = path1.Length + path2.Length + path3.Length;
+            string str = CreateStringWithCapacity(capacity, out Span<char> strSpan);
+
+            path1.CopyTo(strSpan);
+            strSpan = strSpan.Slice(path1.Length);
+            path2.CopyTo(strSpan);
+            strSpan = strSpan.Slice(path2.Length);
+            path3.CopyTo(strSpan);
+            return str;
+        }
+
+        public static string StringConcat(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2, ReadOnlySpan<char> path3, ReadOnlySpan<char> path4)
+        {
+            int capacity = path1.Length + path2.Length + path3.Length + path4.Length;
+            string str = CreateStringWithCapacity(capacity, out Span<char> strSpan);
+
+            path1.CopyTo(strSpan);
+            strSpan = strSpan.Slice(path1.Length);
+            path2.CopyTo(strSpan);
+            strSpan = strSpan.Slice(path2.Length);
+            path3.CopyTo(strSpan);
+            strSpan = strSpan.Slice(path3.Length);
+            path4.CopyTo(strSpan);
+            return str;
+        }
+
+        private static string CreateStringWithCapacity(int capacity, out Span<char> chars)
+        {
+            string str = new string('\0', capacity);
+            chars = MemoryMarshal.AsMemory(str.AsMemory()).Span;
+            return str;
+        }
+#endif
+
+#if !NET5_0_OR_GREATER
+        /// <see cref="string.Contains(string)"/>
+        public static bool Contains(this string @this, char value) => @this.IndexOf(value) >= 0;
+#endif
     }
 }
