@@ -49,7 +49,6 @@ namespace AuroraLib.Core.IO
         #endregion
 
         #region Match
-
         /// <summary>
         /// Matches the specified <paramref name="expected"/> identifier with the data in the <paramref name="stream"/>.
         /// </summary>
@@ -80,11 +79,13 @@ namespace AuroraLib.Core.IO
         public static void MatchThrow(this Stream stream, ReadOnlySpan<byte> expected)
         {
             Span<byte> buffer = stackalloc byte[expected.Length];
-            int i = stream.Read(buffer);
-            if (i != expected.Length || !buffer.SequenceEqual(expected))
-            {
+            int bytesRead = stream.Read(buffer);
+
+            if (bytesRead != expected.Length)
+                throw new EndOfStreamException($"Expected {expected.Length} bytes but only {bytesRead} were available.");
+
+            if (!buffer.SequenceEqual(expected))
                 throw new InvalidIdentifierException(buffer, expected);
-            }
         }
 
         /// <inheritdoc cref="MatchThrow(Stream, ReadOnlySpan{byte})"/>
