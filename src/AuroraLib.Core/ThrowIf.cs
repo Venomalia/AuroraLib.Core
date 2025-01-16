@@ -62,6 +62,24 @@ public static void OutOfRange<T>(T value, T min, T max, string? paramName = null
             }
         }
 
+        /// <summary>
+        /// Validates that the provided character span is not empty, or consists only of whitespace characters.
+        /// </summary>
+        /// <param name="argument">The character span to validate.</param>
+        /// <param name="paramName">The name of the parameter to include in the exception message if validation fails.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the provided character span is empty or contains only whitespace.
+        /// </exception>
+#if NET6_0_OR_GREATER
+        public static void EmptyOrWhiteSpace(ReadOnlySpan<char> argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+#else
+        public static void EmptyOrWhiteSpace(ReadOnlySpan<char> argument, string? paramName = null)
+#endif
+        {
+            Zero(argument.Length, paramName);
+            if (argument.IsWhiteSpace())
+                throw new ArgumentException("Only consists of whitespace character.", paramName);
+        }
 
 #if NET8_0_OR_GREATER
 
