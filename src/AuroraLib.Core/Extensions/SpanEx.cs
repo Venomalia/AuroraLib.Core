@@ -84,6 +84,28 @@ namespace AuroraLib.Core.Extensions
             => MemoryExtensions.IndexOfAny(span, values) != -1;
 
         /// <summary>
+        /// Replaces all occurrences of a specified value in a span with a new value.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the span.</typeparam>
+        /// <param name="span">The span that contains the elements to modify.</param>
+        /// <param name="oldValue">The value to search for in the span.</param>
+        /// <param name="newValue">The value to replace the <paramref name="oldValue"/> with.</param>
+        [DebuggerStepThrough]
+        public static void Replace<T>(this Span<T> span, T oldValue, T newValue) where T : IEquatable<T>
+        {
+            if (oldValue.Equals(newValue))
+                return;
+
+            for (int i = 0; i < span.Length; i++)
+            {
+                if (span[i].Equals(oldValue))
+                {
+                    span[i] = newValue;
+                }
+            }
+        }
+
+        /// <summary>
         /// Counts the occurrences of a specific <paramref name="value"/> of <typeparamref name="T"/> in a <see cref="ReadOnlySpan{T}"/>.
         /// </summary>
         /// <typeparam name="T">The type of elements in the sequences.</typeparam>
