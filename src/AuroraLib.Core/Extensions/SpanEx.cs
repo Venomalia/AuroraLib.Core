@@ -12,74 +12,77 @@ namespace AuroraLib.Core.Extensions
     public static class SpanEx
     {
         /// <summary>
-        /// Determines whether the given sequence is contained within the larger sequence of values.
+        /// Determines if the given span contains the specified sequence of values.
         /// </summary>
-        /// <typeparam name="T">The type of elements in the sequences.</typeparam>
-        /// <param name="values">The sequence of values to search within.</param>
-        /// <param name="sequence">The sequence to search for.</param>
-        /// <returns>true if the sequence is found within the larger sequence; otherwise, false.</returns>
+        /// <typeparam name="T">The type of elements in the span, which must implement <see cref="IEquatable{T}"/>.</typeparam>
+        /// <param name="values">The span to search in.</param>
+        /// <param name="sequence">The sequence of values to check for in the span.</param>
+        /// <returns><c>true</c> if the span contains the specified sequence; otherwise, <c>false</c>.</returns>
         [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool SequenceContains<T>(this ReadOnlySpan<T> values, ReadOnlySpan<T> sequence) where T : IEquatable<T>
-            => SequenceSearch(values, sequence) != -1;
+        public static bool Contains<T>(this ReadOnlySpan<T> values, ReadOnlySpan<T> sequence) where T : IEquatable<T>
+            => MemoryExtensions.IndexOf(values, sequence) != -1;
 
-        /// <summary>
-        /// Searches for a <paramref name="sequence"/> within an <see cref="ReadOnlySpan{T}"/> and returns the index of the first occurrence.
-        /// </summary>
-        /// <typeparam name="T">The type of elements in the sequences.</typeparam>
-        /// <param name="values">The array to search in.</param>
-        /// <param name="sequence">The sequence to search for.</param>
-        /// <returns>The index of the first occurrence of the sequence, or -1 if not found.</returns>
+        /// <inheritdoc cref="Contains{T}(ReadOnlySpan{T}, ReadOnlySpan{T})"/>
         [DebuggerStepThrough]
-        public static int SequenceSearch<T>(this ReadOnlySpan<T> values, ReadOnlySpan<T> sequence) where T : IEquatable<T>
-        {
-            if (!sequence.IsEmpty || values.Length < sequence.Length)
-                return -1;
+        public static bool Contains<T>(this Span<T> values, ReadOnlySpan<T> sequence) where T : IEquatable<T>
+            => MemoryExtensions.IndexOf(values, sequence) != -1;
 
-            for (int i = 0; i <= values.Length; i++)
-            {
-                int p;
-                for (p = 0; p < sequence.Length; p++)
-                {
-                    if (!sequence[p].Equals(values[i + p]))
-                        break;
-                }
-
-                if (p == sequence.Length)
-                    return i - sequence.Length;
-            }
-
-            return -1;
-        }
-
-        /// <summary>
-        /// Determines the maximum matching length between two ReadOnlySpans.
-        /// </summary>
-        /// <typeparam name="T">The type of elements in the sequences.</typeparam>
-        /// <param name="sequence1">The first ReadOnlySpan to compare.</param>
-        /// <param name="sequence2">The second ReadOnlySpan to compare.</param>
-        /// <returns>The length of the maximum matching prefix between the two ReadOnlySpans.</returns>
-        public static int MaxMatch<T>(this ReadOnlySpan<T> sequence1, ReadOnlySpan<T> sequence2) where T : IEquatable<T>
-        {
-            int minLength = Math.Min(sequence1.Length, sequence2.Length);
-            for (int i = 0; i < minLength; i++)
-            {
-                if (!sequence1[i].Equals(sequence2[i]))
-                {
-                    return i;
-                }
-            }
-
-            return minLength;
-        }
-
-        /// <inheritdoc cref="MaxMatch{T}(ReadOnlySpan{T},ReadOnlySpan{T})"/>
+#if !NET6_0_OR_GREATER
         [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int MaxMatch<T>(this Span<T> span, ReadOnlySpan<T> sequence2) where T : IEquatable<T>
-            => MaxMatch((ReadOnlySpan<T>)span, sequence2);
+        public static bool Contains<T>(this ReadOnlySpan<T> span, T value) where T : IEquatable<T>?
+            => MemoryExtensions.IndexOf(span, value) != -1;
+
+        [DebuggerStepThrough]
+        public static bool Contains<T>(this Span<T> span, T value) where T : IEquatable<T>?
+            => MemoryExtensions.IndexOf(span, value) != -1;
+#endif
 
 #if !NET8_0_OR_GREATER
+
+        /// <summary>
+        /// Determines if the given span contains any of the specified values.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the span, which must implement <see cref="IEquatable{T}"/>.</typeparam>
+        /// <param name="span">The span to search in.</param>
+        /// <param name="value0">The first value to check for in the span.</param>
+        /// <param name="value1">The second value to check for in the span.</param>
+        /// <param name="value2">The third value to check for in the span.</param>
+        /// <returns><c>true</c> if the span contains any of the specified values; otherwise, <c>false</c>.</returns>
+        [DebuggerStepThrough]
+        public static bool ContainsAny<T>(this ReadOnlySpan<T> span, T value0, T value1, T value2) where T : IEquatable<T>
+            => MemoryExtensions.IndexOfAny(span, value0, value1, value2) != -1;
+
+        /// <inheritdoc cref="ContainsAny{T}(ReadOnlySpan{T}, T, T, T)"/>
+        [DebuggerStepThrough]
+        public static bool ContainsAny<T>(this Span<T> span, T value0, T value1, T value2) where T : IEquatable<T>
+            => MemoryExtensions.IndexOfAny(span, value0, value1, value2) != -1;
+
+        /// <inheritdoc cref="ContainsAny{T}(ReadOnlySpan{T}, T, T, T)"/>
+        [DebuggerStepThrough]
+        public static bool ContainsAny<T>(this ReadOnlySpan<T> span, T value0, T value1) where T : IEquatable<T>
+            => MemoryExtensions.IndexOfAny(span, value0, value1) != -1;
+
+        /// <inheritdoc cref="ContainsAny{T}(ReadOnlySpan{T}, T, T, T)"/>
+        [DebuggerStepThrough]
+        public static bool ContainsAny<T>(this Span<T> span, T value0, T value1) where T : IEquatable<T>
+            => MemoryExtensions.IndexOfAny(span, value0, value1) != -1;
+
+        /// <summary>
+        /// Determines if the given span contains any of the values from the specified sequence.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the span, which must implement <see cref="IEquatable{T}"/>.</typeparam>
+        /// <param name="span">The span to search in.</param>
+        /// <param name="values">The sequence of values to check for in the span.</param>
+        /// <returns><c>true</c> if the span contains any of the values from the specified sequence; otherwise, <c>false</c>.</returns>
+        [DebuggerStepThrough]
+        public static bool ContainsAny<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> values) where T : IEquatable<T>
+            => MemoryExtensions.IndexOfAny(span, values) != -1;
+
+        /// <inheritdoc cref="ContainsAny{T}(ReadOnlySpan{T}, ReadOnlySpan{T})"/>
+        [DebuggerStepThrough]
+        public static bool ContainsAny<T>(this Span<T> span, ReadOnlySpan<T> values) where T : IEquatable<T>
+            => MemoryExtensions.IndexOfAny(span, values) != -1;
+
         /// <summary>
         /// Counts the occurrences of a specific <paramref name="value"/> of <typeparamref name="T"/> in a <see cref="ReadOnlySpan{T}"/>.
         /// </summary>
@@ -288,7 +291,7 @@ namespace AuroraLib.Core.Extensions
         /// <inheritdoc cref="string.Concat(ReadOnlySpan{char}, ReadOnlySpan{char}, ReadOnlySpan{char})"/>
         public static string StringConcat(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2, ReadOnlySpan<char> path3)
             => string.Concat(path1, path2, path3);
-            
+
         /// <inheritdoc cref="string.Concat(ReadOnlySpan{char}, ReadOnlySpan{char}, ReadOnlySpan{char}, ReadOnlySpan{char})"/>
         public static string StringConcat(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2, ReadOnlySpan<char> path3, ReadOnlySpan<char> path4)
             => string.Concat(path1, path2, path3, path4);
