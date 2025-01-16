@@ -1,4 +1,4 @@
-﻿using AuroraLib.Core.Interfaces;
+using AuroraLib.Core.Format.Identifier;
 using System;
 
 namespace AuroraLib.Core.Exceptions
@@ -44,10 +44,6 @@ namespace AuroraLib.Core.Exceptions
 
         /// <inheritdoc cref="InvalidIdentifierException(string,string)"/>
         public InvalidIdentifierException(ReadOnlySpan<byte> identifier, ReadOnlySpan<byte> expectedIdentifier) : this(BitConverterX.ToString(identifier), BitConverterX.ToString(expectedIdentifier))
-        { }
-
-        /// <inheritdoc cref="InvalidIdentifierException(string,string)"/>
-        public InvalidIdentifierException(IIdentifier identifier, IIdentifier expectedIdentifier) : this(identifier.AsSpan(), expectedIdentifier.AsSpan())
         { }
     }
 

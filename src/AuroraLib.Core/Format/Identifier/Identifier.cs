@@ -1,12 +1,11 @@
-﻿using AuroraLib.Core.Extensions;
-using AuroraLib.Core.Interfaces;
+using AuroraLib.Core.Extensions;
 using AuroraLib.Core.Text;
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace AuroraLib.Core
+namespace AuroraLib.Core.Format.Identifier
 {
     /// <summary>
     /// Represents a identifier.
@@ -14,13 +13,6 @@ namespace AuroraLib.Core
     public sealed class Identifier : IIdentifier
     {
         private readonly byte[] Bytes;
-
-        /// <inheritdoc />
-        public byte this[int index]
-        {
-            get => Bytes[index];
-            set => Bytes[index] = value;
-        }
 
         public Identifier(byte[] bytes)
             => Bytes = bytes;
@@ -56,7 +48,7 @@ namespace AuroraLib.Core
         public static explicit operator byte[](Identifier v) => v.Bytes;
 
         /// <inheritdoc />
-        public override int GetHashCode() => SpanEx.SequenceGetHashCode(AsSpan());
+        public override int GetHashCode() => AsSpan().SequenceGetHashCode();
 
         /// <inheritdoc />
         public override string ToString() => EncodingX.GetDisplayableString(AsSpan());

@@ -1,5 +1,5 @@
 using AuroraLib.Core.Exceptions;
-using AuroraLib.Core.Interfaces;
+using AuroraLib.Core.Format.Identifier;
 using AuroraLib.Core.Text;
 using System;
 using System.Buffers;

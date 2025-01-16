@@ -1,14 +1,12 @@
-﻿using AuroraLib.Core.Extensions;
-using AuroraLib.Core.Interfaces;
+using AuroraLib.Core.Extensions;
 using AuroraLib.Core.Text;
 using System;
 using System.Diagnostics;
-using System.Net;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace AuroraLib.Core
+namespace AuroraLib.Core.Format.Identifier
 {
     /// <summary>
     /// Represents a 32-bit identifier that is not affected by the endian order.
@@ -20,17 +18,6 @@ namespace AuroraLib.Core
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private byte b0, b1, b2, b3;
 #pragma warning restore IDE0044
-
-        /// <inheritdoc />
-        public byte this[int index]
-        {
-            [DebuggerStepThrough]
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => AsSpan()[index];
-            [DebuggerStepThrough]
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set => AsSpan()[index] = value;
-        }
 
         #region Constructors
 
@@ -47,7 +34,7 @@ namespace AuroraLib.Core
         /// <param name="b1">The second byte of the identifier.</param>
         /// <param name="b2">The third byte of the identifier.</param>
         /// <param name="b3">The fourth byte of the identifier.</param>
-        public Identifier32(in byte b0, in byte b1, in byte b2, in byte b3)
+        public Identifier32(byte b0, byte b1, byte b2, byte b3)
         {
             this.b0 = b0;
             this.b1 = b1;
@@ -56,22 +43,14 @@ namespace AuroraLib.Core
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Identifier32"/> struct using the specified integer value.
+        /// Initializes a new instance of the <see cref="Identifier32"/> struct using the specified 32-bit value.
         /// </summary>
         /// <param name="value">The integer value to initialize the identifier.</param>
-        /// <param name="endian">The endianness of the identifier bytes.</param>
-        public Identifier32(in int value, Endian endian = Endian.Little) : this((uint)value, endian) { }
+        public Identifier32(int value) : this((uint)value) { }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Identifier32"/> struct using the specified unsigned integer value.
-        /// </summary>
-        /// <param name="value">The unsigned integer value to initialize the identifier.</param>
-        /// <param name="endian">The endianness of the identifier bytes.</param>
-        public Identifier32(in uint value, Endian endian = Endian.Little)
+        /// <inheritdoc cref="Identifier32(int)"/>
+        public Identifier32(uint value)
         {
-            if (endian == Endian.Big)
-                BitConverterX.Swap(value);
-
             b0 = (byte)(value & 0xFF);
             b1 = (byte)(value >> 8 & 0xFF);
             b2 = (byte)(value >> 16 & 0xFF);
@@ -84,7 +63,7 @@ namespace AuroraLib.Core
         /// <param name="span">The character span to initialize the identifier. Only the first 4 characters will be considered.</param>
         public Identifier32(ReadOnlySpan<char> span)
         {
-            ReadOnlySpan<char> span32 = span.Slice(0,Math.Min(span.Length, 4));
+            ReadOnlySpan<char> span32 = span.Slice(0, Math.Min(span.Length, 4));
             Span<byte> bytes = stackalloc byte[4];
             Encoding.GetEncoding(28591).GetBytes(span32, bytes);
 
@@ -139,7 +118,7 @@ namespace AuroraLib.Core
         public static explicit operator string(Identifier32 v) => v.GetString();
 
         /// <inheritdoc />
-        public override int GetHashCode() => SpanEx.SequenceGetHashCode(AsSpan());
+        public override int GetHashCode() => AsSpan().SequenceGetHashCode();
 
         /// <inheritdoc />
         public override string ToString() => EncodingX.GetDisplayableString(AsSpan());

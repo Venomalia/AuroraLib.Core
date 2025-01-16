@@ -1,4 +1,6 @@
-﻿namespace AuroraLib.Core.Interfaces
+using AuroraLib.Core.Format.Identifier;
+
+namespace AuroraLib.Core.Format
 {
     /// <summary>
     /// Represents an object that has an identifier.

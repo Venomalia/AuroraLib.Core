@@ -1,5 +1,4 @@
-﻿using AuroraLib.Core.Extensions;
-using AuroraLib.Core.Interfaces;
+using AuroraLib.Core.Extensions;
 using AuroraLib.Core.Text;
 using System;
 using System.Diagnostics;
@@ -7,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace AuroraLib.Core
+namespace AuroraLib.Core.Format.Identifier
 {
     /// <summary>
     /// Represents a 64-bit identifier that is not affected by the endian order.
@@ -25,24 +24,20 @@ namespace AuroraLib.Core
         /// </summary>
         public Identifier32 Higher;
 
-        /// <inheritdoc />
-        public byte this[int index]
-        {
-            [DebuggerStepThrough]
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => AsSpan()[index];
-            [DebuggerStepThrough]
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set => AsSpan()[index] = value;
-        }
-
         #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Identifier64"/> struct from a span of bytes.
         /// </summary>
         /// <param name="bytes">The span of bytes representing the identifier.</param>
-        public Identifier64(ReadOnlySpan<byte> bytes) : this(new Identifier32(bytes.Slice(0,4)), new Identifier32(bytes.Slice(4, 4))) { }
+        public Identifier64(ReadOnlySpan<byte> bytes) : this(new Identifier32(bytes.Slice(0, 4)), new Identifier32(bytes.Slice(4, 4)))
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Identifier64"/> struct using the specified bytes.
+        /// </summary>
+        public Identifier64(byte b0, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7) : this(new Identifier32(b0, b1, b2, b3), new Identifier32(b4, b5, b6, b7))
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Identifier64"/> struct with the specified lower and higher identifiers.
@@ -56,22 +51,14 @@ namespace AuroraLib.Core
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Identifier64"/> struct with the specified value and endianness.
+        /// Initializes a new instance of the <see cref="Identifier64"/> struct with the specified 64-bit value.
         /// </summary>
         /// <param name="value">The 64-bit value to initialize the identifier.</param>
-        /// <param name="endian">The endianness of the value.</param>
-        public Identifier64(long value, Endian endian = Endian.Little) : this((ulong)value, endian) { }
+        public Identifier64(long value) : this((ulong)value) { }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Identifier64"/> struct with the specified 64-bit value and endianness.
-        /// </summary>
-        /// <param name="value">The 64-bit value to initialize the identifier.</param>
-        /// <param name="endian">The endianness of the value.</param>
-        public Identifier64(ulong value, Endian endian = Endian.Little)
+        /// <inheritdoc cref="Identifier64(long)"/>
+        public Identifier64(ulong value)
         {
-            if (endian == Endian.Big)
-                value = BitConverterX.Swap(value);
-
             Lower = new Identifier32((uint)value);
             Higher = new Identifier32((uint)(value >> 32));
         }
@@ -139,7 +126,7 @@ namespace AuroraLib.Core
         public static explicit operator string(Identifier64 v) => v.GetString();
 
         /// <inheritdoc />
-        public override int GetHashCode() => SpanEx.SequenceGetHashCode(AsSpan());
+        public override int GetHashCode() => AsSpan().SequenceGetHashCode();
 
         /// <inheritdoc />
         public override string ToString() => EncodingX.GetDisplayableString(AsSpan());

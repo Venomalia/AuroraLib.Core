@@ -1,21 +1,13 @@
-﻿using System;
+using System;
 using System.Text;
 
-namespace AuroraLib.Core.Interfaces
+namespace AuroraLib.Core.Format.Identifier
 {
-
     /// <summary>
     /// Represents an identifier and provides access to individual bytes within the identifier.
     /// </summary>
     public interface IIdentifier : IEquatable<string>, IEquatable<IIdentifier>
     {
-        /// <summary>
-        /// Gets or sets the byte at the specified index within the identifier.
-        /// </summary>
-        /// <param name="index">The index of the byte to get or set.</param>
-        /// <returns>The byte at the specified index.</returns>
-        byte this[int index] { get; set; }
-
         /// <summary>
         /// Returns a <see cref="Span{byte}"/> representation of the identifier.
         /// </summary>
