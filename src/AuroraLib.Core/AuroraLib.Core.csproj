@@ -7,12 +7,12 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Title>AuroraLib.Core</Title>
-	<Version>1.4.3.0</Version>
+	<Version>1.5.0.0</Version>
     <AssemblyVersion>$(Version)</AssemblyVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageTags>StructureReader Modding uint24 int24 uint128 BigEndian</PackageTags>
-    <Description>High performance zero allocation structure reader and other tools for big and little-endian</Description>
+    <Description>High-performance and memory-efficient tools for binary data manipulation and stream handling.</Description>
     <Authors>Venomalia</Authors>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
