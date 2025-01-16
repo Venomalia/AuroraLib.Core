@@ -75,24 +75,25 @@ namespace AuroraLib.Core.Extensions
         /// Computes the hash code for the elements in the specified collection./>.
         /// </summary>
         /// <typeparam name="T">The type of elements in the enumerable.</typeparam>
-        /// <param name="list">The enumerable collection of elements to compute the hash code from.</param>
+        /// <param name="values">The enumerable collection of elements to compute the hash code from.</param>
         /// <returns>The computed hash code.</returns>
         [DebuggerStepThrough]
-        public static int SequenceGetHashCode<T>(this IEnumerable<T> list)
+        public static int SequenceGetHashCode<T>(this IEnumerable<T> values)
         {
-            if (list == null || !list.Any())
+            ThrowIf.Null(values);
+            if (!values.Any())
                 return 0;
-
+            
 #if NET20_OR_GREATER || NETSTANDARD2_0
             int hashCode = 17;
-            foreach (var item in list)
+            foreach (var item in values)
             {
                 hashCode = hashCode * 23 + (item == null ? 0 : item.GetHashCode());
             }
             return hashCode;
 #else
             HashCode gen = default;
-            foreach (T b in list)
+            foreach (T b in values)
             {
                 gen.Add(b);
             }
