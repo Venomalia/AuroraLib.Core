@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Reflection;
 
 namespace AuroraLib.Core.Format
 {
@@ -25,7 +26,6 @@ namespace AuroraLib.Core.Format
         private readonly Dictionary<IIdentifier, IFormatInfo> IdentifierLUT;
         private readonly List<IFormatInfo> Remaining;
 
-
         /// <inheritdoc/>
         public int Count => Formats.Count;
 
@@ -40,6 +40,9 @@ namespace AuroraLib.Core.Format
 
         bool ICollection<IFormatInfo>.IsReadOnly => false;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FormatDictionary"/> class.
+        /// </summary>
         public FormatDictionary()
         {
             Formats = new Dictionary<string, IFormatInfo>();
@@ -47,6 +50,10 @@ namespace AuroraLib.Core.Format
             Remaining = new List<IFormatInfo>();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FormatDictionary"/> class by copying data from another instance.
+        /// </summary>
+        /// <param name="dictionary">The <see cref="FormatDictionary"/> instance to copy data from.</param>
         public FormatDictionary(FormatDictionary dictionary)
         {
             Formats = new Dictionary<string, IFormatInfo>(dictionary.Formats);
@@ -54,11 +61,44 @@ namespace AuroraLib.Core.Format
             Remaining = new List<IFormatInfo>(dictionary.Remaining);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FormatDictionary"/> class using a collection of <see cref="IFormatInfo"/> formats.
+        /// </summary>
+        /// <param name="formats">A collection of <see cref="IFormatInfo"/> formats to add to the dictionary.</param>
         public FormatDictionary(IEnumerable<IFormatInfo> formats) : this()
         {
             foreach (IFormatInfo format in formats)
             {
                 Add(format);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FormatDictionary"/> class using available formats from the specified <paramref name="assemblies"/>.
+        /// </summary>
+        /// <param name="assemblies">Assemblies to search for format information providers.</param>
+        public FormatDictionary(params Assembly[] assemblies) : this(GetAvailableFormats(assemblies))
+        { }
+
+        /// <summary>
+        /// Scans the provided <paramref name="assemblies"/> for types implementing <see cref="IFormatInfoProvider"/> and returns their associated <see cref="IFormatInfo"/>.
+        /// </summary>
+        /// <param name="assemblies">Assemblies to scan for format providers.</param>
+        /// <returns>An enumerable collection of <see cref="IFormatInfo"/> objects found in the provided assemblies.</returns>
+        public static IEnumerable<IFormatInfo> GetAvailableFormats(params Assembly[] assemblies)
+        {
+            foreach (var assembly in assemblies)
+            {
+                // Iterate through all types defined in the current assembly
+                foreach (var type in assembly.DefinedTypes)
+                {
+                    // Check if the type implements IFormatInfoProvider, is not an interface or abstract, and has a parameterless constructor
+                    if (typeof(IFormatInfoProvider).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract && type.GetConstructor(Type.EmptyTypes) != null)
+                    {
+                        // Create an instance of the type and return the associated format information
+                        yield return ((IFormatInfoProvider)Activator.CreateInstance(type.AsType())!).Info;
+                    }
+                }
             }
         }
 
