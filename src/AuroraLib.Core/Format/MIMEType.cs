@@ -1,5 +1,3 @@
-using System;
-
 namespace AuroraLib.Core.Format
 {
     /// <summary>

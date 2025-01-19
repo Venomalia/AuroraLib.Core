@@ -229,7 +229,7 @@ namespace AuroraLib.Core.Format
         {
             if (Formats.Remove(mime, out item))
             {
-                if (item.IdentifierOffset == 0 && item.Identifier != null && IdentifierLUT.TryGetValue(item.Identifier, out IFormatInfo info))
+                if (item.IdentifierOffset == 0 && item.Identifier != null && IdentifierLUT.TryGetValue(item.Identifier, out IFormatInfo? info))
                 {
                     if (item.Equals(info))
                     {

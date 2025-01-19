@@ -83,7 +83,7 @@ namespace AuroraLib.Core.Extensions
             ThrowIf.Null(values);
             if (!values.Any())
                 return 0;
-            
+
 #if NET20_OR_GREATER || NETSTANDARD2_0
             int hashCode = 17;
             foreach (var item in values)

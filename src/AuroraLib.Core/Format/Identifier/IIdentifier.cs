@@ -9,9 +9,9 @@ namespace AuroraLib.Core.Format.Identifier
     public interface IIdentifier : IEquatable<string>, IEquatable<IIdentifier>
     {
         /// <summary>
-        /// Returns a <see cref="Span{byte}"/> representation of the identifier.
+        /// Returns a <see cref="byte"/> span representation of the identifier.
         /// </summary>
-        /// <returns>A <see cref="Span{byte}"/> representing the identifier.</returns>
+        /// <returns>A Span representing the identifier.</returns>
         Span<byte> AsSpan();
 
         /// <summary>

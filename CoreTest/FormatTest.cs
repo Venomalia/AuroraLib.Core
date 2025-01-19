@@ -30,6 +30,10 @@ namespace CoreUnitTest
                 {
                     Assert.AreEqual(format.MIMEType.ToString(), expectedMime);
                 }
+                else
+                {
+                    Assert.Fail();
+                }
             }
         }
 

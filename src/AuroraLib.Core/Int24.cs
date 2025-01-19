@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -292,9 +293,9 @@ namespace AuroraLib.Core
             result = default;
             return false;
         }
-        static bool INumberBase<Int24>.TryConvertToChecked<TOther>(Int24 value, out TOther result) => TOther.TryConvertFromChecked(value.Value, out result);
+        static bool INumberBase<Int24>.TryConvertToChecked<TOther>(Int24 value, [MaybeNullWhen(false)] out TOther result) => TOther.TryConvertFromChecked(value.Value, out result);
 
-        static bool INumberBase<Int24>.TryConvertFromSaturating<TOther>(TOther value, out Int24 result)
+        static bool INumberBase<Int24>.TryConvertFromSaturating<TOther>(TOther value, [MaybeNullWhen(false)] out Int24 result)
         {
             if (TOther.TryConvertToSaturating(value, out int temp))
             {
@@ -305,8 +306,9 @@ namespace AuroraLib.Core
             result = default;
             return false;
         }
-        static bool INumberBase<Int24>.TryConvertToSaturating<TOther>(Int24 value, out TOther result) => TOther.TryConvertFromSaturating(value.Value, out result);
-        static bool INumberBase<Int24>.TryConvertFromTruncating<TOther>(TOther value, out Int24 result)
+        static bool INumberBase<Int24>.TryConvertToSaturating<TOther>(Int24 value, [MaybeNullWhen(false)] out TOther result) => TOther.TryConvertFromSaturating(value.Value, out result);
+
+        static bool INumberBase<Int24>.TryConvertFromTruncating<TOther>(TOther value, [MaybeNullWhen(false)] out Int24 result)
         {
             if (TOther.TryConvertToTruncating(value, out int temp))
             {
@@ -317,7 +319,7 @@ namespace AuroraLib.Core
             result = default;
             return false;
         }
-        static bool INumberBase<Int24>.TryConvertToTruncating<TOther>(Int24 value, out TOther result) => TOther.TryConvertFromTruncating(value.Value, out result);
+        static bool INumberBase<Int24>.TryConvertToTruncating<TOther>(Int24 value, [MaybeNullWhen(false)] out TOther result) => TOther.TryConvertFromTruncating(value.Value, out result);
         #endregion
 
         #region IOperators

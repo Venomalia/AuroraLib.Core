@@ -204,7 +204,7 @@ namespace AuroraLib.Core.IO
             byte[] newBuffer = _APool.Rent(minimumLength);
             if (_Buffer.Length != 0)
             {
-                Buffer.BlockCopy(_Buffer,0,newBuffer, 0, _Buffer.Length);
+                Buffer.BlockCopy(_Buffer, 0, newBuffer, 0, _Buffer.Length);
                 _APool.Return(_Buffer);
             }
             _Buffer = newBuffer;

@@ -71,7 +71,7 @@ namespace AuroraLib.Core.Format
         public bool Equals(IFormatInfo? other) => other != null && other.MIMEType.Equals(MIMEType);
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) => obj is IFormatInfo info && Equals(info);
+        public override bool Equals(object? obj) => obj is IFormatInfo info && Equals(info);
 
         /// <inheritdoc/>
         public override int GetHashCode() => MIMEType.GetHashCode();

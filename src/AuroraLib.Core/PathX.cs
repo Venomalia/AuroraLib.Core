@@ -54,9 +54,9 @@ namespace AuroraLib.Core
 #if NET5_0_OR_GREATER
         /// <inheritdoc cref="Path.Join(ReadOnlySpan{char}, ReadOnlySpan{char})"/>
         public static string Join(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2) => Path.Join(path1, path2);
-        
+
         /// <inheritdoc cref="Path.Join(ReadOnlySpan{char}, ReadOnlySpan{char}, ReadOnlySpan{char})"/>
-        public static string Join(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2, ReadOnlySpan<char> path3) => Path.Join(path1, path2,path3);
+        public static string Join(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2, ReadOnlySpan<char> path3) => Path.Join(path1, path2, path3);
 #else
         /// <inheritdoc cref="Path.Combine(string, string)"/>
         public static string Join(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2)

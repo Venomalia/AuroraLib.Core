@@ -1,4 +1,3 @@
-using AuroraLib.Core.Extensions;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -130,7 +129,7 @@ namespace AuroraLib.Core.IO
             lock (_basestream)
             {
                 BaseStream.Seek(_position + Offset, SeekOrigin.Begin);
-                BaseStream.Read(buffer.Slice(0,num));
+                BaseStream.Read(buffer.Slice(0, num));
             }
             _position += num;
             return num;

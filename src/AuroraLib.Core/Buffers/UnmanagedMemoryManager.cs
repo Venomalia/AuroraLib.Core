@@ -11,13 +11,21 @@ namespace AuroraLib.Core.Buffers
     {
         private readonly void* _pointer;
         private readonly int _length;
-        private readonly Action<bool> _dispose;
+        private readonly Action<bool>? _dispose;
 
+        /// <inheritdoc cref="UnmanagedMemoryManager{T}.UnmanagedMemoryManager(void*, int, Action{bool})"/>
         public UnmanagedMemoryManager(void* pointer, int length)
         {
             _pointer = pointer;
             _length = length;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UnmanagedMemoryManager{T}"/> class.
+        /// </summary>
+        /// <param name="pointer">A pointer to the unmanaged memory.</param>
+        /// <param name="length">The length of the unmanaged memory in bytes.</param>
+        /// <param name="dispose">An action that is invoked when the memory is disposed, passing a boolean indicating if the disposal should occur.</param>
         public UnmanagedMemoryManager(void* pointer, int length, Action<bool> dispose) : this(pointer, length)
             => _dispose = dispose;
 

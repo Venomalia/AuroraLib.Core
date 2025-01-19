@@ -31,6 +31,7 @@ namespace AuroraLib.Core.IO
         {
             ThrowIf.Null(aPool);
             ThrowIf.Null(buffer);
+            ThrowIf.Negative(length);
 
             _APool = aPool;
             _Buffer = buffer;
