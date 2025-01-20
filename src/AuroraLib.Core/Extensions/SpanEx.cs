@@ -276,7 +276,10 @@ namespace AuroraLib.Core.Extensions
         /// <returns>A span of bytes representing the same memory as the original buffer.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#if !(NETSTANDARD || NET20_OR_GREATER)
+#if NET8_0_OR_GREATER
+        public static Span<byte> AsBytes<T>(this ref T buffer) where T : unmanaged
+            => MemoryMarshal.AsBytes(new Span<T>(ref buffer));
+#elif NET6_0_OR_GREATER
         public static Span<byte> AsBytes<T>(this ref T buffer) where T : unmanaged
         {
             ref byte bRef = ref Unsafe.As<T, byte>(ref buffer);
