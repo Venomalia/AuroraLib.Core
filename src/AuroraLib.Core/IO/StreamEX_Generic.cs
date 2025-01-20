@@ -31,53 +31,50 @@ namespace AuroraLib.Core.IO
         /// <returns>The value <typeparamref name="T"/> that were read.</returns>
         /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
         [DebuggerStepThrough]
-#if !(NETSTANDARD || NET20_OR_GREATER)
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-#endif
-#if !(NETSTANDARD)
         public static unsafe T Read<T>(this Stream stream, Endian order = Endian.Little) where T : unmanaged
         {
-            if (sizeof(T) <= 4)
+
+            if (Unsafe.SizeOf<T>() <= 4)
                 return stream.ReadPrimitiveHelper<T>(order);
 
             return stream.ReadGenericHelper<T>(order);
         }
-#else
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe T Read<T>(this Stream stream, Endian order = Endian.Little) where T : unmanaged => stream.ReadGenericHelper<T>(order);
-#endif
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private unsafe static T ReadGenericHelper<T>(this Stream stream, Endian order) where T : unmanaged
         {
             T value;
             Span<byte> buffer = new Span<byte>(&value, sizeof(T));
+
             if (stream.Read(buffer) != buffer.Length)
                 ThrowHelper.EndOfStreamException<T>();
 
             if (order != SystemOrder)
-                BitConverterX.BufferReverseEndianness(buffer, typeof(T));
+            {
+                if (sizeof(T) > 8)
+                    BitConverterX.ReverseEndianness(new Span<T>(&value, 1));
+                else
+                    value = BitConverterX.ReverseEndianness(value);
+            }
 
             return value;
         }
 
-#if !(NETSTANDARD || NET20_OR_GREATER)
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-#endif
-#if !(NETSTANDARD)
-        private unsafe static T ReadPrimitiveHelper<T>(this Stream stream, Endian order) where T : unmanaged
+        private static T ReadPrimitiveHelper<T>(this Stream stream, Endian order) where T : unmanaged
         {
             Type typeT = typeof(T);
-            switch (sizeof(T))
+            switch (Unsafe.SizeOf<T>())
             {
+                case 0:
+                    return default;
                 case 1:
                     byte bVaule = (byte)ReadByteHelper<T>(stream);
                     return Unsafe.As<byte, T>(ref bVaule);
                 case 2:
 #if NET5_0_OR_GREATER
-                    if (typeT == typeof(short) || typeT == typeof(ushort) || typeT == typeof(Half) || typeT.IsEnum)
+                    if (order == SystemOrder || typeT == typeof(short) || typeT == typeof(ushort) || typeT == typeof(Half) || typeT.IsEnum)
 #else
-                    if (typeT == typeof(short) || typeT == typeof(ushort) || typeT.IsEnum)
+                    if (order == SystemOrder || typeT == typeof(short) || typeT == typeof(ushort) || typeT.IsEnum)
 #endif
                     {
                         short iVaule = (short)ReadInt16Helper<T>(stream, order);
@@ -85,14 +82,14 @@ namespace AuroraLib.Core.IO
                     }
                     break;
                 case 3:
-                    if (typeT == typeof(Int24) || typeT == typeof(UInt24))
+                    if (order == SystemOrder || typeT == typeof(Int24) || typeT == typeof(UInt24))
                     {
                         Int24 iVaule = ReadInt24Helper<T>(stream, order);
                         return Unsafe.As<Int24, T>(ref iVaule);
                     }
                     break;
                 default:
-                    if (typeT == typeof(int) || typeT == typeof(uint) || typeT == typeof(float) || typeT.IsEnum)
+                    if (order == SystemOrder || typeT == typeof(int) || typeT == typeof(uint) || typeT == typeof(float) || typeT.IsEnum)
                     {
                         int iVaule = ReadInt32Helper<T>(stream, order);
                         return Unsafe.As<int, T>(ref iVaule);
@@ -101,7 +98,7 @@ namespace AuroraLib.Core.IO
             }
             return stream.ReadGenericHelper<T>(order);
         }
-#endif
+
         /// <summary>
         /// Reads a span of <typeparamref name="T"/> from the <see cref="Stream"/>.
         /// </summary>
@@ -139,10 +136,15 @@ namespace AuroraLib.Core.IO
 #endif
         public static unsafe void Write<T>(this Stream stream, T value, Endian order = Endian.Little) where T : unmanaged
         {
-            Span<byte> buffer = new Span<byte>(&value, sizeof(T));
-            if (order != SystemOrder && buffer.Length > 1)
-                BitConverterX.BufferReverseEndianness(buffer, typeof(T));
+            if (order != SystemOrder && sizeof(T) > 1)
+            {
+                if (sizeof(T) > 8)
+                    BitConverterX.ReverseEndianness(new Span<T>(&value, 1));
+                else
+                    value = BitConverterX.ReverseEndianness(value);
+            }
 
+            Span<byte> buffer = new Span<byte>(&value, sizeof(T));
             stream.Write(buffer);
         }
 
@@ -199,10 +201,15 @@ namespace AuroraLib.Core.IO
 #endif
         public static unsafe void Write<T>(this Stream stream, T objekt, uint count, Endian order = Endian.Little) where T : unmanaged
         {
-            Span<byte> buffer = new Span<byte>(&objekt, sizeof(T));
-            if (order != SystemOrder && buffer.Length > 1)
-                BitConverterX.BufferReverseEndianness(buffer, typeof(T));
+            if (order != SystemOrder && sizeof(T) > 1)
+            {
+                if (sizeof(T) > 8)
+                    BitConverterX.ReverseEndianness(new Span<T>(&objekt, 1));
+                else
+                    objekt = BitConverterX.ReverseEndianness(objekt);
+            }
 
+            Span<byte> buffer = new Span<byte>(&objekt, sizeof(T));
             for (int i = 0; i < count; i++)
             {
                 stream.Write(buffer);

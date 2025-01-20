@@ -112,7 +112,7 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong ReadUInt64(this Stream stream, Endian order = Endian.Little)
-            => stream.Read<ulong>(order);
+            => stream.ReadGenericHelper<ulong>(order);
 
         /// <summary>
         /// Returns a 64-bit signed integer converted from eight bytes at a specified position.
@@ -124,7 +124,7 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ReadInt64(this Stream stream, Endian order = Endian.Little)
-            => stream.Read<long>(order);
+            => stream.ReadGenericHelper<long>(order);
 
 #if NET5_0_OR_GREATER
         /// <summary>
