@@ -56,9 +56,7 @@ namespace AuroraLib.Core.IO
                 ThrowHelper.EndOfStreamException<T>();
 
             if (order != SystemOrder)
-            {
-                BitConverterX.Swap(buffer, typeof(T));
-            }
+                BitConverterX.BufferReverseEndianness(buffer, typeof(T));
 
             return value;
         }
@@ -123,7 +121,7 @@ namespace AuroraLib.Core.IO
                 ThrowHelper.EndOfStreamException<T>(values.Length);
 
             if (order != SystemOrder && sizeof(T) > 1)
-                BitConverterX.Swap(buffer, typeof(T), values.Length);
+                BitConverterX.ReverseEndianness(values);
         }
         #endregion
 
@@ -143,9 +141,8 @@ namespace AuroraLib.Core.IO
         {
             Span<byte> buffer = new Span<byte>(&value, sizeof(T));
             if (order != SystemOrder && buffer.Length > 1)
-            {
-                BitConverterX.Swap(buffer, typeof(T));
-            }
+                BitConverterX.BufferReverseEndianness(buffer, typeof(T));
+
             stream.Write(buffer);
         }
 
@@ -162,11 +159,11 @@ namespace AuroraLib.Core.IO
             {
                 using (SpanBuffer<T> copy = new SpanBuffer<T>(span))
                 {
-                    Span<byte> buffer = MemoryMarshal.Cast<T, byte>(copy);
-                    BitConverterX.Swap(buffer, typeof(T), copy.Length);
+                    BitConverterX.ReverseEndianness(copy.Span);
 #if NET20_OR_GREATER
                     stream.Write(copy.GetBuffer(), 0, sizeof(T) * span.Length);
 #else
+                    Span<byte> buffer = MemoryMarshal.Cast<T, byte>(copy);
                     stream.Write(buffer);
 #endif
                 }
@@ -204,9 +201,7 @@ namespace AuroraLib.Core.IO
         {
             Span<byte> buffer = new Span<byte>(&objekt, sizeof(T));
             if (order != SystemOrder && buffer.Length > 1)
-            {
-                BitConverterX.Swap(buffer, typeof(T));
-            }
+                BitConverterX.BufferReverseEndianness(buffer, typeof(T));
 
             for (int i = 0; i < count; i++)
             {

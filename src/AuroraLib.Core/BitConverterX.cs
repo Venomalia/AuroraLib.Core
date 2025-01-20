@@ -1,5 +1,6 @@
 using AuroraLib.Core.Buffers;
 using AuroraLib.Core.Extensions;
+using AuroraLib.Core.Interfaces;
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
@@ -15,53 +16,319 @@ namespace AuroraLib.Core
     /// </summary>
     public static class BitConverterX
     {
-        #region ConvertGeneric
+        #region ReverseEndianness
+
+        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(ushort)"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ushort ReverseEndianness(ushort value)
+            => BinaryPrimitives.ReverseEndianness(value);
+
+        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(short)"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static short ReverseEndianness(short value)
+            => BinaryPrimitives.ReverseEndianness(value);
+
         /// <summary>
-        /// Converts a instance of <typeparamref name="T"/> to a byte array.
+        /// Reverses the byte order (endianness) of the specified <see cref="UInt24"/> value.
+        /// </summary>
+        /// <param name="value">The 24-bit unsigned integer to reverse.</param>
+        /// <returns>A new <see cref="UInt24"/> with reversed byte order.</returns>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static UInt24 ReverseEndianness(UInt24 value)
+            => new UInt24((value.Value >> 16) | ((value.Value & 0xFF00) << 8) | (value.Value << 16));
+
+        /// <summary>
+        /// Reverses the byte order (endianness) of the specified <see cref="Int24"/> value.
+        /// </summary>
+        /// <param name="value">The 24-bit signed integer to reverse.</param>
+        /// <returns>A new <see cref="Int24"/> with reversed byte order.</returns>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Int24 ReverseEndianness(Int24 value)
+            => new Int24((value.Value >> 16) | ((value.Value & 0xFF00) << 8) | (value.Value << 16));
+
+        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(uint)"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint ReverseEndianness(uint value)
+            => BinaryPrimitives.ReverseEndianness(value);
+
+        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(int)"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int ReverseEndianness(int value)
+            => BinaryPrimitives.ReverseEndianness(value);
+
+        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(ulong)"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong ReverseEndianness(ulong value)
+            => BinaryPrimitives.ReverseEndianness(value);
+
+        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(long)"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static long ReverseEndianness(long value)
+            => BinaryPrimitives.ReverseEndianness(value);
+
+        /// <summary>
+        /// Reverses the byte order (endianness) of a value of the specified <typeparamref name="T"/> type.
         /// </summary>
         /// <typeparam name="T">The type of the value.</typeparam>
-        /// <param name="value">The value to convert.</param>
-        /// <returns>A byte array representing the value.</returns>
+        /// <param name="vaule">The value to reverse the endianness of.</param>
+        /// <returns>A new value of type <typeparamref name="T"/> with reversed byte order.</returns>
         [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#if NET8_0_OR_GREATER
-        public static byte[] GetBytes<T>(in T value) where T : unmanaged
+        public static T ReverseEndianness<T>(T vaule) where T : unmanaged
         {
-            byte[] result = new byte[Unsafe.SizeOf<T>()];
-            MemoryMarshal.Write(result, in value);
-            return result;
-        }
+            Type typeT = typeof(T);
+            switch (Unsafe.SizeOf<T>())
+            {
+                case 0:
+                case 1:
+                    return vaule;
+                case 2:
+#if NET5_0_OR_GREATER
+                    if (typeT == typeof(short) || typeT == typeof(ushort) || typeT == typeof(Half) || typeT.IsEnum)
 #else
-        public static byte[] GetBytes<T>(ref T value) where T : unmanaged
-        {
-            byte[] result = new byte[Unsafe.SizeOf<T>()];
-            MemoryMarshal.Write(result, ref value);
-            return result;
-        }
-
-        /// <inheritdoc cref="GetBytes{T}(ref T)"/>
-        [DebuggerStepThrough]
-        public static byte[] GetBytes<T>(T value) where T : unmanaged
-            => GetBytes(ref value);
+                    if (typeT == typeof(short) || typeT == typeof(ushort) || typeT.IsEnum)
 #endif
-        #endregion
+                    {
+                        short shortVaule = BinaryPrimitives.ReverseEndianness(Unsafe.As<T, short>(ref vaule));
+                        return Unsafe.As<short, T>(ref shortVaule);
+                    }
+                    break;
+                case 3:
+                    if (typeT == typeof(Int24) || typeT == typeof(UInt24))
+                    {
+                        Int24 Int24Vaule = ReverseEndianness(Unsafe.As<T, Int24>(ref vaule));
+                        return Unsafe.As<Int24, T>(ref Int24Vaule);
+                    }
+                    break;
+                case 4:
+                    if (typeT == typeof(int) || typeT == typeof(uint) || typeT == typeof(float) || typeT.IsEnum)
+                    {
+                        int intVaule = BinaryPrimitives.ReverseEndianness(Unsafe.As<T, int>(ref vaule));
+                        return Unsafe.As<int, T>(ref intVaule);
+                    }
+                    break;
+                case 8:
+                    if (typeT == typeof(long) || typeT == typeof(ulong) || typeT == typeof(double) || typeT.IsEnum)
+                    {
+                        long longValue = BinaryPrimitives.ReverseEndianness(Unsafe.As<T, long>(ref vaule));
+                        return Unsafe.As<long, T>(ref longValue);
+                    }
+                    break;
+                default:
+                    break;
+            }
 
-        #region SwapGeneric
-        /// <summary>
-        /// Swaps the byte order of the specified instance of <typeparamref name="T"/>.
-        /// </summary>
-        /// <typeparam name="T">The type to convert to.</typeparam>
-        /// <param name="vaule"></param>
-        /// <returns>An instance of <typeparamref name="T"/>.</returns>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T Swap<T>(T vaule) where T : unmanaged
-        {
-            Span<byte> src = vaule.AsBytes();
-            Swap<T>(src);
+            BufferReverseEndiannessDeep(vaule.AsBytes(), typeT);
             return vaule;
         }
 
+        /// <summary>
+        /// Reverses the byte order (endianness) of each element in the specified span of unmanaged values.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the span.</typeparam>
+        /// <param name="values">The span of values to reverse the byte order of.</param>
+        [DebuggerStepThrough]
+        public static void ReverseEndianness<T>(Span<T> values) where T : unmanaged
+        {
+            Type typeT = typeof(T);
+            switch (Unsafe.SizeOf<T>())
+            {
+                case 0:
+                case 1:
+                    return;
+                case 2:
+#if NET5_0_OR_GREATER
+                    if (typeT == typeof(short) || typeT == typeof(ushort) || typeT == typeof(Half) || typeT.IsEnum)
+#else
+                    if (typeT == typeof(short) || typeT == typeof(ushort) || typeT.IsEnum)
+#endif
+                    {
+                        Span<short> shortVaules = MemoryMarshal.Cast<T, short>(values);
+#if NET8_0_OR_GREATER
+                        BinaryPrimitives.ReverseEndianness(shortVaules, shortVaules);
+#else
+                        for (int i = 0; i < shortVaules.Length; i++)
+                            shortVaules[i] = BinaryPrimitives.ReverseEndianness(shortVaules[i]);
+#endif
+                        return;
+                    }
+                    break;
+                case 3:
+                    if (typeT == typeof(Int24) || typeT == typeof(UInt24))
+                    {
+                        Span<Int24> int24Vaules = MemoryMarshal.Cast<T, Int24>(vaules);
+                        for (int i = 0; i < int24Vaules.Length; i++)
+                            int24Vaules[i] = ReverseEndianness(int24Vaules[i]);
+                        return;
+                    }
+                    break;
+                case 4:
+                    if (typeT == typeof(int) || typeT == typeof(uint) || typeT == typeof(float) || typeT.IsEnum)
+                    {
+
+                        Span<int> intVaules = MemoryMarshal.Cast<T, int>(values);
+#if NET8_0_OR_GREATER
+                        BinaryPrimitives.ReverseEndianness(intVaules, intVaules);
+#else
+                        for (int i = 0; i < intVaules.Length; i++)
+                            intVaules[i] = BinaryPrimitives.ReverseEndianness(intVaules[i]);
+#endif
+                        return;
+                    }
+                    break;
+                case 8:
+                    if (typeT == typeof(long) || typeT == typeof(ulong) || typeT == typeof(double) || typeT.IsEnum)
+                    {
+                        Span<long> longVaules = MemoryMarshal.Cast<T, long>(values);
+#if NET8_0_OR_GREATER
+                        BinaryPrimitives.ReverseEndianness(longVaules, longVaules);
+#else
+                        for (int i = 0; i < longVaules.Length; i++)
+                            longVaules[i] = BinaryPrimitives.ReverseEndianness(longVaules[i]);
+#endif
+                        return;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            Span<byte> bytes = MemoryMarshal.Cast<T, byte>(vaules);
+            BufferReverseEndiannessDeep(bytes, typeT, vaules.Length);
+            return;
+        }
+
+            {
+            }
+            else
+            {
+            }
+        }
+
+        #region BufferReverseEndiannessDeep
+
+        [DebuggerStepThrough]
+        private static void BufferReverseEndiannessDeep(Span<byte> buffer, Type type)
+        {
+            ReadOnlySpan<int> fieldSizes = GetTypeFieldSizes(type);
+            int offset = 0;
+
+            foreach (int fieldSize in fieldSizes)
+            {
+                if (fieldSize > 1)
+                    ReverseBuffer(buffer.Slice(offset, fieldSize));
+                offset += fieldSize;
+            }
+        }
+
+        [DebuggerStepThrough]
+        private static void BufferReverseEndiannessDeep(Span<byte> buffer, Type type, int count)
+        {
+            int offset = 0;
+            ReadOnlySpan<int> fieldSizes = GetTypeFieldSizes(type);
+            for (int i = 0; i < count; i++)
+            {
+                foreach (int fieldSize in fieldSizes)
+                {
+                    if (fieldSize > 1)
+                        ReverseBuffer(buffer.Slice(offset, fieldSize));
+                    offset += fieldSize;
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void ReverseBuffer(Span<byte> values)
+        {
+            switch (values.Length)
+            {
+                case 2:
+                    Span<short> shortVaule = MemoryMarshal.Cast<byte, short>(values);
+                    shortVaule[0] = BinaryPrimitives.ReverseEndianness(shortVaule[0]);
+                    return;
+                case 4:
+                    Span<int> intVaule = MemoryMarshal.Cast<byte, int>(values);
+                    intVaule[0] = BinaryPrimitives.ReverseEndianness(intVaule[0]);
+                    return;
+                case 8:
+                    Span<long> longVaule = MemoryMarshal.Cast<byte, long>(values);
+                    longVaule[0] = BinaryPrimitives.ReverseEndianness(longVaule[0]);
+                    return;
+                default:
+                    values.Reverse();
+                    break;
+            }
+        }
+
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static ReadOnlySpan<int> GetTypeFieldSizes(Type type)
+        {
+            lock (_FieldSizes)
+            {
+                if (_FieldSizes.TryGetValue(type.GetHashCode(), out int[]? primitives))
+                    return primitives;
+
+                return GetNewTypeFieldSizes(type);
+            }
+        }
+
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static ReadOnlySpan<int> GetNewTypeFieldSizes(Type type)
+        {
+            using PoolList<int> primList = new PoolList<int>();
+            FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly);
+            foreach (FieldInfo field in fields)
+            {
+                if (field.IsStatic)
+                    continue;
+
+                Type fieldtype = field.FieldType;
+
+                if (fieldtype.IsEnum)
+                    fieldtype = Enum.GetUnderlyingType(fieldtype);
+
+                int TypeSize = GetStandardTypeSize(fieldtype);
+                if (TypeSize != -1)
+                    primList.Add(TypeSize);
+                else
+                    primList.AddRange(GetTypeFieldSizes(fieldtype));
+            }
+            int[] primitives = primList.ToArray();
+            _FieldSizes.TryAdd(type.GetHashCode(), primitives);
+            return primitives;
+        }
+
+        private static int GetStandardTypeSize(Type type) => type switch
+        {
+            _ when type == typeof(bool) || type == typeof(bool) => sizeof(bool),
+            _ when type == typeof(byte) || type == typeof(sbyte) => sizeof(byte),
+#if NET5_0_OR_GREATER
+            _ when type == typeof(short) || type == typeof(ushort) || type == typeof(Half) => sizeof(short),
+#else
+            _ when type == typeof(short) || type == typeof(ushort) => sizeof(short),
+#endif
+            _ when type == typeof(UInt24) || type == typeof(Int24) => 3,
+            _ when type == typeof(int) || type == typeof(uint) || type == typeof(float) => sizeof(int),
+            _ when type == typeof(long) || type == typeof(ulong) || type == typeof(double) => sizeof(long),
+            _ when type == typeof(IntPtr) || type == typeof(UIntPtr) => Unsafe.SizeOf<IntPtr>(),
+            _ => -1
+        };
+
+        private static readonly Dictionary<int, int[]> _FieldSizes = new Dictionary<int, int[]>();
+        #endregion
+
+        #endregion
+
+        #region ReverseBits & SwapAlternateBits
         /// <summary>
         /// Swaps the bits of the specified instance of <typeparamref name="T"/>.
         /// </summary>
@@ -70,122 +337,16 @@ namespace AuroraLib.Core
         /// <returns>An instance of <typeparamref name="T"/> with swapped bits.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T SwapBits<T>(T vaule) where T : unmanaged
+        public static T ReverseBits<T>(T vaule) where T : unmanaged
         {
             Span<byte> src = vaule.AsBytes();
             src.Reverse();
             for (int i = 0; i < src.Length; i++)
             {
-                src[i] = Swap(src[i]);
+                src[i] = ReverseBits(src[i]);
             }
             return vaule;
         }
-
-        /// <summary>
-        /// Swaps the byte order of the specified buffer based on the given <paramref name="type"/>.
-        /// </summary>
-        /// <param name="buffer">The buffer containing the data to reverse.</param>
-        /// <param name="type">The type of the data in the buffer.</param>
-        [DebuggerStepThrough]
-#if NET5_0_OR_GREATER
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-#endif
-        public static void Swap(Span<byte> buffer, Type type)
-        {
-            int offset = 0;
-            ReadOnlySpan<int> fields = GetPrimitiveTypeSizes(type);
-            foreach (int fieldSize in fields)
-            {
-                buffer.Slice(offset, fieldSize).Reverse();
-                offset += fieldSize;
-            }
-        }
-
-        /// <summary>
-        /// Swaps the byte order of the specified buffer based on the given array of <paramref name="type"/>.
-        /// </summary>
-        /// <param name="buffer">The buffer containing the data to reverse.</param>
-        /// <param name="type">The type of the data in the buffer.</param>
-        /// <param name="count">The number of elements.</param>
-        [DebuggerStepThrough]
-#if NET5_0_OR_GREATER
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-#endif
-        public static void Swap(Span<byte> buffer, Type type, int count)
-        {
-            int offset = 0;
-            ReadOnlySpan<int> fields = GetPrimitiveTypeSizes(type);
-            for (int i = 0; i < count; i++)
-            {
-                foreach (int fieldSize in fields)
-                {
-                    buffer.Slice(offset, fieldSize).Reverse();
-                    offset += fieldSize;
-                }
-            }
-        }
-
-        /// <inheritdoc cref="Swap(Span{byte}, Type)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void Swap<T>(Span<byte> buffer)
-            => Swap(buffer, typeof(T));
-
-        /// <summary>
-        /// Retrieves a list the sizes of primitive types and nested primitive types within the specified type.
-        /// </summary>
-        /// <param name="type">The type to analyze.</param>
-        /// <returns>An array containing the sizes of primitive types within the specified type.</returns>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ReadOnlySpan<int> GetPrimitiveTypeSizes(Type type)
-        {
-            lock (TypePrimitives)
-            {
-                if (TypePrimitives.TryGetValue(type.GetHashCode(), out int[]? primitives))
-                    return primitives;
-
-                return NewPrimitiveTypeSizes(type);
-            }
-        }
-#if NET5_0_OR_GREATER
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-#endif
-        private static ReadOnlySpan<int> NewPrimitiveTypeSizes(Type type)
-        {
-            List<int> primList = new List<int>();
-            if (type == typeof(Int24) || type == typeof(UInt24))
-            {
-                primList.Add(3);
-            }
-            else
-            {
-                FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                foreach (FieldInfo field in fields)
-                {
-                    if (field.IsStatic) continue;
-
-                    Type fieldtype = field.FieldType;
-
-                    if (fieldtype.IsEnum)
-                        fieldtype = Enum.GetUnderlyingType(fieldtype);
-
-                    if (fieldtype.IsPrimitive || fieldtype == typeof(UInt24) || fieldtype == typeof(Int24))
-                        primList.Add(Marshal.SizeOf(fieldtype));
-                    else
-                        primList.AddRange(GetPrimitiveTypeSizes(fieldtype).ToArray());
-                }
-
-            }
-            int[] primitives = primList.ToArray();
-            TypePrimitives.Add(type.GetHashCode(), primitives);
-            return primitives;
-        }
-
-        private static readonly Dictionary<int, int[]> TypePrimitives = new Dictionary<int, int[]>();
-        #endregion
-
-        #region Swap
         /// <summary>
         /// Swaps the bits in the given byte value.
         /// </summary>
@@ -193,7 +354,7 @@ namespace AuroraLib.Core
         /// <returns>The byte value with swapped bits.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static byte Swap(byte value)
+        public static byte ReverseBits(byte value)
             => (byte)((value * 0x0202020202ul & 0x010884422010ul) % 1023);
 
         /// <summary>
@@ -203,8 +364,8 @@ namespace AuroraLib.Core
         /// <returns>The byte value with swapped bits.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static sbyte Swap(sbyte value)
-            => (sbyte)Swap((byte)value);
+        public static sbyte ReverseBits(sbyte value)
+            => (sbyte)ReverseBits((byte)value);
 
         /// <summary>
         /// Swaps the alternate bits of a byte value.
@@ -225,52 +386,6 @@ namespace AuroraLib.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static sbyte SwapAlternateBits(sbyte value)
             => (sbyte)SwapAlternateBits((byte)value);
-
-        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(ushort)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ushort Swap(ushort value)
-            => BinaryPrimitives.ReverseEndianness(value);
-
-        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(short)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static short Swap(short value)
-            => BinaryPrimitives.ReverseEndianness(value);
-
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static UInt24 Swap(UInt24 value)
-            => new UInt24((value.Value >> 16) | ((value.Value & 0xFF00) << 8) | (value.Value << 16));
-
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Int24 Swap(Int24 value)
-            => new Int24((value.Value >> 16) | ((value.Value & 0xFF00) << 8) | (value.Value << 16));
-
-        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(uint)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static uint Swap(uint value)
-            => BinaryPrimitives.ReverseEndianness(value);
-
-        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(int)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Swap(int value)
-            => BinaryPrimitives.ReverseEndianness(value);
-
-        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(ulong)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong Swap(ulong value)
-            => BinaryPrimitives.ReverseEndianness(value);
-
-        /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(long)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static long Swap(long value)
-            => BinaryPrimitives.ReverseEndianness(value);
         #endregion
 
         #region GetBit

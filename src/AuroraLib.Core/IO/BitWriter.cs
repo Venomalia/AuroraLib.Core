@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -50,7 +50,7 @@ namespace AuroraLib.Core.IO
             if (BitPosition != 0)
             {
                 if (Order != Endian.Little)
-                    _buffer = BitConverterX.Swap(_buffer);
+                    _buffer = BitConverterX.ReverseBits(_buffer);
 
                 BaseStream.WriteByte(_buffer);
                 BitPosition = _buffer = 0;

@@ -184,7 +184,7 @@ namespace AuroraLib.Core.IO
             for (int i = 0; i < count; i++)
             {
                 T valueLE = stream.Read<T>();
-                T valueBE = BitConverterX.Swap(valueLE);
+                T valueBE = BitConverterX.ReverseEndianness(valueLE);
                 trend += valueLE.CompareTo(valueBE);
             }
             stream.Seek(orpos, SeekOrigin.Begin);
@@ -202,7 +202,7 @@ namespace AuroraLib.Core.IO
         public static unsafe Endian DetectByteOrderByDistance<T>(this Stream stream, T reference) where T : unmanaged, IConvertible
         {
             T valueLE = stream.Peek<T>();
-            T valueBE = BitConverterX.Swap(valueLE);
+            T valueBE = BitConverterX.ReverseEndianness(valueLE);
 
             double dRef = reference.ToDouble(null);
             double diff1 = Math.Abs(valueLE.ToDouble(null) - dRef);
