@@ -14,7 +14,7 @@ namespace AuroraLib.Core
     [Serializable]
     [DebuggerDisplay("{Value}")]
 #if NET8_0_OR_GREATER
-    public readonly struct Int24 : IComparable, IConvertible, ISpanFormattable, IComparable<Int24>, IEquatable<Int24>, IBinaryInteger<Int24>, IMinMaxValue<Int24>, IUnsignedNumber<Int24>, IUtf8SpanFormattable
+    public readonly struct Int24 : IComparable, IConvertible, ISpanFormattable, IComparable<Int24>, IEquatable<Int24>, IBinaryInteger<Int24>, IMinMaxValue<Int24>, ISignedNumber<Int24>, IUtf8SpanFormattable
 #elif NET6_0_OR_GREATER                  
     public readonly struct Int24 : IComparable, IConvertible, ISpanFormattable, IComparable<Int24>, IEquatable<Int24>
 #else
@@ -257,6 +257,7 @@ namespace AuroraLib.Core
         static Int24 INumberBase<Int24>.Zero => 0;
         static Int24 IAdditiveIdentity<Int24, Int24>.AdditiveIdentity => 0;
         static Int24 IMultiplicativeIdentity<Int24, Int24>.MultiplicativeIdentity => 1;
+        static Int24 ISignedNumber<Int24>.NegativeOne => -1;
 
         static Int24 INumberBase<Int24>.Abs(Int24 value) => value;
         static bool INumberBase<Int24>.IsEvenInteger(Int24 value) => (value.Value & 1) == 0;
