@@ -1,3 +1,4 @@
+using AuroraLib.Core.Interfaces;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -14,15 +15,15 @@ namespace AuroraLib.Core
     [Serializable]
     [DebuggerDisplay("{Value}")]
 #if NET8_0_OR_GREATER
-    public readonly struct Int24 : IComparable, IConvertible, ISpanFormattable, IComparable<Int24>, IEquatable<Int24>, IBinaryInteger<Int24>, IMinMaxValue<Int24>, ISignedNumber<Int24>, IUtf8SpanFormattable
+    public readonly struct Int24 : IComparable, IConvertible, ISpanFormattable, IComparable<Int24>, IEquatable<Int24>, IBinaryInteger<Int24>, IMinMaxValue<Int24>, ISignedNumber<Int24>, IReversibleEndianness<Int24>, IUtf8SpanFormattable
 #elif NET6_0_OR_GREATER                  
-    public readonly struct Int24 : IComparable, IConvertible, ISpanFormattable, IComparable<Int24>, IEquatable<Int24>
+    public readonly struct Int24 : IComparable, IConvertible, ISpanFormattable, IComparable<Int24>, IEquatable<Int24>, IReversibleEndianness<Int24>
 #else
-    public readonly struct Int24 : IComparable, IFormattable, IConvertible, IComparable<Int24>, IEquatable<Int24>
+    public readonly struct Int24 : IComparable, IFormattable, IConvertible, IComparable<Int24>, IEquatable<Int24>, IReversibleEndianness<Int24>
 #endif
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private readonly byte b0, b1;
+        private readonly ushort b0b1;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly sbyte b2;
 
@@ -39,7 +40,7 @@ namespace AuroraLib.Core
         /// <summary>
         /// The value of this Int24 as an Int32
         /// </summary>
-        public int Value => b0 | (b1 << 8) | (b2 << 16);
+        public int Value => b0b1 | (b2 << 16);
 
         /// <summary>
         /// Create a new Int24
@@ -47,15 +48,13 @@ namespace AuroraLib.Core
         /// <param name="value"></param>
         public Int24(int value)
         {
-            b0 = (byte)((value) & 0xFF);
-            b1 = (byte)((value >> 8) & 0xFF);
+            b0b1 = (ushort)(value & 0xFFFF);
             b2 = (sbyte)((value >> 16) & 0xFF);
         }
 
         public Int24(Int24 value)
         {
-            b0 = value.b0;
-            b1 = value.b1;
+            b0b1 = value.b0b1;
             b2 = value.b2;
         }
 
@@ -73,6 +72,8 @@ namespace AuroraLib.Core
 
         /// <inheritdoc/>
         public string ToString(string? format, IFormatProvider? provider) => Value.ToString(format, provider);
+
+        Int24 IReversibleEndianness<Int24>.ReverseEndianness() => BitConverterX.ReverseEndianness(this);
 
         #region IEquatable
         /// <inheritdoc/>

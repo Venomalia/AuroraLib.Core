@@ -1,3 +1,4 @@
+using AuroraLib.Core.Interfaces;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -14,11 +15,11 @@ namespace AuroraLib.Core
     [Serializable]
     [DebuggerDisplay("{Value}")]
 #if NET8_0_OR_GREATER
-    public readonly struct UInt24 : IComparable, IConvertible, ISpanFormattable, IComparable<UInt24>, IEquatable<UInt24>, IBinaryInteger<UInt24>, IMinMaxValue<UInt24>, IUnsignedNumber<UInt24>, IUtf8SpanFormattable
+    public readonly struct UInt24 : IComparable, IConvertible, ISpanFormattable, IComparable<UInt24>, IEquatable<UInt24>, IBinaryInteger<UInt24>, IMinMaxValue<UInt24>, IUnsignedNumber<UInt24>, IReversibleEndianness<UInt24>, IUtf8SpanFormattable
 #elif NET6_0_OR_GREATER
-    public readonly struct UInt24 : IComparable, IConvertible, ISpanFormattable, IComparable<UInt24>, IEquatable<UInt24>
+    public readonly struct UInt24 : IComparable, IConvertible, ISpanFormattable, IComparable<UInt24>, IEquatable<UInt24>, IReversibleEndianness<UInt24>
 #else
-    public readonly struct UInt24 : IComparable, IFormattable, IConvertible, IComparable<UInt24>, IEquatable<UInt24>
+    public readonly struct UInt24 : IComparable, IFormattable, IConvertible, IComparable<UInt24>, IEquatable<UInt24>, IReversibleEndianness<UInt24>
 #endif
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -67,6 +68,8 @@ namespace AuroraLib.Core
 
         /// <inheritdoc/>
         public string ToString(string? format, IFormatProvider? provider) => Value.ToString(format, provider);
+
+        UInt24 IReversibleEndianness<UInt24>.ReverseEndianness() => BitConverterX.ReverseEndianness(this);
 
         #region IEquatable
         /// <inheritdoc/>

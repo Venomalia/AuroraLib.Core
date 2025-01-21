@@ -100,13 +100,6 @@ namespace AuroraLib.Core
                         return Unsafe.As<short, T>(ref shortVaule);
                     }
                     break;
-                case 3:
-                    if (typeT == typeof(Int24) || typeT == typeof(UInt24))
-                    {
-                        Int24 Int24Vaule = ReverseEndianness(Unsafe.As<T, Int24>(ref vaule));
-                        return Unsafe.As<Int24, T>(ref Int24Vaule);
-                    }
-                    break;
                 case 4:
                     if (typeT == typeof(int) || typeT == typeof(uint) || typeT == typeof(float) || typeT.IsEnum)
                     {
@@ -125,8 +118,15 @@ namespace AuroraLib.Core
                     break;
             }
 
-            BufferReverseEndiannessDeep(vaule.AsBytes(), typeT);
-            return vaule;
+            if (vaule is IReversibleEndianness<T> endianness)
+            {
+                return endianness.ReverseEndianness();
+            }
+            else
+            {
+                BufferReverseEndiannessDeep(vaule.AsBytes(), typeT);
+                return vaule;
+            }
         }
 
         /// <summary>
@@ -157,15 +157,6 @@ namespace AuroraLib.Core
                         for (int i = 0; i < shortVaules.Length; i++)
                             shortVaules[i] = BinaryPrimitives.ReverseEndianness(shortVaules[i]);
 #endif
-                        return;
-                    }
-                    break;
-                case 3:
-                    if (typeT == typeof(Int24) || typeT == typeof(UInt24))
-                    {
-                        Span<Int24> int24Vaules = MemoryMarshal.Cast<T, Int24>(vaules);
-                        for (int i = 0; i < int24Vaules.Length; i++)
-                            int24Vaules[i] = ReverseEndianness(int24Vaules[i]);
                         return;
                     }
                     break;
@@ -200,15 +191,15 @@ namespace AuroraLib.Core
                     break;
             }
 
-            Span<byte> bytes = MemoryMarshal.Cast<T, byte>(vaules);
-            BufferReverseEndiannessDeep(bytes, typeT, vaules.Length);
-            return;
-        }
-
+            if (values[0] is IReversibleEndianness<T>)
             {
+                for (int i = 0; i < values.Length; i++)
+                    values[i] = ((IReversibleEndianness<T>)values[i]).ReverseEndianness();
             }
             else
             {
+                Span<byte> bytes = MemoryMarshal.Cast<T, byte>(values);
+                BufferReverseEndiannessDeep(bytes, typeT, values.Length);
             }
         }
 
