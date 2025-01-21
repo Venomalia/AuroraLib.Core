@@ -78,17 +78,17 @@ namespace AuroraLib.Core
         /// Reverses the byte order (endianness) of a value of the specified <typeparamref name="T"/> type.
         /// </summary>
         /// <typeparam name="T">The type of the value.</typeparam>
-        /// <param name="vaule">The value to reverse the endianness of.</param>
+        /// <param name="value">The value to reverse the endianness of.</param>
         /// <returns>A new value of type <typeparamref name="T"/> with reversed byte order.</returns>
         [DebuggerStepThrough]
-        public static T ReverseEndianness<T>(T vaule) where T : unmanaged
+        public static T ReverseEndianness<T>(T value) where T : unmanaged
         {
             Type typeT = typeof(T);
             switch (Unsafe.SizeOf<T>())
             {
                 case 0:
                 case 1:
-                    return vaule;
+                    return value;
                 case 2:
 #if NET5_0_OR_GREATER
                     if (typeT == typeof(short) || typeT == typeof(ushort) || typeT == typeof(Half) || typeT.IsEnum)
@@ -96,21 +96,21 @@ namespace AuroraLib.Core
                     if (typeT == typeof(short) || typeT == typeof(ushort) || typeT.IsEnum)
 #endif
                     {
-                        short shortVaule = BinaryPrimitives.ReverseEndianness(Unsafe.As<T, short>(ref vaule));
-                        return Unsafe.As<short, T>(ref shortVaule);
+                        short shortValue = BinaryPrimitives.ReverseEndianness(Unsafe.As<T, short>(ref value));
+                        return Unsafe.As<short, T>(ref shortValue);
                     }
                     break;
                 case 4:
                     if (typeT == typeof(int) || typeT == typeof(uint) || typeT == typeof(float) || typeT.IsEnum)
                     {
-                        int intVaule = BinaryPrimitives.ReverseEndianness(Unsafe.As<T, int>(ref vaule));
-                        return Unsafe.As<int, T>(ref intVaule);
+                        int intValue = BinaryPrimitives.ReverseEndianness(Unsafe.As<T, int>(ref value));
+                        return Unsafe.As<int, T>(ref intValue);
                     }
                     break;
                 case 8:
                     if (typeT == typeof(long) || typeT == typeof(ulong) || typeT == typeof(double) || typeT.IsEnum)
                     {
-                        long longValue = BinaryPrimitives.ReverseEndianness(Unsafe.As<T, long>(ref vaule));
+                        long longValue = BinaryPrimitives.ReverseEndianness(Unsafe.As<T, long>(ref value));
                         return Unsafe.As<long, T>(ref longValue);
                     }
                     break;
@@ -118,14 +118,14 @@ namespace AuroraLib.Core
                     break;
             }
 
-            if (vaule is IReversibleEndianness<T> endianness)
+            if (value is IReversibleEndianness<T> endianness)
             {
                 return endianness.ReverseEndianness();
             }
             else
             {
-                BufferReverseEndiannessDeep(vaule.AsBytes(), typeT);
-                return vaule;
+                BufferReverseEndiannessDeep(value.AsBytes(), typeT);
+                return value;
             }
         }
 
@@ -150,12 +150,12 @@ namespace AuroraLib.Core
                     if (typeT == typeof(short) || typeT == typeof(ushort) || typeT.IsEnum)
 #endif
                     {
-                        Span<short> shortVaules = MemoryMarshal.Cast<T, short>(values);
+                        Span<short> shortValues = MemoryMarshal.Cast<T, short>(values);
 #if NET8_0_OR_GREATER
-                        BinaryPrimitives.ReverseEndianness(shortVaules, shortVaules);
+                        BinaryPrimitives.ReverseEndianness(shortValues, shortValues);
 #else
-                        for (int i = 0; i < shortVaules.Length; i++)
-                            shortVaules[i] = BinaryPrimitives.ReverseEndianness(shortVaules[i]);
+                        for (int i = 0; i < shortValues.Length; i++)
+                            shortValues[i] = BinaryPrimitives.ReverseEndianness(shortValues[i]);
 #endif
                         return;
                     }
@@ -164,12 +164,12 @@ namespace AuroraLib.Core
                     if (typeT == typeof(int) || typeT == typeof(uint) || typeT == typeof(float) || typeT.IsEnum)
                     {
 
-                        Span<int> intVaules = MemoryMarshal.Cast<T, int>(values);
+                        Span<int> intValues = MemoryMarshal.Cast<T, int>(values);
 #if NET8_0_OR_GREATER
-                        BinaryPrimitives.ReverseEndianness(intVaules, intVaules);
+                        BinaryPrimitives.ReverseEndianness(intValues, intValues);
 #else
-                        for (int i = 0; i < intVaules.Length; i++)
-                            intVaules[i] = BinaryPrimitives.ReverseEndianness(intVaules[i]);
+                        for (int i = 0; i < intValues.Length; i++)
+                            intValues[i] = BinaryPrimitives.ReverseEndianness(intValues[i]);
 #endif
                         return;
                     }
@@ -177,12 +177,12 @@ namespace AuroraLib.Core
                 case 8:
                     if (typeT == typeof(long) || typeT == typeof(ulong) || typeT == typeof(double) || typeT.IsEnum)
                     {
-                        Span<long> longVaules = MemoryMarshal.Cast<T, long>(values);
+                        Span<long> longValues = MemoryMarshal.Cast<T, long>(values);
 #if NET8_0_OR_GREATER
-                        BinaryPrimitives.ReverseEndianness(longVaules, longVaules);
+                        BinaryPrimitives.ReverseEndianness(longValues, longValues);
 #else
-                        for (int i = 0; i < longVaules.Length; i++)
-                            longVaules[i] = BinaryPrimitives.ReverseEndianness(longVaules[i]);
+                        for (int i = 0; i < longValues.Length; i++)
+                            longValues[i] = BinaryPrimitives.ReverseEndianness(longValues[i]);
 #endif
                         return;
                     }
@@ -241,16 +241,16 @@ namespace AuroraLib.Core
             switch (values.Length)
             {
                 case 2:
-                    Span<short> shortVaule = MemoryMarshal.Cast<byte, short>(values);
-                    shortVaule[0] = BinaryPrimitives.ReverseEndianness(shortVaule[0]);
+                    Span<short> shortValue = MemoryMarshal.Cast<byte, short>(values);
+                    shortValue[0] = BinaryPrimitives.ReverseEndianness(shortValue[0]);
                     return;
                 case 4:
-                    Span<int> intVaule = MemoryMarshal.Cast<byte, int>(values);
-                    intVaule[0] = BinaryPrimitives.ReverseEndianness(intVaule[0]);
+                    Span<int> intValue = MemoryMarshal.Cast<byte, int>(values);
+                    intValue[0] = BinaryPrimitives.ReverseEndianness(intValue[0]);
                     return;
                 case 8:
-                    Span<long> longVaule = MemoryMarshal.Cast<byte, long>(values);
-                    longVaule[0] = BinaryPrimitives.ReverseEndianness(longVaule[0]);
+                    Span<long> longValue = MemoryMarshal.Cast<byte, long>(values);
+                    longValue[0] = BinaryPrimitives.ReverseEndianness(longValue[0]);
                     return;
                 default:
                     values.Reverse();
@@ -324,19 +324,19 @@ namespace AuroraLib.Core
         /// Swaps the bits of the specified instance of <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The type to convert to.</typeparam>
-        /// <param name="vaule">The instance to swap the bits for.</param>
+        /// <param name="value">The instance to swap the bits for.</param>
         /// <returns>An instance of <typeparamref name="T"/> with swapped bits.</returns>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T ReverseBits<T>(T vaule) where T : unmanaged
+        public static T ReverseBits<T>(T value) where T : unmanaged
         {
-            Span<byte> src = vaule.AsBytes();
+            Span<byte> src = value.AsBytes();
             src.Reverse();
             for (int i = 0; i < src.Length; i++)
             {
                 src[i] = ReverseBits(src[i]);
             }
-            return vaule;
+            return value;
         }
         /// <summary>
         /// Swaps the bits in the given byte value.

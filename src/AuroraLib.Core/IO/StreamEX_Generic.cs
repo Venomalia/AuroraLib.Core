@@ -68,8 +68,8 @@ namespace AuroraLib.Core.IO
                 case 0:
                     return default;
                 case 1:
-                    byte bVaule = (byte)ReadByteHelper<T>(stream);
-                    return Unsafe.As<byte, T>(ref bVaule);
+                    byte bValue = (byte)ReadByteHelper<T>(stream);
+                    return Unsafe.As<byte, T>(ref bValue);
                 case 2:
 #if NET5_0_OR_GREATER
                     if (order == SystemOrder || typeT == typeof(short) || typeT == typeof(ushort) || typeT == typeof(Half) || typeT.IsEnum)
@@ -77,22 +77,22 @@ namespace AuroraLib.Core.IO
                     if (order == SystemOrder || typeT == typeof(short) || typeT == typeof(ushort) || typeT.IsEnum)
 #endif
                     {
-                        short iVaule = (short)ReadInt16Helper<T>(stream, order);
-                        return Unsafe.As<short, T>(ref iVaule);
+                        short iValue = (short)ReadInt16Helper<T>(stream, order);
+                        return Unsafe.As<short, T>(ref iValue);
                     }
                     break;
                 case 3:
                     if (order == SystemOrder || typeT == typeof(Int24) || typeT == typeof(UInt24))
                     {
-                        Int24 iVaule = ReadInt24Helper<T>(stream, order);
-                        return Unsafe.As<Int24, T>(ref iVaule);
+                        Int24 iValue = ReadInt24Helper<T>(stream, order);
+                        return Unsafe.As<Int24, T>(ref iValue);
                     }
                     break;
                 default:
                     if (order == SystemOrder || typeT == typeof(int) || typeT == typeof(uint) || typeT == typeof(float) || typeT.IsEnum)
                     {
-                        int iVaule = ReadInt32Helper<T>(stream, order);
-                        return Unsafe.As<int, T>(ref iVaule);
+                        int iValue = ReadInt32Helper<T>(stream, order);
+                        return Unsafe.As<int, T>(ref iValue);
                     }
                     break;
             }
@@ -124,7 +124,7 @@ namespace AuroraLib.Core.IO
 
         #region Write
         /// <summary>
-        /// Writes the specified vaule of <typeparamref name="T"/> to the <see cref="Stream"/>.
+        /// Writes the specified Value of <typeparamref name="T"/> to the <see cref="Stream"/>.
         /// </summary>
         /// <typeparam name="T">The type of the value to write.</typeparam>
         /// <param name="stream">The stream to write the value to.</param>

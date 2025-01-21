@@ -6,7 +6,7 @@ namespace AuroraLib.Core.Interfaces
     /// Supports generic cloning, offering a type-safe way to create a copy of the current instance.
     /// </summary>
     /// <typeparam name="T">The type of the object that this interface can clone.</typeparam>
-    public interface ICloneable<out T> : ICloneable
+    public interface ICloneable<out T> : ICloneable where T : notnull
     {
         /// <summary>
         /// Creates a new object that is a copy of the current instance.
