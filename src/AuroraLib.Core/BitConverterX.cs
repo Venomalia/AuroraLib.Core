@@ -294,6 +294,8 @@ namespace AuroraLib.Core
                 }
                 else
                 {
+                    if (fieldtype.IsPointer) throw new NotSupportedException("Reversing the endianness of pointer types is not supported.");
+
                     FixedBufferAttribute? fixedBufferAttr = field.GetCustomAttribute<FixedBufferAttribute>();
                     if (fixedBufferAttr == null)
                     {
