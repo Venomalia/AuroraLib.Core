@@ -275,7 +275,7 @@ namespace AuroraLib.Core
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static ReadOnlySpan<int> GetNewTypeFieldSizes(Type type)
         {
-            using PoolList<int> primList = new PoolList<int>();
+            List<int> primList = new List<int>(8);
             FieldInfo[] fields = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.DeclaredOnly);
             foreach (FieldInfo field in fields)
             {
@@ -289,9 +289,35 @@ namespace AuroraLib.Core
 
                 int TypeSize = GetStandardTypeSize(fieldtype);
                 if (TypeSize != -1)
+                {
                     primList.Add(TypeSize);
+                }
                 else
-                    primList.AddRange(GetTypeFieldSizes(fieldtype));
+                {
+                    FixedBufferAttribute? fixedBufferAttr = field.GetCustomAttribute<FixedBufferAttribute>();
+                    if (fixedBufferAttr == null)
+                    {
+                        primList.AddRange(GetTypeFieldSizes(fieldtype));
+                    }
+                    else
+                    {
+                        // Fixed Buffer
+                        fieldtype = fixedBufferAttr.ElementType;
+                        TypeSize = GetStandardTypeSize(fixedBufferAttr.ElementType);
+                        if (TypeSize != -1)
+                        {
+                            for (int i = 0; i < fixedBufferAttr.Length; i++)
+                                primList.Add(TypeSize);
+                        }
+                        else
+                        {
+                            ReadOnlySpan<int> range = GetTypeFieldSizes(fieldtype);
+                            for (int i = 0; i < fixedBufferAttr.Length; i++)
+                                primList.AddRange(range);
+                        }
+                        continue;
+                    }
+                }
             }
             int[] primitives = primList.ToArray();
             _FieldSizes.TryAdd(type.GetHashCode(), primitives);
