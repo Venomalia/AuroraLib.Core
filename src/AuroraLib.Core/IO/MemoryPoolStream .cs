@@ -90,7 +90,7 @@ namespace AuroraLib.Core.IO
             if (stream.CanSeek)
             {
                 stream.Seek(0, SeekOrigin.Begin);
-                stream.At(0, s => s.Read(_Buffer.AsSpan(0, (int)stream.Length)));
+                stream.At(0, s => s.Read(_Buffer, 0, (int)stream.Length));
             }
             else
             {
@@ -152,9 +152,8 @@ namespace AuroraLib.Core.IO
         public override int ReadByte()
         {
             if (Position >= Length)
-            {
                 return -1;
-            }
+
             return _Buffer[Position++];
         }
 
@@ -162,11 +161,12 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void WriteByte(byte value)
-#if NET20_OR_GREATER || NETSTANDARD2_0
-            => Write(new byte[1] { value });
-#else
-            => Write(stackalloc byte[1] { value });
-#endif
+        {
+            if (_Position >= Length)
+                SetLength(_Position + 1);
+
+            _Buffer[_Position++] = value;
+        }
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
@@ -193,9 +193,7 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-#if !(NETSTANDARD || NET20_OR_GREATER)
-        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-#endif
+        [MethodImpl(MethodImplOptions.NoInlining)]
         protected override void ExpandBuffer(int minimumLength)
         {
 #if !NET6_0_OR_GREATER
