@@ -1,4 +1,4 @@
-﻿using Benchmark.Benchmarks;
+using Benchmark.Benchmarks;
 using BenchmarkDotNet.Running;
 
 namespace Benchmark
@@ -7,7 +7,12 @@ namespace Benchmark
     {
         static void Main(string[] args)
         {
-            var Result = BenchmarkRunner.Run<Pool>();
+            var resultReadValue = BenchmarkRunner.Run<StreamReadValueBenchmark>();
+            var resultReadTestStruct = BenchmarkRunner.Run<StreamReadTestStructBenchmark>();
+            var resultPoolStreamWrite = BenchmarkRunner.Run<MemoryPoolStreamWriteBenchmark>();
+            var resultPoolBuffer = BenchmarkRunner.Run<PoolBufferBenchmark>();
+
         }
+
     }
 }

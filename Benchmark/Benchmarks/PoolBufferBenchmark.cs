@@ -1,20 +1,14 @@
-﻿using AuroraLib.Core.Buffers;
+using AuroraLib.Core.Buffers;
 using BenchmarkDotNet.Attributes;
-using System;
 using System.Buffers;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Benchmark.Benchmarks
 {
     [MemoryDiagnoser]
-    public class Pool
+    public class PoolBufferBenchmark
     {
-        [Params(10, 100, 1000)]
+        [Params(100, 1000)]
         public int N;
-
 
         [Benchmark]
         public void Array()

@@ -1,10 +1,10 @@
-﻿using AuroraLib.Core.IO;
+using AuroraLib.Core.IO;
 using BenchmarkDotNet.Attributes;
 
 namespace Benchmark.Benchmarks
 {
     [MemoryDiagnoser]
-    public class WriteStream
+    public class MemoryPoolStreamWriteBenchmark
     {
         [Params(1, 10, 100)]
         public int MB;
