@@ -1,6 +1,5 @@
 using AuroraLib.Core.Buffers;
-using AuroraLib.Core.Extensions;
-using AuroraLib.Core.Interfaces;
+using AuroraLib.Core.Collections;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

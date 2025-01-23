@@ -1,13 +1,13 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace AuroraLib.Core.Extensions
+namespace AuroraLib.Core
 {
     /// <summary>
     /// Provides extension methods and utilities for generics.
     /// </summary>
-    public static class GenericEx
+    public static class GenericExtension
     {
         /// <summary>
         /// Returns a value of <typeparamref name="T"/> clamped between the specified minimum and maximum values.

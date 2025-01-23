@@ -1,10 +1,9 @@
-using AuroraLib.Core.Buffers;
 using System;
 using System.Runtime.CompilerServices;
 
-namespace AuroraLib.Core.Extensions
+namespace AuroraLib.Core.Buffers
 {
-    public static class MemoryEx
+    public static class MemoryExtension
     {
         #region Cast
         /// <summary>
@@ -18,7 +17,6 @@ namespace AuroraLib.Core.Extensions
         public static Memory<TTo> Cast<TFrom, TTo>(this Memory<TFrom> memory) where TFrom : struct where TTo : struct
         {
             MemoryHelper helper = Unsafe.As<Memory<TFrom>, MemoryHelper>(ref memory);
-
             // If the underlying object implements IMemoryCast, perform a memory cast using the CastMemory method
             if (helper.Object is IMemoryCast castMemory)
                 return castMemory.CastMemory<TTo>();
@@ -53,6 +51,5 @@ namespace AuroraLib.Core.Extensions
             public readonly int Length;
         }
         #endregion
-
     }
 }

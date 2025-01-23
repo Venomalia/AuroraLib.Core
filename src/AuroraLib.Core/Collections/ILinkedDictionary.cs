@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace AuroraLib.Core.Interfaces
+namespace AuroraLib.Core.Collections
 {
     /// <summary>
     /// Represents a dictionary where values can be automatically linked to their corresponding keys.

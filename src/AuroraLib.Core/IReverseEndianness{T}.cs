@@ -1,4 +1,4 @@
-namespace AuroraLib.Core.Interfaces
+namespace AuroraLib.Core
 {
     /// <summary>
     /// Represents types that support reversing their endianness.

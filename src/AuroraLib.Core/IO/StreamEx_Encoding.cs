@@ -1,5 +1,5 @@
+using AuroraLib.Core.Collections;
 using AuroraLib.Core.Exceptions;
-using AuroraLib.Core.Extensions;
 using AuroraLib.Core.Text;
 using System;
 using System.Collections.Generic;

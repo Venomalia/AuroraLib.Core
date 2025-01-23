@@ -1,6 +1,6 @@
 using System;
 
-namespace AuroraLib.Core.Interfaces
+namespace AuroraLib.Core
 {
     /// <summary>
     /// Supports generic cloning, offering a type-safe way to create a copy of the current instance.

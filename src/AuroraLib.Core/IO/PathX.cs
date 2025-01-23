@@ -1,10 +1,10 @@
-using AuroraLib.Core.Extensions;
+using AuroraLib.Core;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace AuroraLib.Core
+namespace AuroraLib.Core.IO
 {
     public static class PathX
     {
@@ -87,8 +87,8 @@ namespace AuroraLib.Core
             bool hasSeparator = IsDirectorySeparator(first[first.Length - 1]) || IsDirectorySeparator(second[0]);
 
             return hasSeparator ?
-                SpanEx.StringConcat(first, second) :
-                SpanEx.StringConcat(first, DirectorySeparatorString.AsSpan(), second);
+                SpanExtension.StringConcat(first, second) :
+                SpanExtension.StringConcat(first, DirectorySeparatorString.AsSpan(), second);
         }
 
         private static unsafe string JoinInternal(ReadOnlySpan<char> first, ReadOnlySpan<char> second, ReadOnlySpan<char> third)
@@ -100,10 +100,10 @@ namespace AuroraLib.Core
 
             return (firstHasSeparator, secondHasSeparator) switch
             {
-                (false, false) => SpanEx.StringConcat(first, SpanEx.StringConcat(DirectorySeparatorString.AsSpan(), second, DirectorySeparatorString.AsSpan()).AsSpan(), third),
-                (false, true) => SpanEx.StringConcat(first, DirectorySeparatorString.AsSpan(), second, third),
-                (true, false) => SpanEx.StringConcat(first, second, DirectorySeparatorString.AsSpan(), third),
-                (true, true) => SpanEx.StringConcat(first, second, third),
+                (false, false) => SpanExtension.StringConcat(first, SpanExtension.StringConcat(DirectorySeparatorString.AsSpan(), second, DirectorySeparatorString.AsSpan()).AsSpan(), third),
+                (false, true) => SpanExtension.StringConcat(first, DirectorySeparatorString.AsSpan(), second, third),
+                (true, false) => SpanExtension.StringConcat(first, second, DirectorySeparatorString.AsSpan(), third),
+                (true, true) => SpanExtension.StringConcat(first, second, third),
             };
         }
 
