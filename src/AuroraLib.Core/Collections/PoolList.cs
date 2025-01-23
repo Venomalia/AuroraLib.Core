@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace AuroraLib.Core.Buffers
+namespace AuroraLib.Core.Collections
 {
 
     /// <summary>
