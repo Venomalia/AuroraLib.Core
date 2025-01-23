@@ -1,4 +1,4 @@
-﻿namespace AuroraLib.Core.Interfaces
+﻿namespace AuroraLib.Core
 {
     /// <summary>
     /// Represents an interface for objects that have a name.

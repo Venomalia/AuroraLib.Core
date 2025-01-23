@@ -1,4 +1,4 @@
-using AuroraLib.Core.Extensions;
+using AuroraLib.Core;
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -87,7 +87,7 @@ namespace AuroraLib.Core.Text
         [DebuggerStepThrough]
         public static string GetDisplayableString(ReadOnlySpan<byte> bytes)
         {
-            int length = SpanEx.IndexOf(bytes, InvalidByte);
+            int length = SpanExtension.IndexOf(bytes, InvalidByte);
             if (length == -1)
                 return GetString(bytes);
 

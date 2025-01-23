@@ -15,8 +15,8 @@ It simplifies working across different .NET versions by providing extension meth
 | `SubStream`          | Provides a view into a specific portion of an underlying `Stream`.           |
 | `BitReader`          | Methods for reading bit streams with fine-grained control.                   |
 | `BitWriter`          | Methods for writing bit streams efficiently.                                 |
-| `BackwardsMemoryStream`| Enables reading and writing streams in reverse order.                      |
-| `StreamEx`           | Extensions for `Stream`s to simplify reading, writing, and data manipulation.|
+| `PathX`              | Performs operations on spans that contain path information.                  |
+| `StreamExtension`    | Extensions for `Stream`s to simplify reading, writing, and data manipulation.|
 
 ### Buffer Management
 
@@ -24,9 +24,17 @@ It simplifies working across different .NET versions by providing extension meth
 |---------------------|------------------------------------------------------------------------------|
 | `SpanBuffer`        | A buffer allocated from `ArrayPool` for zero-allocation data management.     |
 | `CircularBuffer`    | A circular buffer allocated from `ArrayPool`.                                |
-| `SpanEx`            | Extension methods and utilities for spans.                                   |
-| `MemoryEx`          | Casts a `Memory<T>` of one type to another.                                  |
+| `SpanExtension`     | Extension methods and utilities for spans.                                   |
+| `MemoryExtension`   | Casts a `Memory<T>` of one type to another.                                  |
 | `ValueStringBuilder`| A stack-based string builder for efficient string creation.                  |
+
+### Collections
+
+| Utility               | Description                                                                |
+|-----------------------|----------------------------------------------------------------------------|
+| `PoolList`            | A memory-efficient list implementation that utilizes a pooled.             |
+| `ObservableDictionary`| A dictionary that raises notifications when items are changed.             |
+| `CollectionExtension` | Extension methods for Collections.                                         |
 
 ### Format Handling
 

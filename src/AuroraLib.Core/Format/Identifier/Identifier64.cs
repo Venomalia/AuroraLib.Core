@@ -1,4 +1,3 @@
-using AuroraLib.Core.Extensions;
 using AuroraLib.Core.Text;
 using System;
 using System.Diagnostics;

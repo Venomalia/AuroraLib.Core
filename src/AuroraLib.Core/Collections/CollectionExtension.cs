@@ -6,12 +6,12 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace AuroraLib.Core.Extensions
+namespace AuroraLib.Core.Collections
 {
     /// <summary>
     /// Provides extension methods and utilities for collections.
     /// </summary>
-    public static class CollectionEx
+    public static class CollectionExtension
     {
         /// <summary>
         /// Moves an item within the list from the specified old index to the new index.
@@ -69,7 +69,7 @@ namespace AuroraLib.Core.Extensions
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SequenceGetHashCode<T>(this List<T> list) where T : unmanaged
-            => SpanEx.SequenceGetHashCode(list.UnsafeAsSpan());
+            => list.UnsafeAsSpan().SequenceGetHashCode();
 
         /// <summary>
         /// Computes the hash code for the elements in the specified collection./>.
@@ -81,6 +81,7 @@ namespace AuroraLib.Core.Extensions
         public static int SequenceGetHashCode<T>(this IEnumerable<T> values)
         {
             ThrowIf.Null(values);
+
             if (!values.Any())
                 return 0;
 
@@ -146,7 +147,7 @@ namespace AuroraLib.Core.Extensions
                 return true;
             }
 
-            value = default!;
+            value = default;
             return false;
         }
 
@@ -210,11 +211,11 @@ namespace AuroraLib.Core.Extensions
         {
             if (enumerable is KeyValuePair<TKey, TValue>[] array)
             {
-                AddUniqueRange(dictionary, array.AsSpan());
+                dictionary.AddUniqueRange(array.AsSpan());
             }
             else if (enumerable is List<KeyValuePair<TKey, TValue>> list)
             {
-                AddUniqueRange(dictionary, list.UnsafeAsSpan());
+                dictionary.AddUniqueRange(list.UnsafeAsSpan());
             }
             else
             {

@@ -1,4 +1,4 @@
-using AuroraLib.Core;
+using AuroraLib.Core.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;

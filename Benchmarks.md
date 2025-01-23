@@ -48,10 +48,3 @@ BenchmarkDotNet=v0.13.5, OS=Windows 10, AMD Ryzen 7 3800X, 1 CPU, 16 logical and
 |            Array | 1000 | 282.63 ns | 5.671 ns | 14.017 ns | 274.23 ns | 1.5635 |   13072 B |
 |   ArrayPool_Rent | 1000 |  57.76 ns | 0.113 ns |  0.095 ns |  57.75 ns |      - |         - |
 | Using_SpanBuffer | 1000 |  61.95 ns | 1.232 ns |  1.265 ns |  61.82 ns |      - |         - |
-
-|                     Method | MB |        Mean |     Error |    StdDev |      Gen0 |      Gen1 |      Gen2 |  Allocated |
-|--------------------------- |--- |------------:|----------:|----------:|----------:|----------:|----------:|-----------:|
-|     MemoryStream_WriteByte |  1 |  2,705.1 us |   6.71 us |   6.28 us |  511.7188 |  496.0938 |  496.0938 |  2097430 B |
-| MemoryPoolStream_WriteByte |  1 |    150.6 us |   2.01 us |   1.88 us |         - |         - |         - |       64 B |
-|     MemoryStream_WriteByte | 10 | 33,009.8 us | 424.24 us | 396.84 us | 1937.5000 | 1937.5000 | 1937.5000 | 33555300 B |
-| MemoryPoolStream_WriteByte | 10 |  1,941.9 us | 104.93 us | 309.40 us |         - |         - |         - |       67 B |

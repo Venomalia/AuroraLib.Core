@@ -1,6 +1,5 @@
-using AuroraLib.Core.Extensions;
+using AuroraLib.Core.Collections;
 using AuroraLib.Core.Format.Identifier;
-using AuroraLib.Core.Interfaces;
 using AuroraLib.Core.IO;
 using System;
 using System.Collections;

@@ -1,15 +1,16 @@
+using AuroraLib.Core;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace AuroraLib.Core.Extensions
+namespace AuroraLib.Core
 {
     /// <summary>
     /// Provides extension methods and utilities for spans.
     /// </summary>
-    public static class SpanEx
+    public static class SpanExtension
     {
         /// <summary>
         /// Determines if the given span contains the specified sequence of values.
@@ -20,21 +21,21 @@ namespace AuroraLib.Core.Extensions
         /// <returns><c>true</c> if the span contains the specified sequence; otherwise, <c>false</c>.</returns>
         [DebuggerStepThrough]
         public static bool Contains<T>(this ReadOnlySpan<T> values, ReadOnlySpan<T> sequence) where T : IEquatable<T>
-            => MemoryExtensions.IndexOf(values, sequence) != -1;
+            => values.IndexOf(sequence) != -1;
 
         /// <inheritdoc cref="Contains{T}(ReadOnlySpan{T}, ReadOnlySpan{T})"/>
         [DebuggerStepThrough]
         public static bool Contains<T>(this Span<T> values, ReadOnlySpan<T> sequence) where T : IEquatable<T>
-            => MemoryExtensions.IndexOf(values, sequence) != -1;
+            => values.IndexOf(sequence) != -1;
 
 #if !NET6_0_OR_GREATER
         [DebuggerStepThrough]
         public static bool Contains<T>(this ReadOnlySpan<T> span, T value) where T : IEquatable<T>?
-            => MemoryExtensions.IndexOf(span, value) != -1;
+            => span.IndexOf(value) != -1;
 
         [DebuggerStepThrough]
         public static bool Contains<T>(this Span<T> span, T value) where T : IEquatable<T>?
-            => MemoryExtensions.IndexOf(span, value) != -1;
+            => span.IndexOf(value) != -1;
 #endif
 
 #if !NET8_0_OR_GREATER
@@ -50,22 +51,22 @@ namespace AuroraLib.Core.Extensions
         /// <returns><c>true</c> if the span contains any of the specified values; otherwise, <c>false</c>.</returns>
         [DebuggerStepThrough]
         public static bool ContainsAny<T>(this ReadOnlySpan<T> span, T value0, T value1, T value2) where T : IEquatable<T>
-            => MemoryExtensions.IndexOfAny(span, value0, value1, value2) != -1;
+            => span.IndexOfAny(value0, value1, value2) != -1;
 
         /// <inheritdoc cref="ContainsAny{T}(ReadOnlySpan{T}, T, T, T)"/>
         [DebuggerStepThrough]
         public static bool ContainsAny<T>(this Span<T> span, T value0, T value1, T value2) where T : IEquatable<T>
-            => MemoryExtensions.IndexOfAny(span, value0, value1, value2) != -1;
+            => span.IndexOfAny(value0, value1, value2) != -1;
 
         /// <inheritdoc cref="ContainsAny{T}(ReadOnlySpan{T}, T, T, T)"/>
         [DebuggerStepThrough]
         public static bool ContainsAny<T>(this ReadOnlySpan<T> span, T value0, T value1) where T : IEquatable<T>
-            => MemoryExtensions.IndexOfAny(span, value0, value1) != -1;
+            => span.IndexOfAny(value0, value1) != -1;
 
         /// <inheritdoc cref="ContainsAny{T}(ReadOnlySpan{T}, T, T, T)"/>
         [DebuggerStepThrough]
         public static bool ContainsAny<T>(this Span<T> span, T value0, T value1) where T : IEquatable<T>
-            => MemoryExtensions.IndexOfAny(span, value0, value1) != -1;
+            => span.IndexOfAny(value0, value1) != -1;
 
         /// <summary>
         /// Determines if the given span contains any of the values from the specified sequence.
@@ -76,12 +77,12 @@ namespace AuroraLib.Core.Extensions
         /// <returns><c>true</c> if the span contains any of the values from the specified sequence; otherwise, <c>false</c>.</returns>
         [DebuggerStepThrough]
         public static bool ContainsAny<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> values) where T : IEquatable<T>
-            => MemoryExtensions.IndexOfAny(span, values) != -1;
+            => span.IndexOfAny(values) != -1;
 
         /// <inheritdoc cref="ContainsAny{T}(ReadOnlySpan{T}, ReadOnlySpan{T})"/>
         [DebuggerStepThrough]
         public static bool ContainsAny<T>(this Span<T> span, ReadOnlySpan<T> values) where T : IEquatable<T>
-            => MemoryExtensions.IndexOfAny(span, values) != -1;
+            => span.IndexOfAny(values) != -1;
 
         /// <summary>
         /// Replaces all occurrences of a specified value in a span with a new value.
@@ -131,7 +132,7 @@ namespace AuroraLib.Core.Extensions
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Count<T>(this Span<T> span, T value) where T : IEquatable<T>
-            => Count((ReadOnlySpan<T>)span, value);
+            => ((ReadOnlySpan<T>)span).Count(value);
 #endif
 
         /// <summary>
@@ -156,7 +157,7 @@ namespace AuroraLib.Core.Extensions
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int IndexOf<T>(this Span<T> span, Predicate<T> condition) where T : unmanaged
-            => IndexOf((ReadOnlySpan<T>)span, condition);
+            => ((ReadOnlySpan<T>)span).IndexOf(condition);
 
         /// <summary>
         /// Finds the index of the last element in the specified span that matches the condition.
@@ -180,7 +181,7 @@ namespace AuroraLib.Core.Extensions
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int LastIndexOf<T>(this Span<T> span, Predicate<T> condition) where T : unmanaged
-            => LastIndexOf((ReadOnlySpan<T>)span, condition);
+            => ((ReadOnlySpan<T>)span).LastIndexOf(condition);
 
         /// <summary>
         /// Computes the hash code for the elements in the specified span.
@@ -209,7 +210,7 @@ namespace AuroraLib.Core.Extensions
             if (typeof(T) == typeof(char))
             {
                 ReadOnlySpan<char> chars = MemoryMarshal.Cast<T, char>(span);
-                return String.GetHashCode(chars);
+                return string.GetHashCode(chars);
             }
 #endif
             HashCode gen = default;
@@ -230,13 +231,13 @@ namespace AuroraLib.Core.Extensions
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SequenceGetHashCode<T>(this Span<T> span) where T : unmanaged
-            => SequenceGetHashCode((ReadOnlySpan<T>)span);
+            => ((ReadOnlySpan<T>)span).SequenceGetHashCode();
 
         /// <inheritdoc cref="SequenceGetHashCode{T}(ReadOnlySpan{T})"/>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SequenceGetHashCode<T>(this T[] array) where T : unmanaged
-            => SequenceGetHashCode(array.AsSpan());
+            => array.AsSpan().SequenceGetHashCode();
 
         /// <summary>
         /// Casts an array of one primitive type <typeparamref name="TFrom"/> to a span of another primitive type <typeparamref name="TTo"/>.
