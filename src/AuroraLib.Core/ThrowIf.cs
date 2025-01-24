@@ -53,7 +53,7 @@ namespace AuroraLib.Core
 #if NET6_0_OR_GREATER
         public static void OutOfRange<T>(T value, T min, T max, [CallerArgumentExpression(nameof(value))] string? paramName = null) where T : IComparable<T>
 #else
-public static void OutOfRange<T>(T value, T min, T max, string? paramName = null) where T : IComparable<T>
+        public static void OutOfRange<T>(T value, T min, T max, string? paramName = null) where T : IComparable<T>
 #endif
         {
             if (value.CompareTo(min) < 0 || value.CompareTo(max) > 0)
@@ -289,55 +289,55 @@ public static void OutOfRange<T>(T value, T min, T max, string? paramName = null
         private static class ThrowHelper
         {
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             [DoesNotReturn]
 #endif
             public static void ThrowIsNullOrEmpty(string? paramName)
                 => throw new ArgumentException("String is Empty.", paramName);
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             [DoesNotReturn]
 #endif
             public static void ThrowNullOrWhiteSpace(string? paramName)
                 => throw new ArgumentException("String is Empty or consists only of whitespace character.", paramName);
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             [DoesNotReturn]
 #endif
             public static void ThrowLessThan<T>(T value, T other, string? paramName)
                 => throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} must be greater or equal to {other}.");
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             [DoesNotReturn]
 #endif
             public static void ThrowGreaterThan<T>(T value, T other, string? paramName)
                 => throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} must be less than or equal to {other}.");
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             [DoesNotReturn]
 #endif
             public static void ThrowEqual<T>(T value, T other, string? paramName = null)
                 => throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} cannot be equal to {other}.");
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             [DoesNotReturn]
 #endif
             public static void ThrowNotEqual<T>(T value, T other, string? paramName)
                 => throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} must be equal to {other}.");
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             [DoesNotReturn]
 #endif
             public static void ThrowZero<T>(T value, string? paramName = null)
                 => throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} cannot be zero.");
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             [DoesNotReturn]
 #endif
             public static void ThrowNegative<T>(T value, string? paramName)
                 => throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} cannot be negative.");
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             [DoesNotReturn]
 #endif
             public static void ThrowDisposed(object instance)

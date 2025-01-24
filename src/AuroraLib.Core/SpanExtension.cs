@@ -214,7 +214,7 @@ namespace AuroraLib.Core
             }
 #endif
             HashCode gen = default;
-#if NET6_0_OR_GREATER
+#if NET6_0_OR_GREATER 
             ReadOnlySpan<byte> buffer = MemoryMarshal.Cast<T, byte>(span);
             gen.AddBytes(buffer);
 #else
@@ -259,7 +259,7 @@ namespace AuroraLib.Core
             if (toLength * toSize != buffer.Length * fromSize)
                 throw new ArgumentException($"Buffer length is not a multiple of the target type size of {nameof(TTo)}.");
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER 
             ref TTo toRef = ref Unsafe.As<TFrom, TTo>(ref MemoryMarshal.GetArrayDataReference(buffer));
             return MemoryMarshal.CreateSpan(ref toRef, toLength);
 #else
@@ -280,7 +280,7 @@ namespace AuroraLib.Core
 #if NET8_0_OR_GREATER
         public static Span<byte> AsBytes<T>(this ref T buffer) where T : unmanaged
             => MemoryMarshal.AsBytes(new Span<T>(ref buffer));
-#elif NET6_0_OR_GREATER
+#elif NET6_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         public static Span<byte> AsBytes<T>(this ref T buffer) where T : unmanaged
         {
             ref byte bRef = ref Unsafe.As<T, byte>(ref buffer);

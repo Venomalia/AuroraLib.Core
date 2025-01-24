@@ -35,7 +35,7 @@ namespace AuroraLib.Core.IO
             return path;
         }
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc cref="Path.GetExtension(ReadOnlySpan{char})"/>
         public static ReadOnlySpan<char> GetExtension(ReadOnlySpan<char> path) => Path.GetExtension(path);
 #else
@@ -51,7 +51,7 @@ namespace AuroraLib.Core.IO
         }
 #endif
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc cref="Path.Join(ReadOnlySpan{char}, ReadOnlySpan{char})"/>
         public static string Join(ReadOnlySpan<char> path1, ReadOnlySpan<char> path2) => Path.Join(path1, path2);
 
@@ -110,7 +110,7 @@ namespace AuroraLib.Core.IO
         private static readonly string DirectorySeparatorString = Path.DirectorySeparatorChar.ToString();
 #endif
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc cref="Path.GetDirectoryName(ReadOnlySpan{char})"/>
         public static ReadOnlySpan<char> GetDirectoryName(ReadOnlySpan<char> path) => Path.GetDirectoryName(path);
 #else
@@ -150,7 +150,7 @@ namespace AuroraLib.Core.IO
             => ch == Path.DirectorySeparatorChar || ch == Path.AltDirectorySeparatorChar;
 #endif
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc cref="Path.GetFileNameWithoutExtension(ReadOnlySpan{char})"/>
         public static ReadOnlySpan<char> GetFileNameWithoutExtension(ReadOnlySpan<char> path) => Path.GetFileNameWithoutExtension(path);
 #else
@@ -163,7 +163,7 @@ namespace AuroraLib.Core.IO
         }
 #endif
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc cref="Path.GetFileName(ReadOnlySpan{char})"/>
         public static ReadOnlySpan<char> GetFileName(ReadOnlySpan<char> path) => Path.GetFileName(path);
 #else

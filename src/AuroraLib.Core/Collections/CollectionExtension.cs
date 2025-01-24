@@ -194,7 +194,7 @@ namespace AuroraLib.Core.Collections
             {
                 collection.AddRange(array.AsSpan());
             }
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER 
             else if (enumerable is List<T> list)
             {
                 collection.AddRange(CollectionsMarshal.AsSpan(list));

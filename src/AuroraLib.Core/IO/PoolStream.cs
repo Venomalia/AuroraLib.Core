@@ -81,11 +81,7 @@ namespace AuroraLib.Core.IO
             ThrowIf.Disposed(!CanRead, this);
             ThrowIf.Null(destination, nameof(destination));
 
-#if NET20_OR_GREATER || NETSTANDARD2_0
             destination.Write(_Buffer, (int)Position, (int)Length);
-#else
-            destination.Write(UnsafeAsSpan((int)Position));
-#endif
         }
 
         /// <inheritdoc/>
@@ -150,11 +146,8 @@ namespace AuroraLib.Core.IO
         {
             ThrowIf.Disposed(!CanRead, this);
             ThrowIf.Null(stream, nameof(stream));
-#if NET20_OR_GREATER || NETSTANDARD2_0
+
             stream.Write(_Buffer, 0, (int)Length);
-#else
-            stream.Write(UnsafeAsSpan());
-#endif
         }
 
         /// <inheritdoc cref="MemoryStream.ToArray"/>

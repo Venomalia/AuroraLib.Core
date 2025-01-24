@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AssemblyTitle>AuroraLib.Core</AssemblyTitle>
-    <TargetFrameworks>net8.0;net6.0;netstandard2.0;net472;</TargetFrameworks>
+    <TargetFrameworks>net8.0;net6.0;netstandard2.0;netstandard2.1;net472;</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
@@ -38,16 +38,28 @@
   </ItemGroup>
 	
 	<PropertyGroup>
-		<NETFrameworks>|netstandard2.0|net481|net48|net472|NET471|NET47|NET462|NET461|</NETFrameworks>
+		<NETFrameworks>|netstandard2.1|netstandard2.0|net481|net48|net472|NET471|NET47|NET462|NET461|</NETFrameworks>
 	</PropertyGroup>
 
-  <PropertyGroup Condition="$(NETFrameworks.Contains('|$(TargetFramework)|'))">
-    <LangVersion>8.0</LangVersion>
-  </PropertyGroup>
+  <Choose>
+    <When Condition="'$(TargetFramework)' == 'netstandard2.1'">
+      <PropertyGroup>
+        <LangVersion>8.0</LangVersion>
+      </PropertyGroup>
+    </When>
+    <When Condition="$(NETFrameworks.Contains('|$(TargetFramework)|'))">
+      <PropertyGroup>
+        <LangVersion>8.0</LangVersion>
+      </PropertyGroup>
+      <ItemGroup>
+        <PackageReference Include="System.Memory" Version="4.5.5" />
+      </ItemGroup>
+    </When>
+  </Choose>
 
-	<ItemGroup Condition="$(NETFrameworks.Contains('|$(TargetFramework)|'))">
-		<PackageReference Include="System.Memory" Version="4.5.5" />
-	</ItemGroup>
+  <ItemGroup Condition="$(NETFrameworks.Contains('|$(TargetFramework)|'))">
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="icon.png">

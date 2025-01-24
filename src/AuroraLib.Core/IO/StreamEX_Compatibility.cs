@@ -77,7 +77,7 @@ namespace AuroraLib.Core.IO
         /// When <paramref name="count"/> is 0 (zero), this read operation will be completed without waiting for available data in the stream.
         /// </remarks>
         public static void ReadExactly(this Stream stream, byte[] buffer, int offset, int count)
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
             => ReadAtLeastCore(stream, buffer.AsSpan(offset, count), count, throwOnEndOfStream: true);
 #else
         {
