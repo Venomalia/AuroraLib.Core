@@ -81,6 +81,18 @@ public static void OutOfRange<T>(T value, T min, T max, string? paramName = null
                 throw new ArgumentException("Only consists of whitespace character.", paramName);
         }
 
+        /// <summary>
+        /// Throws an <see cref="InvalidOperationException"/> if the specified parameter is read-only.
+        /// </summary>
+        /// <param name="isReadOnly">A boolean value indicating whether the parameter is read-only.</param>
+        /// <param name="paramName">The name of the parameter being checked.</param>
+        /// <exception cref="InvalidOperationException"> </exception>
+        public static void ReadOnly(bool isReadOnly, string paramName)
+        {
+            if (isReadOnly)
+                throw new InvalidOperationException($"{paramName} is read-only and cannot be modified.");
+        }
+
 #if NET8_0_OR_GREATER
 
         /// <inheritdoc cref="ArgumentException.ThrowIfNullOrEmpty(string?, string?)"/>
