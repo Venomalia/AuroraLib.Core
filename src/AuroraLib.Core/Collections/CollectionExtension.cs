@@ -89,7 +89,7 @@ namespace AuroraLib.Core.Collections
             int hashCode = 17;
             foreach (var item in values)
             {
-                hashCode = hashCode * 23 + (item == null ? 0 : item.GetHashCode());
+                hashCode = hashCode * 23 + (item is null ? 0 : item.GetHashCode());
             }
             return hashCode;
 #else
@@ -162,8 +162,19 @@ namespace AuroraLib.Core.Collections
         public static void AddRange<T>(this ICollection<T> collection, ReadOnlySpan<T> span)
         {
             if (collection is List<T> list)
+            {
+#if NET8_0_OR_GREATER
+                CollectionExtensions.AddRange(list, span);
+                return;
+#else
                 list.Capacity = list.Count + span.Length;
-
+#endif
+            }
+            else if (collection is PoolList<T> pool)
+            {
+                pool.AddRange(span);
+                return;
+            }
             foreach (T value in span)
                 collection.Add(value);
         }
@@ -175,14 +186,20 @@ namespace AuroraLib.Core.Collections
             {
                 inlist.AddRange(collection);
             }
+            else if (collection is PoolList<T> pool)
+            {
+                pool.AddRange(collection);
+            }
             else if (enumerable is T[] array)
             {
                 collection.AddRange(array.AsSpan());
             }
+#if NET5_0_OR_GREATER
             else if (enumerable is List<T> list)
             {
-                collection.AddRange(list.UnsafeAsSpan());
+                collection.AddRange(CollectionsMarshal.AsSpan(list));
             }
+#endif
             else
             {
                 foreach (T pair in enumerable)

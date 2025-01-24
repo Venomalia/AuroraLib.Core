@@ -138,26 +138,6 @@ namespace AuroraLib.Core.IO
 
         /// <inheritdoc/>
         [DebuggerStepThrough]
-#if NET20_OR_GREATER || NETSTANDARD2_0
-        public override long Seek(long offset, SeekOrigin origin)
-        {
-            switch (origin)
-            {
-                case SeekOrigin.Begin:
-                    Position = offset;
-                    break;
-                case SeekOrigin.Current:
-                    Position += offset;
-                    break;
-                case SeekOrigin.End:
-                    Position = Length + offset;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(origin), origin, ThrowIf.InvalidEnumMessage(origin, nameof(origin)));
-            }
-            return Position;
-        }
-#else
         public override long Seek(long offset, SeekOrigin origin) => origin switch
         {
             SeekOrigin.Begin => Position = offset,
@@ -165,7 +145,6 @@ namespace AuroraLib.Core.IO
             SeekOrigin.End => Position = Length + offset,
             _ => throw new ArgumentOutOfRangeException(nameof(origin), origin, ThrowIf.InvalidEnumMessage(origin, nameof(origin)))
         };
-#endif
 
         /// <inheritdoc/>
         public override void SetLength(long value)

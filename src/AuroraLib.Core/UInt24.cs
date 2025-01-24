@@ -82,7 +82,7 @@ namespace AuroraLib.Core
         /// <inheritdoc/>
         public int CompareTo(object? value)
         {
-            if (value == null)
+            if (value is null)
                 return 1;
             else if (value is UInt24 num24)
                 return Value.CompareTo(num24.Value);

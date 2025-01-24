@@ -32,7 +32,7 @@ namespace AuroraLib.Core.Format
         }
 
         /// <inheritdoc/>
-        public bool Equals(MediaType? other) => other != null && other.Type == Type && other.Name == Name;
+        public bool Equals(MediaType? other) => !(other is null) && other.Type == Type && other.Name == Name;
 
         /// <inheritdoc/>
         public override bool Equals(object obj) => obj is MediaType media && Equals(media);

@@ -33,7 +33,7 @@ namespace AuroraLib.Core.Collections
                     _dictionary[key] = value;
                     CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, new KeyValuePair<TKey, TValue>(key, value), new KeyValuePair<TKey, TValue>(key, oldValue)));
 
-                    if (PropertyChanged != null)
+                    if (!(PropertyChanged is null))
                     {
                         PropertyChanged(this, _PropertyChangedEventArgs_Keys);
                         PropertyChanged(this, _PropertyChangedEventArgs_Values);
@@ -90,7 +90,7 @@ namespace AuroraLib.Core.Collections
         /// <param name="comparer">The equality comparer to use when comparing keys.</param>
         public ObservableDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey>? comparer = null)
         {
-            if (dictionary == null) throw new ArgumentNullException(nameof(dictionary));
+            if (dictionary is null) throw new ArgumentNullException(nameof(dictionary));
             _dictionary = new Dictionary<TKey, TValue>(dictionary, comparer);
         }
 #endif
@@ -221,7 +221,7 @@ namespace AuroraLib.Core.Collections
 
         private void DictionaryPropertyChanged()
         {
-            if (PropertyChanged != null)
+            if (!(PropertyChanged is null))
             {
                 PropertyChanged(this, _PropertyChangedEventArgs_Count);
                 PropertyChanged(this, _PropertyChangedEventArgs_Keys);

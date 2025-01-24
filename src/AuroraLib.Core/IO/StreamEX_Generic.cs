@@ -1,6 +1,7 @@
 using AuroraLib.Core.Buffers;
 using AuroraLib.Core.Collections;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -160,13 +161,9 @@ namespace AuroraLib.Core.IO
             {
                 using (SpanBuffer<T> copy = new SpanBuffer<T>(span))
                 {
-                    BitConverterX.ReverseEndianness(copy.Span);
-#if NET20_OR_GREATER
+                    Span<T> spanCopy = copy.Span;
+                    BitConverterX.ReverseEndianness(spanCopy);
                     stream.Write(copy.GetBuffer(), 0, sizeof(T) * span.Length);
-#else
-                    Span<byte> buffer = MemoryMarshal.Cast<T, byte>(copy);
-                    stream.Write(buffer);
-#endif
                 }
             }
             else
@@ -294,7 +291,7 @@ namespace AuroraLib.Core.IO
                 Write(stream, (ReadOnlySpan<T>)pool.UnsafeAsSpan(), order);
                 return;
             }
-            else if(Collection is T[] array)
+            else if (Collection is T[] array)
             {
                 Write(stream, (ReadOnlySpan<T>)array, order);
                 return;

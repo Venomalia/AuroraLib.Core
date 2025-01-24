@@ -52,7 +52,7 @@ namespace AuroraLib.Core.Format
             IsMatchAction = isMatchAction;
             Class = @class;
 
-            if (Class != null && IsMatchAction == null)
+            if (!(Class is null) && IsMatchAction is null)
             {
                 object? instance = CreateInstance();
                 if (instance is IFormatRecognition recognition)
@@ -73,10 +73,10 @@ namespace AuroraLib.Core.Format
         /// <inheritdoc/>
         public bool IsMatch(Stream stream, ReadOnlySpan<char> fileNameAndExtension = default)
         {
-            if (IsMatchAction != null)
+            if (!(IsMatchAction is null))
                 return IsMatchAction(stream, fileNameAndExtension);
 
-            if (Identifier != null)
+            if (!(Identifier is null))
             {
                 ReadOnlySpan<byte> identifier = Identifier.AsSpan();
                 if (stream.Length >= IdentifierOffset + identifier.Length)
@@ -96,7 +96,7 @@ namespace AuroraLib.Core.Format
         }
 
         /// <inheritdoc/>
-        public bool Equals(IFormatInfo? other) => other != null && other.MIMEType.Equals(MIMEType);
+        public bool Equals(IFormatInfo? other) => !(other is null) && other.MIMEType.Equals(MIMEType);
 
         /// <inheritdoc/>
         public override bool Equals(object? obj) => obj is IFormatInfo info && Equals(info);

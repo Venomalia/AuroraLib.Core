@@ -1,4 +1,4 @@
-﻿//This is a standard NET class that uses the internal access modifier so I had to copy it.
+//This is a standard NET class that uses the internal access modifier so I had to copy it.
 // => https://github.com/dotnet/runtime/blob/main/src/libraries/Common/src/System/Text/ValueStringBuilder.cs
 
 // Licensed to the .NET Foundation under one or more agreements.
@@ -148,10 +148,8 @@ namespace AuroraLib.Core.Text
 
         public void Insert(int index, string s)
         {
-            if (s == null)
-            {
+            if (s is null)
                 return;
-            }
 
             int count = s.Length;
 
@@ -185,10 +183,8 @@ namespace AuroraLib.Core.Text
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Append(string s)
         {
-            if (s == null)
-            {
+            if (s is null)
                 return;
-            }
 
             int pos = _pos;
             if (s.Length == 1 && (uint)pos < (uint)_chars.Length) // very common case, e.g. appending strings from NumberFormatInfo like separators, percent symbols, etc.
@@ -307,10 +303,9 @@ namespace AuroraLib.Core.Text
 
             char[]? toReturn = _arrayToReturnToPool;
             _chars = _arrayToReturnToPool = poolArray;
-            if (toReturn != null)
-            {
-                ArrayPool<char>.Shared.Return(toReturn);
-            }
+            if (toReturn is null)
+                return;
+            ArrayPool<char>.Shared.Return(toReturn);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -318,10 +313,10 @@ namespace AuroraLib.Core.Text
         {
             char[]? toReturn = _arrayToReturnToPool;
             this = default; // for safety, to avoid using pooled array if this instance is erroneously appended to again
-            if (toReturn != null)
-            {
-                ArrayPool<char>.Shared.Return(toReturn);
-            }
+            if (toReturn is null)
+                return;
+
+            ArrayPool<char>.Shared.Return(toReturn);
         }
 
 #if NET6_0_OR_GREATER

@@ -268,19 +268,13 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         public static long Align(this Stream stream, long offset, SeekOrigin origin, int boundary = 32)
         {
-            switch (origin)
+            offset = origin switch
             {
-                case SeekOrigin.Begin:
-                    break;
-                case SeekOrigin.Current:
-                    offset += stream.Position;
-                    break;
-                case SeekOrigin.End:
-                    offset = stream.Length - offset;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(origin), origin, ThrowIf.InvalidEnumMessage(origin, nameof(origin)));
-            }
+                SeekOrigin.Begin => offset,
+                SeekOrigin.Current => offset + stream.Position,
+                SeekOrigin.End => stream.Length - offset,
+                _ => throw new ArgumentOutOfRangeException(nameof(origin), origin, ThrowIf.InvalidEnumMessage(origin, nameof(origin)))
+            };
 
             return stream.Seek(AlignPosition(offset, boundary), SeekOrigin.Begin);
         }

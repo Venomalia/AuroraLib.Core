@@ -197,7 +197,7 @@ public static void OutOfRange<T>(T value, T min, T max, string? paramName = null
         public static void Equal<T>(T value, T other, string? paramName = null) where T : IEquatable<T>?
 #endif
         {
-            if (value?.Equals(other) ?? other == null)
+            if (value?.Equals(other) ?? other is null)
                 ThrowHelper.ThrowEqual(value, other, paramName);
         }
 
@@ -209,7 +209,7 @@ public static void OutOfRange<T>(T value, T min, T max, string? paramName = null
         public static void NotEqual<T>(T value, T other, string? paramName = null) where T : IEquatable<T>?
 #endif
         {
-            if (!(value?.Equals(other) ?? other == null))
+            if (!(value?.Equals(other) ?? other is null))
                 ThrowHelper.ThrowNotEqual(value, other, paramName);
         }
 

@@ -3,16 +3,17 @@ BenchmarkDotNet=v0.13.5, OS=Windows 10, AMD Ryzen 7 3800X, 1 CPU, 16 logical and
 
 ## StreamReadValueBenchmark
 [Benchmark](https://github.com/Venomalia/AuroraLib.Core/blob/main/Benchmark/Benchmarks/StreamReadValueBenchmark.cs)
-|                             Method |      Mean |    Error |   StdDev |
-|----------------------------------- |----------:|---------:|---------:|
-|             BinaryReader_ReadInt32 | 363.79 ns | 4.246 ns | 3.972 ns |
-|         BinaryPrimitives_ReadInt32 | 294.76 ns | 2.857 ns | 2.673 ns |
-|               AuroraCore_ReadInt32 | 230.71 ns | 0.945 ns | 0.789 ns |
-|         BinaryPrimitives_ReadInt64 | 297.29 ns | 3.327 ns | 3.112 ns |
-|               AuroraCore_ReadInt64 | 259.43 ns | 2.898 ns | 2.711 ns |
-|     AuroraCore_ReadInt64_EndianBig | 273.26 ns | 2.411 ns | 2.137 ns |
-|           AuroraCore_ReadSpanInt64 |  39.70 ns | 0.374 ns | 0.313 ns |
-| AuroraCore_ReadSpanInt64_EndianBig |  51.52 ns | 0.530 ns | 0.496 ns |
+|                             Method |      Mean |    Error |   StdDev |    Median |
+|----------------------------------- |----------:|---------:|---------:|----------:|
+|             BinaryReader_ReadInt32 | 366.60 ns | 5.448 ns | 5.096 ns | 364.41 ns |
+|         BinaryPrimitives_ReadInt32 | 298.04 ns | 2.926 ns | 2.737 ns | 298.10 ns |
+|               AuroraCore_ReadInt32 | 233.12 ns | 2.744 ns | 2.143 ns | 233.31 ns |
+|         BinaryPrimitives_ReadInt64 | 298.30 ns | 3.794 ns | 3.549 ns | 296.60 ns |
+|               AuroraCore_ReadInt64 | 258.63 ns | 4.040 ns | 3.779 ns | 255.68 ns |
+|     AuroraCore_ReadInt64_EndianBig | 275.64 ns | 4.401 ns | 4.116 ns | 274.01 ns |
+|           AuroraCore_ReadSpanInt64 |  27.05 ns | 0.519 ns | 0.555 ns |  26.86 ns |
+| AuroraCore_ReadSpanInt64_EndianBig |  40.37 ns | 0.738 ns | 1.440 ns |  40.25 ns |
+|           AuroraCore_ReadListInt64 |  53.47 ns | 1.095 ns | 2.449 ns |  52.72 ns |
 
 ## StreamReadTestStructBenchmark
 [Benchmark](https://github.com/Venomalia/AuroraLib.Core/blob/main/Benchmark/Benchmarks/StreamReadTestStructBenchmark.cs)

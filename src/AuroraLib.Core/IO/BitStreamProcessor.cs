@@ -113,7 +113,7 @@ namespace AuroraLib.Core.IO
         {
             if (!disposedValue)
             {
-                if (basestream != null && !Protectbase)
+                if (!(basestream is null) && !Protectbase)
                 {
                     try { basestream.Dispose(); }
                     catch { }

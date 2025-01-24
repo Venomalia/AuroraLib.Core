@@ -104,5 +104,13 @@ namespace Benchmark.Benchmarks
             using SpanBuffer<long> buffer = new(n);
             stream.Read<long>(buffer, Endian.Big);
         }
+
+        [Benchmark]
+        public void AuroraCore_ReadListInt64()
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            List<long> list = new List<long>();
+            stream.ReadCollection(list, n);
+        }
     }
 }

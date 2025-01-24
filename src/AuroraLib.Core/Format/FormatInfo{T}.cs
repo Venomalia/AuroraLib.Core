@@ -68,7 +68,7 @@ namespace AuroraLib.Core.Format
 #endif
 
         /// <inheritdoc/>
-        public bool Equals(IFormatInfo? other) => other != null && other.MIMEType.Equals(MIMEType);
+        public bool Equals(IFormatInfo? other) => !(other is null) && other.MIMEType.Equals(MIMEType);
 
         /// <inheritdoc/>
         public override bool Equals(object? obj) => obj is IFormatInfo info && Equals(info);

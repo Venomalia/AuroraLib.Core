@@ -15,8 +15,9 @@ namespace AuroraLib.Core.IO
         /// <inheritdoc cref="Stream.Read(byte[], int, int)"/>
         public static int Read(this Stream stream, Span<byte> buffer)
         {
-            if (stream is PoolStream pool)
-                return pool.Read(buffer);
+            if (buffer.IsEmpty) return 0;
+
+            if (stream is PoolStream pool) return pool.Read(buffer);
 
             byte[] sharedBuffer = ArrayPool<byte>.Shared.Rent(buffer.Length);
             try
@@ -35,6 +36,9 @@ namespace AuroraLib.Core.IO
         /// <inheritdoc cref="Stream.Write(byte[], int, int)"/>
         public static void Write(this Stream stream, ReadOnlySpan<byte> buffer)
         {
+            if (buffer.IsEmpty)
+                return;
+
             if (stream is PoolStream pool)
             {
                 pool.Write(buffer);

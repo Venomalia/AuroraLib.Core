@@ -29,7 +29,7 @@ namespace AuroraLib.Core.Format.Identifier
         public bool Equals(string? other) => other == GetString();
 
         /// <inheritdoc />
-        public bool Equals(IIdentifier? other) => other != null && other.AsSpan().SequenceEqual(AsSpan());
+        public bool Equals(IIdentifier? other) => !(other is null) && other.AsSpan().SequenceEqual(AsSpan());
 
         /// <inheritdoc />
         [DebuggerStepThrough]
