@@ -40,11 +40,14 @@ BenchmarkDotNet=v0.13.5, OS=Windows 10, AMD Ryzen 7 3800X, 1 CPU, 16 logical and
 
 ## PoolBufferBenchmark
 [Benchmark](https://github.com/Venomalia/AuroraLib.Core/blob/main/Benchmark/Benchmarks/PoolBufferBenchmark.cs)
-|           Method |    N |      Mean |    Error |    StdDev |    Median |   Gen0 | Allocated |
-|----------------- |----- |----------:|---------:|----------:|----------:|-------:|----------:|
-|            Array |  100 |  34.89 ns | 0.726 ns |  0.918 ns |  34.95 ns | 0.1645 |    1376 B |
-|   ArrayPool_Rent |  100 |  57.67 ns | 0.220 ns |  0.184 ns |  57.62 ns |      - |         - |
-| Using_SpanBuffer |  100 |  60.34 ns | 0.235 ns |  0.184 ns |  60.27 ns |      - |         - |
-|            Array | 1000 | 282.63 ns | 5.671 ns | 14.017 ns | 274.23 ns | 1.5635 |   13072 B |
-|   ArrayPool_Rent | 1000 |  57.76 ns | 0.113 ns |  0.095 ns |  57.75 ns |      - |         - |
-| Using_SpanBuffer | 1000 |  61.95 ns | 1.232 ns |  1.265 ns |  61.82 ns |      - |         - |
+|           Method |    N |      Mean |    Error |   StdDev |   Gen0 | Allocated |
+|----------------- |----- |----------:|---------:|---------:|-------:|----------:|
+|            Array |   10 |  11.56 ns | 0.254 ns | 0.237 ns | 0.0249 |     208 B |
+|   ArrayPool_Rent |   10 |  56.60 ns | 0.888 ns | 0.831 ns |      - |         - |
+| Using_SpanBuffer |   10 |  15.29 ns | 0.314 ns | 0.322 ns | 0.0249 |     208 B |
+|            Array |  100 |  35.41 ns | 0.715 ns | 0.765 ns | 0.1645 |    1376 B |
+|   ArrayPool_Rent |  100 |  56.93 ns | 0.123 ns | 0.109 ns |      - |         - |
+| Using_SpanBuffer |  100 |  41.40 ns | 0.744 ns | 0.621 ns | 0.0660 |     552 B |
+|            Array | 1000 | 283.65 ns | 2.875 ns | 6.605 ns | 1.5635 |   13072 B |
+|   ArrayPool_Rent | 1000 |  56.60 ns | 0.563 ns | 0.499 ns |      - |         - |
+| Using_SpanBuffer | 1000 |  60.47 ns | 0.881 ns | 0.824 ns |      - |         - |

@@ -12,6 +12,8 @@ namespace AuroraLib.Core.Buffers
     /// <typeparam name="T">The type of elements in the buffer.</typeparam>
     public readonly struct SpanBuffer<T> : IMemoryOwner<T> where T : unmanaged
     {
+        private const int SmallArrayBoundary = 512;
+
         private readonly byte[] _buffer;
 
         /// <summary>
@@ -62,8 +64,18 @@ namespace AuroraLib.Core.Buffers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe SpanBuffer(int length)
         {
+            ThrowIf.Negative(length, nameof(length));
+
             Length = length;
-            _buffer = length == 0 ? Array.Empty<byte>() : ArrayPool<byte>.Shared.Rent(length * sizeof(T));
+            if (length == 0)
+            {
+                _buffer = Array.Empty<byte>();
+            }
+            else
+            {
+                int bytes = length * sizeof(T);
+                _buffer = bytes > SmallArrayBoundary ? ArrayPool<byte>.Shared.Rent(bytes) : new byte[bytes];
+            }
         }
 
         /// <inheritdoc cref="SpanBuffer{T}.SpanBuffer(int)"/>
@@ -85,7 +97,8 @@ namespace AuroraLib.Core.Buffers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
-            if (Length != 0) ArrayPool<byte>.Shared.Return(_buffer);
+            if (_buffer.Length > SmallArrayBoundary)
+                ArrayPool<byte>.Shared.Return(_buffer);
         }
 
         public static implicit operator Span<T>(SpanBuffer<T> x) => x.Span;

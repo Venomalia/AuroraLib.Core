@@ -1,4 +1,4 @@
-using AuroraLib.Core.Buffers;
+using AuroraLib.Core.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -36,10 +36,10 @@ namespace CoreUnitTest
 
             list.Insert(1, 42);
 
-            Assert.AreEqual(_items.Length +1, list.Count); // The list should now have 4 elements
+            Assert.AreEqual(_items.Length + 1, list.Count); // The list should now have 4 elements
             Assert.AreEqual(_items[0], list[0]);
             Assert.AreEqual(42, list[1]);
-            Assert.AreEqual(_items[1], list[2]); 
+            Assert.AreEqual(_items[1], list[2]);
             Assert.AreEqual(_items[2], list[3]);
             Assert.AreEqual(_items[3], list[4]);
         }

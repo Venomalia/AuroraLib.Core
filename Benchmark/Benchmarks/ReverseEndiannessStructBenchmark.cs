@@ -1,5 +1,4 @@
 using AuroraLib.Core;
-using AuroraLib.Core.Extensions;
 using BenchmarkDotNet.Attributes;
 using System.Buffers.Binary;
 
