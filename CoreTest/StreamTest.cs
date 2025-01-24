@@ -1,6 +1,5 @@
 using AuroraLib.Core;
 using AuroraLib.Core.Buffers;
-using AuroraLib.Core.Extensions;
 using AuroraLib.Core.Format.Identifier;
 using AuroraLib.Core.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -325,19 +324,43 @@ namespace CoreUnitTest
         }
 
         [TestMethod]
-        public void WriteList()
+        [DataRow(Endian.Little)]
+        [DataRow(Endian.Big)]
+        public void WriteList(Endian order)
         {
             List<uint> list = new List<uint>() { 5, 10, 6, 8, 6 };
 
             using (MemoryPoolStream stream = new MemoryPoolStream())
             {
-                stream.Write(list, Endian.Little);
+                stream.WriteCollection(list, order);
 
                 stream.Position = 0;
                 for (int i = 0; i < list.Count; i++)
                 {
-                    uint vaule = stream.ReadUInt32(Endian.Little);
+                    uint vaule = stream.ReadUInt32(order);
                     Assert.AreEqual(list[i], vaule);
+                }
+            }
+        }
+
+
+        [TestMethod]
+        [DataRow(Endian.Little)]
+        [DataRow(Endian.Big)]
+        public void ReadList(Endian order)
+        {
+            ReadOnlySpan<int> data = new int[] { 5, 10, 6, 8, 6 };
+            List<int> list = new List<int>();
+
+            using (MemoryPoolStream stream = new MemoryPoolStream())
+            {
+                stream.Write(data, order);
+                stream.Position = 0;
+
+                stream.ReadCollection(list, data.Length, order);
+                for (int i = 0; i < data.Length; i++)
+                {
+                    Assert.AreEqual(list[i], data[i]);
                 }
             }
         }

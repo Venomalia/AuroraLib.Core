@@ -177,16 +177,6 @@ namespace AuroraLib.Core.IO
         }
 
         /// <summary>
-        /// Writes the data from the specified <see cref="List{T}"/> to the <see cref="Stream"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of elements in the List.</typeparam>
-        /// <param name="stream">The stream to write the data to.</param>
-        /// <param name="list">The List containing the data to write.</param>
-        /// <param name="order">The byte order of the data. Default is Endian.Little.</param>
-        public static void Write<T>(this Stream stream, List<T> list, Endian order = Endian.Little) where T : unmanaged
-            => Write(stream, (ReadOnlySpan<T>)list.UnsafeAsSpan(), order);
-
-        /// <summary>
         /// Writes multiple instances of the specified <typeparamref name="T"/> <paramref name="objekt"/> to the <see cref="Stream"/>.
         /// </summary>
         /// <typeparam name="T">The type of the object to write.</typeparam>
@@ -219,6 +209,114 @@ namespace AuroraLib.Core.IO
         public static unsafe void Write<T>(this Stream stream, T objekt, int count, Endian order = Endian.Little) where T : unmanaged
             => Write(stream, objekt, (uint)count, order);
 
+        #endregion
+
+        #region Read&Write Collection
+        /// <summary>
+        /// Reads a collection of type <typeparamref name="T"/> from the provided <paramref name="stream"/> into the specified <paramref name="Collection"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the collection.</typeparam>
+        /// <param name="stream">The stream to read data from.</param>
+        /// <param name="Collection">The collection to populate with the read data.</param>
+        /// <param name="count">The number of elements to read from the stream.</param>
+        /// <param name="order">The byte order (endianness) of the data. Defaults to LittleEndian.</param>
+        public static void ReadCollection<T>(this Stream stream, ICollection<T> Collection, int count, Endian order = Endian.Little) where T : unmanaged
+        {
+            ThrowIf.Null(Collection, nameof(Collection));
+            ThrowIf.ReadOnly(Collection.IsReadOnly, nameof(Collection));
+
+#if !NET8_0_OR_GREATER
+            if (Collection is List<T> list)
+            {
+                ReadList(stream, list, count, order);
+                return;
+            }
+#endif
+            using (SpanBuffer<T> copy = new SpanBuffer<T>(count))
+            {
+                stream.Read<T>(copy, order);
+                Collection.AddRange(copy);
+            }
+        }
+
+#if !NET8_0_OR_GREATER
+        private static void ReadList<T>(Stream stream, List<T> list, int count, Endian order = Endian.Little) where T : unmanaged
+        {
+            ThrowIf.Negative(count, nameof(count));
+
+            if (count * Unsafe.SizeOf<T>() <= 512)
+            {
+                T[] data = new T[count];
+                stream.Read(data.AsSpan(), order);
+                list.AddRange(data);
+            }
+            else
+            {
+                T[] copy = ArrayPool<T>.Shared.Rent(count);
+                try
+                {
+                    Span<T> values = new Span<T>(copy, 0, count);
+                    stream.Read(values, order);
+
+                    list.AddRange(copy);
+                    if (copy.Length > count)
+                    {
+                        int dif = copy.Length - count;
+                        list.RemoveRange(list.Count - dif, dif);
+                    }
+                }
+                finally
+                {
+                    ArrayPool<T>.Shared.Return(copy);
+                }
+            }
+        }
+#endif
+
+        /// <summary>
+        /// Writes a <paramref name="Collection"/> of type <typeparamref name="T"/> to the provided <paramref name="stream"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in the collection.</typeparam>
+        /// <param name="stream">The stream to write data to.</param>
+        /// <param name="Collection">The collection containing the data to be written.</param>
+        /// <param name="order">The byte order (endianness) to use when writing. Defaults to LittleEndian.</param>
+        public static void WriteCollection<T>(this Stream stream, ICollection<T> Collection, Endian order = Endian.Little) where T : unmanaged
+        {
+            ThrowIf.Null(Collection, nameof(Collection));
+
+            if (Collection is List<T> list)
+            {
+                Write(stream, (ReadOnlySpan<T>)list.UnsafeAsSpan(), order);
+                return;
+            }
+            else if (Collection is PoolList<T> pool)
+            {
+                Write(stream, (ReadOnlySpan<T>)pool.UnsafeAsSpan(), order);
+                return;
+            }
+            else if(Collection is T[] array)
+            {
+                Write(stream, (ReadOnlySpan<T>)array, order);
+                return;
+            }
+
+            T[] copy = ArrayPool<T>.Shared.Rent(Collection.Count);
+            try
+            {
+                Collection.CopyTo(copy, 0);
+                Span<T> values = new Span<T>(copy, 0, Collection.Count);
+
+                if (order != SystemOrder && Unsafe.SizeOf<T>() > 1)
+                    BitConverterX.ReverseEndianness(values);
+
+                Span<byte> buffer = MemoryMarshal.Cast<T, byte>(copy);
+                stream.Write(buffer);
+            }
+            finally
+            {
+                ArrayPool<T>.Shared.Return(copy);
+            }
+        }
         #endregion
 
         #region Read&Write IBinaryObject
