@@ -26,7 +26,6 @@ It simplifies working across different .NET versions by providing extension meth
 | `CircularBuffer`    | A circular buffer allocated from `ArrayPool`.                                |
 | `SpanExtension`     | Extension methods and utilities for spans.                                   |
 | `MemoryExtension`   | Casts a `Memory<T>` of one type to another.                                  |
-| `ValueStringBuilder`| A stack-based string builder for efficient string creation.                  |
 
 ### Collections
 
