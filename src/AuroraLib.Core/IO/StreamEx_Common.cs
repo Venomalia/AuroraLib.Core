@@ -351,8 +351,10 @@ namespace AuroraLib.Core.IO
 
         private static int GetAlignmentRemainder(long position, int boundary)
         {
-            if (boundary <= 0 || (boundary & (boundary - 1)) != 0)
-                throw new ArgumentOutOfRangeException(nameof(boundary), "Boundary must be a positive power of 2.");
+            if (boundary <= 0)
+                throw new ArgumentOutOfRangeException(nameof(boundary), "Boundary must be greater than zero.");
+            if ((boundary & (boundary - 1)) != 0)
+                throw new ArgumentOutOfRangeException(nameof(boundary), "Boundary must be a power of 2.");
 
             return (int)(position & (boundary - 1));
         }
