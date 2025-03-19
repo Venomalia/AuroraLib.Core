@@ -11,6 +11,11 @@ namespace AuroraLib.Core.Format.Identifier
     /// </summary>
     public sealed class Identifier : IIdentifier
     {
+        /// <summary>
+        /// Returns an empty <see cref="Identifier"/>
+        /// </summary>
+        public static readonly Identifier Empty = new Identifier(Array.Empty<byte>());
+
         private readonly byte[] Bytes;
 
         public Identifier(byte[] bytes)
@@ -48,6 +53,9 @@ namespace AuroraLib.Core.Format.Identifier
 
         /// <inheritdoc />
         public override int GetHashCode() => AsSpan().SequenceGetHashCode();
+
+        /// <inheritdoc />
+        public int CompareTo(IIdentifier? other) => other == null ? 1 : AsSpan().SequenceCompareTo(other.AsSpan());
 
         /// <inheritdoc />
         public override string ToString() => EncodingX.GetDisplayableString(AsSpan());

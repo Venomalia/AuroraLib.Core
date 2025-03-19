@@ -6,7 +6,7 @@ namespace AuroraLib.Core.Format.Identifier
     /// <summary>
     /// Represents an identifier and provides access to individual bytes within the identifier.
     /// </summary>
-    public interface IIdentifier : IEquatable<string>, IEquatable<IIdentifier>
+    public interface IIdentifier : IEquatable<string>, IEquatable<IIdentifier>, IComparable<IIdentifier>
     {
         /// <summary>
         /// Returns a <see cref="byte"/> span representation of the identifier.

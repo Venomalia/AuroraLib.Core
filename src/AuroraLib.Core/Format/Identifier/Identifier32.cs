@@ -120,6 +120,9 @@ namespace AuroraLib.Core.Format.Identifier
         public override int GetHashCode() => AsSpan().SequenceGetHashCode();
 
         /// <inheritdoc />
+        public int CompareTo(IIdentifier? other) => other == null ? 1 : AsSpan().SequenceCompareTo(other.AsSpan());
+
+        /// <inheritdoc />
         public override string ToString() => EncodingX.GetDisplayableString(AsSpan());
     }
 }
