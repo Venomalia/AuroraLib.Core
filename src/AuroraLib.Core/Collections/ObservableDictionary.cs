@@ -12,7 +12,7 @@ namespace AuroraLib.Core.Collections
     /// </summary>
     /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
     /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
-    public sealed class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary, IReadOnlyDictionary<TKey, TValue>, INotifyCollectionChanged, INotifyPropertyChanged where TKey : notnull
+    public class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary, IReadOnlyDictionary<TKey, TValue>, INotifyCollectionChanged, INotifyPropertyChanged where TKey : notnull
     {
         readonly Dictionary<TKey, TValue> _dictionary;
 
@@ -23,7 +23,7 @@ namespace AuroraLib.Core.Collections
         public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <inheritdoc/>
-        public TValue this[TKey key]
+        public virtual TValue this[TKey key]
         {
             get => _dictionary[key];
             set
@@ -96,7 +96,7 @@ namespace AuroraLib.Core.Collections
 #endif
 
         /// <inheritdoc/>
-        public void Add(TKey key, TValue value)
+        public virtual void Add(TKey key, TValue value)
         {
             _dictionary.Add(key, value);
 
@@ -105,11 +105,10 @@ namespace AuroraLib.Core.Collections
         }
 
         /// <inheritdoc/>
-        public void Clear()
+        public virtual void Clear()
         {
             _dictionary.Clear();
-
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            CollectionChanged?.Invoke(this, _NotifyCollectionChangedEventArgs_Reset);
             DictionaryPropertyChanged();
         }
 
@@ -117,7 +116,7 @@ namespace AuroraLib.Core.Collections
         public bool ContainsKey(TKey key) => _dictionary.ContainsKey(key);
 
         /// <inheritdoc/>
-        public bool Remove(TKey key)
+        public virtual bool Remove(TKey key)
         {
             if (_dictionary.Remove(key, out TValue value))
             {
@@ -232,5 +231,6 @@ namespace AuroraLib.Core.Collections
         private static readonly PropertyChangedEventArgs _PropertyChangedEventArgs_Count = new PropertyChangedEventArgs(nameof(Count));
         private static readonly PropertyChangedEventArgs _PropertyChangedEventArgs_Keys = new PropertyChangedEventArgs(nameof(Keys));
         private static readonly PropertyChangedEventArgs _PropertyChangedEventArgs_Values = new PropertyChangedEventArgs(nameof(Values));
+        private static readonly NotifyCollectionChangedEventArgs _NotifyCollectionChangedEventArgs_Reset = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset);
     }
 }
