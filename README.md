@@ -23,7 +23,6 @@ It simplifies working across different .NET versions by providing extension meth
 | Utility             | Description                                                                  |
 |---------------------|------------------------------------------------------------------------------|
 | `SpanBuffer`        | A buffer allocated from `ArrayPool` for zero-allocation data management.     |
-| `CircularBuffer`    | A circular buffer allocated from `ArrayPool`.                                |
 | `SpanExtension`     | Extension methods and utilities for spans.                                   |
 | `MemoryExtension`   | Casts a `Memory<T>` of one type to another.                                  |
 
