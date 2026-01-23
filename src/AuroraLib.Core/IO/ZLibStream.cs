@@ -12,25 +12,28 @@ namespace AuroraLib.Core.IO
     {
         private readonly Adler32 adler32;
         private readonly bool _isCompress;
+        private readonly bool _leaveOpen;
 
         public ZLibStream(Stream stream, CompressionMode mode) : this(stream, mode, false) { }
 
         public ZLibStream(Stream stream, CompressionLevel compressionLevel) : this(stream, compressionLevel, false) { }
 
-        public ZLibStream(Stream stream, CompressionMode mode, bool leaveOpen) : base(stream, mode, leaveOpen)
+        public ZLibStream(Stream stream, CompressionMode mode, bool leaveOpen) : base(stream, mode, true)
         {
             adler32 = new Adler32();
             _isCompress = mode == CompressionMode.Compress;
+            _leaveOpen = leaveOpen;
             if (_isCompress)
                 stream.Write(new Header(CompressionLevel.Optimal));
             else if (!stream.Read<Header>().Validate())
                 throw new InvalidDataException();
         }
 
-        public ZLibStream(Stream stream, CompressionLevel compressionLevel, bool leaveOpen) : base(stream, compressionLevel, leaveOpen)
+        public ZLibStream(Stream stream, CompressionLevel compressionLevel, bool leaveOpen) : base(stream, compressionLevel, true)
         {
             adler32 = new Adler32();
             _isCompress = true;
+            _leaveOpen = leaveOpen;
             stream.Write(new Header(compressionLevel));
         }
 
@@ -58,10 +61,13 @@ namespace AuroraLib.Core.IO
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && _isCompress)
-                base.BaseStream.Write(adler32.GetCurrentHashAsUInt32(), Endian.Big);
-
+            var baseStream = base.BaseStream;
             base.Dispose(disposing);
+            if (disposing && _isCompress)
+               baseStream.Write(adler32.GetCurrentHashAsUInt32(), Endian.Big);
+
+            if (!_leaveOpen)
+                baseStream.Dispose();
         }
 
         private readonly struct Header
