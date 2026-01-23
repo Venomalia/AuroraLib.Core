@@ -17,6 +17,7 @@ It simplifies working across different .NET versions by providing extension meth
 | `BitWriter`          | Methods for writing bit streams efficiently.                                 |
 | `PathX`              | Performs operations on spans that contain path information.                  |
 | `StreamExtension`    | Extensions for `Stream`s to simplify reading, writing, and data manipulation.|
+| `ZLibStream`         | Provides methods to compress & decompress zlib data for netstandard and older.|
 
 ### Buffer Management
 
