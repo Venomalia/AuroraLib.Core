@@ -8,7 +8,7 @@ namespace AuroraLib.Core.IO
 {
     public static class PathX
     {
-        public const char ExtensionSeparatorChar = '.';
+        private const char ExtensionSeparatorChar = '.';
 
         /// <summary>
         /// Gets the relative path from the given path to the main path.
@@ -209,33 +209,5 @@ namespace AuroraLib.Core.IO
         }
         internal static readonly Regex illegalChars = new Regex(@"^(.*(//|\\))?(?'X'PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*| )((//|\\).*)?$|[\x00-\x1f\x7F?*:""<>|]| ((//|\\).*)?$", RegexOptions.CultureInvariant);
 
-        /// <summary>
-        /// Converts a byte size into a human-readable string with size suffixes.
-        /// </summary>
-        /// <param name="value">The size value to convert.</param>
-        /// <param name="decimalPlaces">The number of decimal places to round the adjusted size.</param>
-        /// <param name="suffixes">The type of size suffixes to use (decimal or binary).</param>
-        /// <returns>A string representation of the size with the appropriate size suffix.</returns>
-        public static string AddSizeSuffix(long value, int decimalPlaces = 0, SuffixesType suffixes = SuffixesType.Decimal)
-        {
-            int ex = (int)Math.Max(0, Math.Log(value, (int)suffixes));
-            double adjustedSize = Math.Round(value / Math.Pow((int)suffixes, ex), decimalPlaces);
-            if (suffixes == SuffixesType.Decimal)
-            {
-                return adjustedSize + DecimalSizeSuffixes[ex];
-            }
-            return adjustedSize + BinarySizeSuffixes[ex];
-        }
-        private static readonly string[] DecimalSizeSuffixes = { "B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "RB", "QB" };
-        private static readonly string[] BinarySizeSuffixes = { "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB", "RiB", "QiB" };
-
-        /// <summary>
-        /// The type of size suffixes to use.
-        /// </summary>
-        public enum SuffixesType : int
-        {
-            Decimal = 1000,
-            Binary = 1024,
-        }
     }
 }

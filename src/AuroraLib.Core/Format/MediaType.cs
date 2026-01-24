@@ -35,7 +35,7 @@ namespace AuroraLib.Core.Format
         public bool Equals(MediaType? other) => !(other is null) && other.Type == Type && other.Name == Name;
 
         /// <inheritdoc/>
-        public override bool Equals(object obj) => obj is MediaType media && Equals(media);
+        public override bool Equals(object? obj) => obj is MediaType media && Equals(media);
 
         /// <inheritdoc/>
         public override int GetHashCode() => ToString().GetHashCode();

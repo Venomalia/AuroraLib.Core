@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Runtime.CompilerServices;
 
 namespace AuroraLib.Core.Buffers
@@ -27,7 +28,6 @@ namespace AuroraLib.Core.Buffers
 
             // Use MemoryCastManager for dynamic memory conversion
             return new MemoryCastManager<TFrom, TTo>(memory).Memory;
-
         }
 
         /// <summary>

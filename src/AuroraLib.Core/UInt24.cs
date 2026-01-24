@@ -95,6 +95,7 @@ namespace AuroraLib.Core
         #endregion
 
         #region operators
+#pragma warning disable CS1591, IDE0090
         public static UInt24 operator ++(UInt24 a) => new UInt24(a.Value + 1);
 
         public static UInt24 operator --(UInt24 a) => new UInt24(a.Value - 1);
@@ -130,6 +131,7 @@ namespace AuroraLib.Core
         public static explicit operator UInt24(ulong x) => new UInt24((uint)x);
 
         public static implicit operator ulong(UInt24 x) => x.Value;
+#pragma warning restore CS1591, IDE0090
 
         #endregion operators
 
@@ -188,10 +190,13 @@ namespace AuroraLib.Core
 
         #region Parse
 
+        /// <inheritdoc/>
         public static UInt24 Parse(string s, NumberStyles style, IFormatProvider? provider) => new UInt24(uint.Parse(s, style, provider));
 
+        /// <inheritdoc/>
         public static UInt24 Parse(string s, IFormatProvider? provider) => Parse(s, NumberStyles.Integer, provider);
 
+        /// <inheritdoc/>
         public static bool TryParse(string? s, NumberStyles style, IFormatProvider? provider, out UInt24 result)
         {
             if (uint.TryParse(s, style, provider, out var value) && value <= MaxValue)
@@ -205,6 +210,7 @@ namespace AuroraLib.Core
                 return false;
             }
         }
+        /// <inheritdoc/>
         public static bool TryParse(string? s, IFormatProvider? provider, out UInt24 result) => TryParse(s, NumberStyles.Integer, provider, out result);
 
         #endregion
@@ -212,8 +218,11 @@ namespace AuroraLib.Core
 #if NET6_0_OR_GREATER
 
         #region Span Parse
+        /// <inheritdoc/>
         public static UInt24 Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider) => new UInt24(uint.Parse(s, style, provider));
+        /// <inheritdoc/>
         public static UInt24 Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Parse(s, NumberStyles.Integer, provider);
+        /// <inheritdoc/>
         public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, out UInt24 result)
         {
             if (uint.TryParse(s, style, provider, out var value) && value <= MaxValue)
@@ -227,10 +236,12 @@ namespace AuroraLib.Core
                 return false;
             }
         }
+        /// <inheritdoc/>
         public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out UInt24 result) => TryParse(s, NumberStyles.Integer, provider, out result);
         #endregion
 
         #region ISpanFormattable
+        /// <inheritdoc/>
         public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null) => Value.TryFormat(destination, out charsWritten, format, provider);
         #endregion
 
@@ -239,41 +250,71 @@ namespace AuroraLib.Core
 #if NET8_0_OR_GREATER
 
         #region IMinMaxValue
+        /// <inheritdoc/>
         static UInt24 IMinMaxValue<UInt24>.MaxValue => (UInt24)MaxValue;
+        /// <inheritdoc/>
         static UInt24 IMinMaxValue<UInt24>.MinValue => (UInt24)MinValue;
         #endregion
 
         #region INumberBase
+        /// <inheritdoc/>
         static UInt24 INumberBase<UInt24>.One => 1;
+        /// <inheritdoc/>
         static int INumberBase<UInt24>.Radix => 2;
+        /// <inheritdoc/>
         static UInt24 INumberBase<UInt24>.Zero => 0;
+        /// <inheritdoc/>
         static UInt24 IAdditiveIdentity<UInt24, UInt24>.AdditiveIdentity => 0;
+        /// <inheritdoc/>
         static UInt24 IMultiplicativeIdentity<UInt24, UInt24>.MultiplicativeIdentity => 1;
 
+        /// <inheritdoc/>
         static UInt24 INumberBase<UInt24>.Abs(UInt24 value) => value;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsEvenInteger(UInt24 value) => (value.Value & 1) == 0;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsOddInteger(UInt24 value) => (value.Value & 1) != 0;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsZero(UInt24 value) => value.Value == 0;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsPositive(UInt24 value) => true;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsNegative(UInt24 value) => false;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsComplexNumber(UInt24 value) => false;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsImaginaryNumber(UInt24 value) => false;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsRealNumber(UInt24 value) => true;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsInfinity(UInt24 value) => false;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsNegativeInfinity(UInt24 value) => false;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsPositiveInfinity(UInt24 value) => false;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsInteger(UInt24 value) => true;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsNaN(UInt24 value) => false;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsFinite(UInt24 value) => true;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsSubnormal(UInt24 value) => false;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsNormal(UInt24 value) => true;
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.IsCanonical(UInt24 value) => true;
 
+        /// <inheritdoc/>
         static UInt24 INumberBase<UInt24>.MaxMagnitude(UInt24 x, UInt24 y) => x > y ? x : y;
+        /// <inheritdoc/>
         static UInt24 INumberBase<UInt24>.MinMagnitude(UInt24 x, UInt24 y) => x < y ? x : y;
+        /// <inheritdoc/>
         static UInt24 INumberBase<UInt24>.MaxMagnitudeNumber(UInt24 x, UInt24 y) => x > y ? x : y;
+        /// <inheritdoc/>
         static UInt24 INumberBase<UInt24>.MinMagnitudeNumber(UInt24 x, UInt24 y) => x < y ? x : y;
 
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.TryConvertFromChecked<TOther>(TOther value, out UInt24 result)
         {
             if (TOther.TryConvertToChecked(value, out uint temp) && temp <= MaxValue)
@@ -285,8 +326,10 @@ namespace AuroraLib.Core
             result = default;
             return false;
         }
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.TryConvertToChecked<TOther>(UInt24 value, [MaybeNullWhen(false)] out TOther result) => TOther.TryConvertFromChecked(value.Value, out result);
 
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.TryConvertFromSaturating<TOther>(TOther value, [MaybeNullWhen(false)] out UInt24 result)
         {
             if (TOther.TryConvertToSaturating(value, out uint temp))
@@ -298,7 +341,10 @@ namespace AuroraLib.Core
             result = default;
             return false;
         }
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.TryConvertToSaturating<TOther>(UInt24 value, [MaybeNullWhen(false)] out TOther result) => TOther.TryConvertFromSaturating(value.Value, out result);
+
+        /// <inheritdoc/>
         static bool INumberBase<UInt24>.TryConvertFromTruncating<TOther>(TOther value, [MaybeNullWhen(false)] out UInt24 result)
         {
             if (TOther.TryConvertToTruncating(value, out uint temp))
@@ -346,13 +392,20 @@ namespace AuroraLib.Core
         #endregion
 
         #region IBinaryInteger
+        /// <inheritdoc/>
         unsafe int IBinaryInteger<UInt24>.GetByteCount() => sizeof(UInt24);
+        /// <inheritdoc/>
         int IBinaryInteger<UInt24>.GetShortestBitLength() => BitOperations.Log2(Value) + 1;
+        /// <inheritdoc/>
         public static UInt24 PopCount(UInt24 value) => (UInt24)uint.PopCount(value);
+        /// <inheritdoc/>
         public static UInt24 TrailingZeroCount(UInt24 value) => (UInt24)uint.TrailingZeroCount(value);
+        /// <inheritdoc/>
         public static bool IsPow2(UInt24 value) => uint.IsPow2(value.Value);
+        /// <inheritdoc/>
         public static UInt24 Log2(UInt24 value) => (UInt24)uint.Log2(value.Value);
 
+        /// <inheritdoc/>
         static unsafe bool IBinaryInteger<UInt24>.TryReadBigEndian(ReadOnlySpan<byte> source, bool isUnsigned, out UInt24 value)
         {
             UInt24 result = default;

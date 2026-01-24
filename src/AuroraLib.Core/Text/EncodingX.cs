@@ -100,6 +100,35 @@ namespace AuroraLib.Core.Text
         }
         #endregion
 
+        /// <summary>
+        /// Converts a byte size into a human-readable string with size suffixes.
+        /// </summary>
+        /// <param name="value">The size value to convert.</param>
+        /// <param name="decimalPlaces">The number of decimal places to round the adjusted size.</param>
+        /// <param name="suffixes">The type of size suffixes to use (decimal or binary).</param>
+        /// <returns>A string representation of the size with the appropriate size suffix.</returns>
+        public static string AddSizeSuffix(long value, int decimalPlaces = 0, SuffixesType suffixes = SuffixesType.Decimal)
+        {
+            int ex = (int)Math.Max(0, Math.Log(value, (int)suffixes));
+            double adjustedSize = Math.Round(value / Math.Pow((int)suffixes, ex), decimalPlaces);
+            if (suffixes == SuffixesType.Decimal)
+            {
+                return adjustedSize + DecimalSizeSuffixes[ex];
+            }
+            return adjustedSize + BinarySizeSuffixes[ex];
+        }
+        private static readonly string[] DecimalSizeSuffixes = { "B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "RB", "QB" };
+        private static readonly string[] BinarySizeSuffixes = { "B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB", "RiB", "QiB" };
+
+        /// <summary>
+        /// The type of size suffixes to use.
+        /// </summary>
+        public enum SuffixesType : int
+        {
+            Decimal = 1000,
+            Binary = 1024,
+        }
+
 #if NET20_OR_GREATER || NETSTANDARD2_0
         /// <inheritdoc cref="Encoding.GetString(byte[])"/>
         public static unsafe string GetString(this Encoding encoding, ReadOnlySpan<byte> bytes)

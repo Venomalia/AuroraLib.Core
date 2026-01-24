@@ -103,10 +103,10 @@ namespace AuroraLib.Core.IO
         {
 #if NET20_OR_GREATER
             byte[] bytes = new byte[length];
-            stream.Read(bytes, 0, bytes.Length);
+            stream.ReadExactly(bytes, 0, bytes.Length);
 #else
             Span<byte> bytes = stackalloc byte[length];
-            stream.Read(bytes);
+            stream.ReadExactly(bytes);
 #endif
             return EncodingX.GetCString(bytes, encoding, padding);
         }

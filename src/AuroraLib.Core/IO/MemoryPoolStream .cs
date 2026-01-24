@@ -11,7 +11,7 @@ namespace AuroraLib.Core.IO
     /// </summary>
     public sealed class MemoryPoolStream : PoolStream
     {
-        private const int defaultcapacity = 512;
+        private const int defaultcapacity = 0x400;
 
         /// <inheritdoc/>
         public override long Position
@@ -64,6 +64,7 @@ namespace AuroraLib.Core.IO
         /// </summary>
         /// <param name="aPool">The ArrayPool used to rent and return byte arrays.</param>
         /// <param name="capacity">The initial capacity of the stream.</param>
+        /// <param name="setLength">Set as initial capacity of the stream.</param>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public MemoryPoolStream(ArrayPool<byte> aPool, int capacity, bool setLength = false) : this(aPool, aPool.Rent(capacity), setLength ? capacity : 0)
@@ -106,7 +107,7 @@ namespace AuroraLib.Core.IO
         /// <param name="length">The length of the stream to read.</param>
         [DebuggerStepThrough]
         public MemoryPoolStream(Stream stream, int length) : this(length, true)
-            => stream.Read(_Buffer.AsSpan(0, length));
+            => stream.ReadExactly(_Buffer, 0, length);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemoryPoolStream"/> class with the data from the specified ReadOnlySpan.

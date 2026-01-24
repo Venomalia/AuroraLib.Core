@@ -11,7 +11,7 @@ namespace AuroraLib.Core.IO
     /// </summary>
     public sealed class BitReader : BitStreamProcessor
     {
-        private byte[] _buffer = new byte[9];
+        private readonly byte[] _buffer = new byte[9];
 
         /// <inheritdoc/>
         public override long Position

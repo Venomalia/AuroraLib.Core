@@ -43,7 +43,11 @@ namespace AuroraLib.Core.IO
         {
             byte[] copy = new byte[stream.Length];
             stream.Seek(0, SeekOrigin.Begin);
-            stream.Read(copy, 0, copy.Length);
+#if NET8_0_OR_GREATER
+            stream.ReadExactly(copy);
+#else
+            stream.ReadExactly(copy, 0, copy.Length);
+#endif
             return copy;
         }
         #endregion
@@ -237,7 +241,7 @@ namespace AuroraLib.Core.IO
                     byte[] sharedBuffer = ArrayPool<byte>.Shared.Rent(count);
                     try
                     {
-                        stream.Read(sharedBuffer, 0, count);
+                        stream.ReadExactly(sharedBuffer, 0, count);
                     }
                     finally
                     {
@@ -247,7 +251,7 @@ namespace AuroraLib.Core.IO
                 }
                 else
                 {
-                    stream.Read(stackalloc byte[count]);
+                    stream.ReadExactly(stackalloc byte[count]);
                 }
 #endif
             }

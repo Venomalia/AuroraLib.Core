@@ -33,7 +33,6 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         public static unsafe T Read<T>(this Stream stream, Endian order = Endian.Little) where T : unmanaged
         {
-
             if (Unsafe.SizeOf<T>() <= 4)
                 return stream.ReadPrimitiveHelper<T>(order);
 
@@ -306,7 +305,7 @@ namespace AuroraLib.Core.IO
                 if (order != SystemOrder && Unsafe.SizeOf<T>() > 1)
                     BitConverterX.ReverseEndianness(values);
 
-                Span<byte> buffer = MemoryMarshal.Cast<T, byte>(copy);
+                Span<byte> buffer = MemoryMarshal.Cast<T, byte>(copy.AsSpan());
                 stream.Write(buffer);
             }
             finally

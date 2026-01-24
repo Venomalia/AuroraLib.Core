@@ -100,6 +100,7 @@ namespace AuroraLib.Core
         #endregion
 
         #region operators
+#pragma warning disable CS1591, IDE0090
         public static Int24 operator ++(Int24 a) => new Int24(a.Value + 1);
 
         public static Int24 operator --(Int24 a) => new Int24(a.Value - 1);
@@ -140,6 +141,7 @@ namespace AuroraLib.Core
 
         public static implicit operator ulong(Int24 x) => (ulong)x.Value;
 
+#pragma warning restore CS1591, IDE0090
         #endregion operators
 
         #region IConvertible
@@ -197,10 +199,13 @@ namespace AuroraLib.Core
 
         #region Parse
 
+        /// <inheritdoc/>
         public static Int24 Parse(string s, NumberStyles style, IFormatProvider? provider) => new Int24(int.Parse(s, style, provider));
 
+        /// <inheritdoc/>
         public static Int24 Parse(string s, IFormatProvider? provider) => Parse(s, NumberStyles.Integer, provider);
 
+        /// <inheritdoc/>
         public static bool TryParse(string? s, NumberStyles style, IFormatProvider? provider, out Int24 result)
         {
             if (int.TryParse(s, style, provider, out var value) && value <= MaxValue)
@@ -214,6 +219,7 @@ namespace AuroraLib.Core
                 return false;
             }
         }
+        /// <inheritdoc/>
         public static bool TryParse(string? s, IFormatProvider? provider, out Int24 result) => TryParse(s, NumberStyles.Integer, provider, out result);
 
         #endregion
@@ -221,8 +227,11 @@ namespace AuroraLib.Core
 #if NET6_0_OR_GREATER
 
         #region Span Parse
+        /// <inheritdoc/>
         public static Int24 Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider) => new Int24(int.Parse(s, style, provider));
+        /// <inheritdoc/>
         public static Int24 Parse(ReadOnlySpan<char> s, IFormatProvider? provider) => Parse(s, NumberStyles.Integer, provider);
+        /// <inheritdoc/>
         public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, out Int24 result)
         {
             if (int.TryParse(s, style, provider, out var value) && value <= MaxValue)
@@ -236,10 +245,12 @@ namespace AuroraLib.Core
                 return false;
             }
         }
+        /// <inheritdoc/>
         public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out Int24 result) => TryParse(s, NumberStyles.Integer, provider, out result);
         #endregion
 
         #region ISpanFormattable
+        /// <inheritdoc/>
         public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null) => Value.TryFormat(destination, out charsWritten, format, provider);
         #endregion
 
@@ -357,10 +368,15 @@ namespace AuroraLib.Core
 
         #region IBinaryInteger
         unsafe int IBinaryInteger<Int24>.GetByteCount() => sizeof(Int24);
+        /// <inheritdoc/>
         int IBinaryInteger<Int24>.GetShortestBitLength() => int.Log2(Value) + 1;
+        /// <inheritdoc/>
         public static Int24 PopCount(Int24 value) => (Int24)int.PopCount(value.Value);
+        /// <inheritdoc/>
         public static Int24 TrailingZeroCount(Int24 value) => (Int24)int.TrailingZeroCount(value.Value);
+        /// <inheritdoc/>
         public static bool IsPow2(Int24 value) => int.IsPow2(value.Value);
+        /// <inheritdoc/>
         public static Int24 Log2(Int24 value) => (Int24)int.Log2(value.Value);
 
         static unsafe bool IBinaryInteger<Int24>.TryReadBigEndian(ReadOnlySpan<byte> source, bool isUnsigned, out Int24 value)
