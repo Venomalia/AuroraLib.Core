@@ -15,6 +15,8 @@ namespace CoreUnitTest
         [TestMethod]
         [DataRow(10, Endian.Little)]
         [DataRow(10, Endian.Big)]
+        [DataRow(311, Endian.Little)]
+        [DataRow(311, Endian.Big)]
         public void WriteGeneric(int vaule, Endian order)
         {
             using (MemoryPoolStream stream = new MemoryPoolStream())
@@ -37,6 +39,8 @@ namespace CoreUnitTest
         [TestMethod]
         [DataRow((short)10, Endian.Little)]
         [DataRow((short)10, Endian.Big)]
+        [DataRow((short)311, Endian.Little)]
+        [DataRow((short)311, Endian.Big)]
         public void ReadGenericShort(short vaule, Endian order)
         {
             using (MemoryPoolStream stream = new MemoryPoolStream())
@@ -52,6 +56,8 @@ namespace CoreUnitTest
         [TestMethod]
         [DataRow(10, Endian.Little)]
         [DataRow(10, Endian.Big)]
+        [DataRow(311, Endian.Little)]
+        [DataRow(311, Endian.Big)]
         public void ReadGenericInt(int vaule, Endian order)
         {
             using (MemoryPoolStream stream = new MemoryPoolStream())
@@ -67,6 +73,8 @@ namespace CoreUnitTest
         [TestMethod]
         [DataRow((long)10, Endian.Little)]
         [DataRow((long)10, Endian.Big)]
+        [DataRow((long)311, Endian.Little)]
+        [DataRow((long)311, Endian.Big)]
         public void ReadGenericLong(long vaule, Endian order)
         {
             using (MemoryPoolStream stream = new MemoryPoolStream())
@@ -82,6 +90,8 @@ namespace CoreUnitTest
         [TestMethod]
         [DataRow((short)10, Endian.Little)]
         [DataRow((short)10, Endian.Big)]
+        [DataRow((short)311, Endian.Little)]
+        [DataRow((short)311, Endian.Big)]
         public void ReadInt16(short vaule, Endian order)
         {
             using (MemoryPoolStream stream = new MemoryPoolStream())
@@ -97,6 +107,10 @@ namespace CoreUnitTest
         [TestMethod]
         [DataRow(10, Endian.Little)]
         [DataRow(10, Endian.Big)]
+        [DataRow(311, Endian.Little)]
+        [DataRow(311, Endian.Big)]
+        [DataRow(421122, Endian.Little)]
+        [DataRow(421122, Endian.Big)]
         public void ReadInt24(int intVaule, Endian order)
         {
             Int24 vaule = intVaule;
@@ -113,6 +127,8 @@ namespace CoreUnitTest
         [TestMethod]
         [DataRow(10, Endian.Little)]
         [DataRow(10, Endian.Big)]
+        [DataRow(311, Endian.Little)]
+        [DataRow(311, Endian.Big)]
         public void ReadInt32(int vaule, Endian order)
         {
             using (MemoryPoolStream stream = new MemoryPoolStream())
@@ -128,6 +144,8 @@ namespace CoreUnitTest
         [TestMethod]
         [DataRow(10, Endian.Little)]
         [DataRow(10, Endian.Big)]
+        [DataRow(311, Endian.Little)]
+        [DataRow(311, Endian.Big)]
         public void ReadInt64(long vaule, Endian order)
         {
             using (MemoryPoolStream stream = new MemoryPoolStream())
@@ -143,6 +161,8 @@ namespace CoreUnitTest
         [TestMethod]
         [DataRow(10, Endian.Little)]
         [DataRow(10, Endian.Big)]
+        [DataRow(311, Endian.Little)]
+        [DataRow(311, Endian.Big)]
         public void ReadSpan(int length, Endian order)
         {
             using (MemoryPoolStream stream = new MemoryPoolStream())
@@ -162,6 +182,8 @@ namespace CoreUnitTest
         [TestMethod]
         [DataRow(10, Endian.Little)]
         [DataRow(10, Endian.Big)]
+        [DataRow(311, Endian.Little)]
+        [DataRow(311, Endian.Big)]
         public void WriteSpan(int length, Endian order)
         {
             using (MemoryPoolStream stream = new MemoryPoolStream())

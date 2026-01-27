@@ -37,7 +37,7 @@ namespace AuroraLib.Core
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static UInt24 ReverseEndianness(UInt24 value)
-            => new UInt24((value.Value >> 16) | ((value.Value & 0xFF00) << 8) | (value.Value << 16));
+            => new UInt24((value.Value >> 16) | (value.Value & 0xFF00) | (value.Value << 16));
 
         /// <summary>
         /// Reverses the byte order (endianness) of the specified <see cref="Int24"/> value.
@@ -47,7 +47,7 @@ namespace AuroraLib.Core
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Int24 ReverseEndianness(Int24 value)
-            => new Int24((value.Value >> 16) | ((value.Value & 0xFF00) << 8) | (value.Value << 16));
+            => new Int24((value.Value >> 16) | (value.Value & 0xFF00) | (value.Value << 16));
 
         /// <inheritdoc cref="BinaryPrimitives.ReverseEndianness(uint)"/>
         [DebuggerStepThrough]
