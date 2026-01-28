@@ -76,14 +76,14 @@ namespace AuroraLib.Core.IO
                     if (order == SystemOrder || typeT == typeof(short) || typeT == typeof(ushort) || typeT.IsEnum)
 #endif
                     {
-                        short iValue = (short)ReadInt16Helper<T>(stream, order);
+                        short iValue = (short)ReadInt16Helper(stream, order);
                         return Unsafe.As<short, T>(ref iValue);
                     }
                     break;
                 case 3:
                     if (order == SystemOrder || typeT == typeof(Int24) || typeT == typeof(UInt24))
                     {
-                        Int24 iValue = ReadInt24Helper<T>(stream, order);
+                        Int24 iValue = ReadInt24Helper(stream, order);
                         return Unsafe.As<Int24, T>(ref iValue);
                     }
                     break;
