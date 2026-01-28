@@ -81,7 +81,7 @@ namespace AuroraLib.Core.IO
             ThrowIf.Disposed(!CanRead, this);
             ThrowIf.Null(destination, nameof(destination));
 
-            destination.Write(_Buffer, (int)Position, (int)Length);
+            destination.Write(_Buffer, (int)Position, (int)(Length- Position));
         }
 
         /// <inheritdoc/>
