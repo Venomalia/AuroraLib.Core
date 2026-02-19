@@ -23,7 +23,6 @@ It simplifies working across different .NET versions by providing extension meth
 
 | Utility             | Description                                                                  |
 |---------------------|------------------------------------------------------------------------------|
-| `SpanBuffer`        | A buffer allocated from `ArrayPool` for zero-allocation data management.     |
 | `SpanExtension`     | Extension methods and utilities for spans.                                   |
 | `MemoryExtension`   | Casts a `Memory<T>` of one type to another.                                  |
 
@@ -34,14 +33,6 @@ It simplifies working across different .NET versions by providing extension meth
 | `PoolList`            | A memory-efficient list implementation that utilizes a pooled.             |
 | `ObservableDictionary`| A dictionary that raises notifications when items are changed.             |
 | `CollectionExtension` | Extension methods for Collections.                                         |
-
-### Format Handling
-
-| Utility             | Description                                                                  |
-|---------------------|------------------------------------------------------------------------------|
-| `MediaType`         | Works with MIME Media types.                                                 |
-| `FormatInfo`        | Provides information for specific file formats.                              |
-| `FormatDictionary`  | A dictionary for looking up `FormatInfo` by MIME type or detecting stream content.|
 
 ### Value Types
 
