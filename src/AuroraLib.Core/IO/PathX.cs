@@ -1,8 +1,6 @@
-using AuroraLib.Core;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text.RegularExpressions;
 
 namespace AuroraLib.Core.IO
 {
@@ -10,6 +8,10 @@ namespace AuroraLib.Core.IO
     {
         private const char ExtensionSeparatorChar = '.';
 
+#if NET10_0_OR_GREATER
+        extension(Path)
+        {
+#endif
         /// <summary>
         /// Gets the relative path from the given path to the main path.
         /// </summary>
@@ -34,6 +36,17 @@ namespace AuroraLib.Core.IO
                 return path.Slice(0, path.LastIndexOf(ExtensionSeparatorChar));
             return path;
         }
+
+        /// <summary>
+        /// Checks if the given path contains any invalid characters according to the operating system's rules for path names.
+        /// </summary>
+        /// <param name="path">The path to check.</param>
+        /// <returns>True if the path contains any invalid characters; otherwise, false.</returns>
+        public static bool CheckInvalidPathChars(ReadOnlySpan<char> path)
+            => path.IndexOfAny(Path.GetInvalidPathChars()) == 0;
+#if NET10_0_OR_GREATER
+        }
+#endif
 
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         /// <inheritdoc cref="Path.GetExtension(ReadOnlySpan{char})"/>
@@ -177,37 +190,5 @@ namespace AuroraLib.Core.IO
             return path.Slice(lastSeparator + 1);
         }
 #endif
-
-
-        /// <summary>
-        /// Checks if the given path contains any invalid characters according to the operating system's rules for path names.
-        /// </summary>
-        /// <param name="path">The path to check.</param>
-        /// <returns>True if the path contains any invalid characters; otherwise, false.</returns>
-        public static bool CheckInvalidPathChars(ReadOnlySpan<char> path)
-            => path.IndexOfAny(Path.GetInvalidPathChars()) == 0;
-
-        /// <summary>
-        /// Converts a potentially invalid file path to a valid one by replacing or removing illegal characters.
-        /// </summary>
-        /// <param name="path">The path to convert.</param>
-        /// <returns>A valid file path with illegal characters replaced or removed.</returns>
-        public static string GetValidPath(string path)
-        {
-            Match match = illegalChars.Match(path);
-            while (match.Success)
-            {
-                int index = match.Index;
-                if (match.Groups["X"].Success)
-                    index = match.Groups["X"].Index;
-                char llegalChar = path[index];
-                path = path.Remove(index, 1);
-                path = path.Insert(index, $"{(byte)llegalChar:X2}");
-                match = illegalChars.Match(path);
-            }
-            return path.TrimEnd(' ', '\\', '/');
-        }
-        internal static readonly Regex illegalChars = new Regex(@"^(.*(//|\\))?(?'X'PRN|AUX|CLOCK\$|NUL|CON|COM\d|LPT\d|\..*| )((//|\\).*)?$|[\x00-\x1f\x7F?*:""<>|]| ((//|\\).*)?$", RegexOptions.CultureInvariant);
-
     }
 }

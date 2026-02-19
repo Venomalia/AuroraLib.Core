@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -7,6 +7,14 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <StartupObject>Benchmark.Benchmarker</StartupObject>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NETFrameworks>|netstandard2.0|net481|net48|net472|NET471|NET47|NET462|NET461|</NETFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(NETFrameworks.Contains('|$(TargetFramework)|'))">
+    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

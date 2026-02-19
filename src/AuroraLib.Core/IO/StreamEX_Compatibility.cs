@@ -19,6 +19,14 @@ namespace AuroraLib.Core.IO
 
             if (stream is PoolStream pool) return pool.Read(buffer);
 
+            if (stream is MemoryStream ms && ms.TryGetBuffer(out ArraySegment<byte> msbuffer))
+            {
+                int numRead = Math.Min(buffer.Length, (int)(ms.Length - ms.Position));
+                msbuffer.AsSpan((int)ms.Position, numRead).CopyTo(buffer);
+                ms.Position += numRead;
+                return numRead;
+            }
+
             byte[] sharedBuffer = ArrayPool<byte>.Shared.Rent(buffer.Length);
             try
             {

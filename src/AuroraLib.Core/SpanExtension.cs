@@ -1,4 +1,3 @@
-using AuroraLib.Core;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -12,6 +11,36 @@ namespace AuroraLib.Core
     /// </summary>
     public static class SpanExtension
     {
+        /// <summary>
+        /// Converts a sequence of bytes into a hexadecimal string.
+        /// </summary>
+        /// <param name="bytes">The bytes to convert.</param>
+        /// <returns>A string containing the hexadecimal representation of the input bytes. </returns>
+        [DebuggerStepThrough]
+        public static string ToHexString(this ReadOnlySpan<byte> bytes)
+#if NET6_0_OR_GREATER
+            => Convert.ToHexString(bytes);
+#else
+        {
+            char[] result = new char[bytes.Length * 2];
+
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                byte b = bytes[i];
+                result[i * 2] = ToHex(b >> 4);
+                result[i * 2 + 1] = ToHex(b & 0xF);
+            }
+
+            return new string(result);
+
+            static char ToHex(int v) => (char)(v < 10 ? (v & 0xF) + '0' : (v & 0xF) - 10 + 'A');
+        }
+#endif
+        /// <inheritdoc cref="ToHexString(ReadOnlySpan{byte})"/>
+        [DebuggerStepThrough]
+        public static string ToHexString(this Span<byte> bytes) => ToHexString((ReadOnlySpan<byte>)bytes);
+
+
         /// <summary>
         /// Determines if the given span contains the specified sequence of values.
         /// </summary>
@@ -134,55 +163,6 @@ namespace AuroraLib.Core
         public static int Count<T>(this Span<T> span, T value) where T : IEquatable<T>
             => ((ReadOnlySpan<T>)span).Count(value);
 #endif
-
-        /// <summary>
-        /// Finds the index of the first element in the specified span that matches the condition.
-        /// </summary>
-        /// <typeparam name="T">The type of elements in the span.</typeparam>
-        /// <param name="span">The read-only span to search.</param>
-        /// <param name="condition">The delegate that defines the condition to search for.</param>
-        /// <returns>The zero-based index of the first occurrence of an element that satisfies the condition, if found; otherwise, -1.</returns>
-        [DebuggerStepThrough]
-        public static int IndexOf<T>(this ReadOnlySpan<T> span, Predicate<T> condition)
-        {
-            for (int i = 0; i < span.Length; i++)
-            {
-                if (condition(span[i]))
-                    return i;
-            }
-            return -1;
-        }
-
-        /// <inheritdoc cref="IndexOf{T}(ReadOnlySpan{T}, Predicate{T})"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int IndexOf<T>(this Span<T> span, Predicate<T> condition) where T : unmanaged
-            => ((ReadOnlySpan<T>)span).IndexOf(condition);
-
-        /// <summary>
-        /// Finds the index of the last element in the specified span that matches the condition.
-        /// </summary>
-        /// <typeparam name="T">The type of elements in the span.</typeparam>
-        /// <param name="span">The read-only span to search.</param>
-        /// <param name="condition">The delegate that defines the condition to search for.</param>
-        /// <returns>The zero-based index of the last occurrence of an element that satisfies the condition, if found; otherwise, -1.</returns>
-        [DebuggerStepThrough]
-        public static int LastIndexOf<T>(this ReadOnlySpan<T> span, Predicate<T> condition)
-        {
-            for (int i = span.Length - 1; i >= 0; i--)
-            {
-                if (condition(span[i]))
-                    return i;
-            }
-            return -1;
-        }
-
-        /// <inheritdoc cref="LastIndexOf{T}(ReadOnlySpan{T}, Predicate{T})"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int LastIndexOf<T>(this Span<T> span, Predicate<T> condition) where T : unmanaged
-            => ((ReadOnlySpan<T>)span).LastIndexOf(condition);
-
         /// <summary>
         /// Computes the hash code for the elements in the specified span.
         /// </summary>

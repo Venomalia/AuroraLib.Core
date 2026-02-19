@@ -1,3 +1,4 @@
+using AuroraLib.Core.Exceptions;
 using System;
 using System.Buffers;
 using System.Diagnostics;

@@ -8,9 +8,9 @@ namespace Benchmark
         static void Main(string[] args)
         {
             var resultReadValue = BenchmarkRunner.Run<StreamReadValueBenchmark>();
-            var resultReadTestStruct = BenchmarkRunner.Run<StreamReadTestStructBenchmark>();
-            var resultPoolStreamWrite = BenchmarkRunner.Run<MemoryPoolStreamWriteBenchmark>();
-            var resultPoolBuffer = BenchmarkRunner.Run<PoolBufferBenchmark>();
+            //var resultReadTestStruct = BenchmarkRunner.Run<StreamReadTestStructBenchmark>();
+            //var resultPoolStreamWrite = BenchmarkRunner.Run<MemoryPoolStreamWriteBenchmark>();
+            //var resultPoolBuffer = BenchmarkRunner.Run<PoolBufferBenchmark>();
 
         }
 

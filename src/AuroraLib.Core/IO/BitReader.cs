@@ -2,6 +2,7 @@ using System;
 using System.Buffers.Binary;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace AuroraLib.Core.IO
@@ -116,8 +117,7 @@ namespace AuroraLib.Core.IO
             FillBuffer(1);
             if (Order == Endian.Big)
                 currentPosition = 7 - currentPosition;
-
-            return BitConverterX.GetBit(_buffer[0], currentPosition);
+            return (_buffer[0] >> currentPosition & 1) != 0;
         }
 
         /// <summary>

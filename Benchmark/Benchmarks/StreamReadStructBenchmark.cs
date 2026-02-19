@@ -1,5 +1,4 @@
 using AuroraLib.Core;
-using AuroraLib.Core.Buffers;
 using AuroraLib.Core.IO;
 using BenchmarkDotNet.Attributes;
 using System.Buffers;
@@ -70,30 +69,13 @@ namespace Benchmark.Benchmarks
             }
         }
 
-        [Benchmark]
-        public void AuroraCore_ReadTestStruct_EndianBig()
-        {
-            stream.Seek(0, SeekOrigin.Begin);
-            for (var i = 0; i < n; ++i)
-            {
-                _ = stream.Read<TestStruct>(Endian.Big);
-            }
-        }
 
         [Benchmark]
         public void AuroraCore_ReadSpanTestStruct()
         {
             stream.Seek(0, SeekOrigin.Begin);
-            using SpanBuffer<TestStruct> buffer = new(n);
+            Span<TestStruct> buffer = stackalloc TestStruct[n];
             stream.Read<TestStruct>(buffer);
-        }
-
-        [Benchmark]
-        public void AuroraCore_ReadSpanTestStruct_EndianBig()
-        {
-            stream.Seek(0, SeekOrigin.Begin);
-            using SpanBuffer<TestStruct> buffer = new(n);
-            stream.Read<TestStruct>(buffer,Endian.Big);
         }
 
         public readonly record struct TestStruct(long Test1, int Test2, short Test3, byte Test4, byte Test5) : IReversibleEndianness<TestStruct>

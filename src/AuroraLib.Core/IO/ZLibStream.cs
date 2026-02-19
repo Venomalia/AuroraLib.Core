@@ -1,4 +1,5 @@
 #if !NET6_0_OR_GREATER
+using AuroraLib.Core.IO;
 using System;
 using System.IO;
 using System.IO.Compression;

@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -291,7 +292,7 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong ReadUInt64(this Stream stream, Endian order = Endian.Little)
-            => stream.ReadGenericHelper<ulong>(order);
+            => order == Endian.Little ? stream.Read<ulong>() : BinaryPrimitives.ReverseEndianness(stream.Read<ulong>());
 
         /// <summary>
         /// Returns a 64-bit signed integer converted from eight bytes at a specified position.
@@ -303,7 +304,7 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long ReadInt64(this Stream stream, Endian order = Endian.Little)
-            => stream.ReadGenericHelper<long>(order);
+            => order == Endian.Little ? stream.Read<long>() : BinaryPrimitives.ReverseEndianness(stream.Read<long>());
 
 #if NET5_0_OR_GREATER
         /// <summary>
@@ -340,18 +341,99 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double ReadDouble(this Stream stream, Endian order = Endian.Little)
-            => stream.Read<double>(order);
+            => order == Endian.Little ? stream.Read<double>() : (double)BinaryPrimitives.ReverseEndianness(stream.Read<ulong>());
+        #endregion
 
+        #region Write
         /// <summary>
-        /// Reads the 16-bit order mark (BOM) and returns the endianness.
+        /// Writes a 16-bit unsigned integer to the <see cref="Stream"/>.
         /// </summary>
-        /// <param name="stream">The stream to read from.</param>
-        /// <returns>The endianness represented by the BOM</returns>
-        /// <inheritdoc cref="ThrowHelper.EndOfStreamException{T}()"/>
+        /// <param name="stream">The stream to write the value to.</param>
+        /// <param name="value">The value to write to the stream.</param>
+        /// <param name="order">The endianness of the data to write.</param>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Endian ReadBOM(this Stream stream)
-            => stream.Read<Endian>();
+        public static unsafe void Write(this Stream stream, ushort value, Endian order)
+            => stream.Write(order == Endian.Little ? value : BinaryPrimitives.ReverseEndianness(value));
+
+        /// <summary>
+        /// Writes a 16-bit signed integer to the <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="stream">The stream to write the value to.</param>
+        /// <param name="value">The value to write to the stream.</param>
+        /// <param name="order">The endianness of the data to write.</param>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe void Write(this Stream stream, short value, Endian order)
+            => stream.Write(order == Endian.Little ? value : BinaryPrimitives.ReverseEndianness(value));
+
+        /// <summary>
+        /// Writes a 24-bit unsigned integer to the <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="stream">The stream to write the value to.</param>
+        /// <param name="value">The value to write to the stream.</param>
+        /// <param name="order">The endianness of the data to write.</param>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe void Write(this Stream stream, UInt24 value, Endian order)
+            => stream.Write(order == Endian.Little ? value : value.ReverseEndianness());
+
+        /// <summary>
+        /// Writes a 24-bit signed integer to the <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="stream">The stream to write the value to.</param>
+        /// <param name="value">The value to write to the stream.</param>
+        /// <param name="order">The endianness of the data to write.</param>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe void Write(this Stream stream, Int24 value, Endian order)
+            => stream.Write(order == Endian.Little ? value : value.ReverseEndianness());
+
+        /// <summary>
+        /// Writes a 32-bit unsigned integer to the <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="stream">The stream to write the value to.</param>
+        /// <param name="value">The value to write to the stream.</param>
+        /// <param name="order">The endianness of the data to write.</param>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe void Write(this Stream stream, uint value, Endian order)
+            => stream.Write(order == Endian.Little ? value : BinaryPrimitives.ReverseEndianness(value));
+
+        /// <summary>
+        /// Writes a 32-bit signed integer to the <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="stream">The stream to write the value to.</param>
+        /// <param name="value">The value to write to the stream.</param>
+        /// <param name="order">The endianness of the data to write.</param>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe void Write(this Stream stream, int value, Endian order)
+            => stream.Write(order == Endian.Little ? value : BinaryPrimitives.ReverseEndianness(value));
+
+        /// <summary>
+        /// Writes a 64-bit unsigned integer to the <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="stream">The stream to write the value to.</param>
+        /// <param name="value">The value to write to the stream.</param>
+        /// <param name="order">The endianness of the data to write.</param>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe void Write(this Stream stream, ulong value, Endian order)
+            => stream.Write(order == Endian.Little ? value : BinaryPrimitives.ReverseEndianness(value));
+
+        /// <summary>
+        /// Writes a 64-bit signed integer to the <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="stream">The stream to write the value to.</param>
+        /// <param name="value">The value to write to the stream.</param>
+        /// <param name="order">The endianness of the data to write.</param>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe void Write(this Stream stream, long value, Endian order)
+            => stream.Write(order == Endian.Little ? value : BinaryPrimitives.ReverseEndianness(value));
+
+
         #endregion
 
         #region internal

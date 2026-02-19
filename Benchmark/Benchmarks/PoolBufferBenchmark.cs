@@ -43,13 +43,5 @@ namespace Benchmark.Benchmarks
                 ArrayPool<long>.Shared.Return(longdata);
             }
         }
-
-        [Benchmark]
-        public void Using_SpanBuffer()
-        {
-            using SpanBuffer<byte> bytedata = new(N);
-            using SpanBuffer<int> intdata = new(N);
-            using SpanBuffer<long> longdata = new(N);
-        }
     }
 }

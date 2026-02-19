@@ -1,5 +1,3 @@
-using AuroraLib.Core;
-using AuroraLib.Core.Buffers;
 using AuroraLib.Core.IO;
 using BenchmarkDotNet.Attributes;
 using System.Buffers.Binary;
@@ -9,7 +7,7 @@ namespace Benchmark.Benchmarks
 {
     public class StreamReadValueBenchmark
     {
-        private const int n = 30;
+        private const int n = 50;
 
         private Stream stream = Stream.Null;
 
@@ -31,7 +29,7 @@ namespace Benchmark.Benchmarks
             BinaryReader reader = new(stream);
             for (var i = 0; i < n; ++i)
             {
-                _ = reader.ReadInt32();
+                _ = reader.ReadUInt32();
             }
         }
 
@@ -46,14 +44,42 @@ namespace Benchmark.Benchmarks
                 _ = BinaryPrimitives.ReadInt32LittleEndian(bytes.Slice(0, 4));
             }
         }
-
         [Benchmark]
         public void AuroraCore_ReadInt32()
         {
             stream.Seek(0, SeekOrigin.Begin);
             for (var i = 0; i < n; ++i)
             {
-                _ = stream.ReadInt32();
+                _ = stream.ReadInt32(); //fastes
+            }
+        }
+
+        [Benchmark]
+        public void AuroraCore_ReadInt32LittleEndian()
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            for (var i = 0; i < n; ++i)
+            {
+                _ = stream.ReadInt32LittleEndian();
+            }
+        }
+
+        [Benchmark]
+        public void AuroraCore_ReadGenericInt32A() // fastet net 10
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            for (var i = 0; i < n; ++i)
+            {
+                _ = ReadGenericHelper_A<int>(stream);
+            }
+        }
+        [Benchmark]
+        public void AuroraCore_ReadGenericInt32B() // fastet net 10
+        {
+            stream.Seek(0, SeekOrigin.Begin);
+            for (var i = 0; i < n; ++i)
+            {
+                _ = ReadGenericHelper_A<int>(stream);
             }
         }
 
@@ -79,6 +105,39 @@ namespace Benchmark.Benchmarks
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private unsafe static T ReadGenericHelper_A<T>(Stream stream) where T : unmanaged
+        {
+            T value;
+            Span<byte> buffer = new Span<byte>(&value, sizeof(T));
+
+            if (stream.Read(buffer) != buffer.Length)
+                EndOfStreamException<T>();
+
+            return value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private unsafe static T ReadGenericHelper_B<T>(Stream stream) where T : unmanaged
+        {
+            T value;
+            Span<byte> buffer = new Span<byte>(&value, sizeof(T));
+
+            if (stream.Read(buffer) != buffer.Length)
+                throw GetEndOfStreamException<T>();
+
+            return value;
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static void EndOfStreamException<T>()
+    => throw new EndOfStreamException($"Cannot read a {typeof(T)}, is beyond the end of the stream.");
+
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static EndOfStreamException GetEndOfStreamException<T>()
+    => new EndOfStreamException($"Cannot read a {typeof(T)}, is beyond the end of the stream.");
+
         [Benchmark]
         public void AuroraCore_ReadInt64_EndianBig()
         {
@@ -93,16 +152,8 @@ namespace Benchmark.Benchmarks
         public void AuroraCore_ReadSpanInt64()
         {
             stream.Seek(0, SeekOrigin.Begin);
-            using SpanBuffer<long> buffer = new(n);
+            Span<long> buffer = stackalloc long[n];
             stream.Read<long>(buffer);
-        }
-
-        [Benchmark]
-        public void AuroraCore_ReadSpanInt64_EndianBig()
-        {
-            stream.Seek(0, SeekOrigin.Begin);
-            using SpanBuffer<long> buffer = new(n);
-            stream.Read<long>(buffer, Endian.Big);
         }
 
         [Benchmark]

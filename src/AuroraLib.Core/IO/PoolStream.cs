@@ -1,3 +1,4 @@
+using AuroraLib.Core.Exceptions;
 using System;
 using System.Buffers;
 using System.Diagnostics;
@@ -81,7 +82,7 @@ namespace AuroraLib.Core.IO
             ThrowIf.Disposed(!CanRead, this);
             ThrowIf.Null(destination, nameof(destination));
 
-            destination.Write(_Buffer, (int)Position, (int)(Length- Position));
+            destination.Write(_Buffer, (int)Position, (int)(Length - Position));
         }
 
         /// <inheritdoc/>

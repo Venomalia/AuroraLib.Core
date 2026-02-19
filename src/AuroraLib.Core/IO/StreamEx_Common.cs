@@ -1,5 +1,4 @@
 using AuroraLib.Core.Exceptions;
-using AuroraLib.Core.Format.Identifier;
 using AuroraLib.Core.Text;
 using System;
 using System.Buffers;
@@ -67,12 +66,6 @@ namespace AuroraLib.Core.IO
             return i == expected.Length && buffer.SequenceEqual(expected);
         }
 
-        /// <inheritdoc cref="Match(Stream, ReadOnlySpan{byte})"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Match(this Stream stream, IIdentifier expected)
-            => stream.Match(expected.AsSpan());
-
         /// <summary>
         /// Matches the identifier in the <paramref name="stream"/> with the specified <paramref name="expected"/> identifier and throws an <see cref="InvalidIdentifierException"/> if the match fails.
         /// </summary>
@@ -91,12 +84,6 @@ namespace AuroraLib.Core.IO
             if (!buffer.SequenceEqual(expected))
                 throw new InvalidIdentifierException(buffer, expected);
         }
-
-        /// <inheritdoc cref="MatchThrow(Stream, ReadOnlySpan{byte})"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void MatchThrow(this Stream stream, IIdentifier expected)
-            => stream.MatchThrow(expected.AsSpan());
 
         #endregion
 
@@ -188,11 +175,17 @@ namespace AuroraLib.Core.IO
             for (int i = 0; i < count; i++)
             {
                 T valueLE = stream.Read<T>();
-                T valueBE = BitConverterX.ReverseEndianness(valueLE);
+                T valueBE = ReverseEndianness(valueLE);
                 trend += valueLE.CompareTo(valueBE);
             }
             stream.Seek(orpos, SeekOrigin.Begin);
             return trend < 0 ? Endian.Little : Endian.Big;
+
+            static T ReverseEndianness(T value)
+            {
+                value.AsBytes().Reverse();
+                return value;
+            }
         }
 
         /// <summary>
@@ -206,13 +199,19 @@ namespace AuroraLib.Core.IO
         public static unsafe Endian DetectByteOrderByDistance<T>(this Stream stream, T reference) where T : unmanaged, IConvertible
         {
             T valueLE = stream.Peek<T>();
-            T valueBE = BitConverterX.ReverseEndianness(valueLE);
+            T valueBE = ReverseEndianness(valueLE);
 
             double dRef = reference.ToDouble(null);
             double diff1 = Math.Abs(valueLE.ToDouble(null) - dRef);
             double diff2 = Math.Abs(valueBE.ToDouble(null) - dRef);
 
             return diff1 < diff2 ? Endian.Little : Endian.Big;
+
+            static T ReverseEndianness(T value)
+            {
+                value.AsBytes().Reverse();
+                return value;
+            }
         }
         #endregion
 
@@ -238,15 +237,15 @@ namespace AuroraLib.Core.IO
                 if (count > 2048)
                 {
 #endif
-                    byte[] sharedBuffer = ArrayPool<byte>.Shared.Rent(count);
-                    try
-                    {
-                        stream.ReadExactly(sharedBuffer, 0, count);
-                    }
-                    finally
-                    {
-                        ArrayPool<byte>.Shared.Return(sharedBuffer);
-                    }
+                byte[] sharedBuffer = ArrayPool<byte>.Shared.Rent(count);
+                try
+                {
+                    stream.ReadExactly(sharedBuffer, 0, count);
+                }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(sharedBuffer);
+                }
 #if NET5_0_OR_GREATER
                 }
                 else

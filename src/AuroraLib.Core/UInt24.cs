@@ -68,7 +68,8 @@ namespace AuroraLib.Core
         /// <inheritdoc/>
         public string ToString(string? format, IFormatProvider? provider) => Value.ToString(format, provider);
 
-        UInt24 IReversibleEndianness<UInt24>.ReverseEndianness() => BitConverterX.ReverseEndianness(this);
+        /// <inheritdoc/>
+        public UInt24 ReverseEndianness() => new UInt24((Value >> 16) | (Value & 0xFF00) | (Value << 16));
 
         #region IEquatable
         /// <inheritdoc/>
@@ -425,7 +426,7 @@ namespace AuroraLib.Core
                     result = Unsafe.ReadUnaligned<UInt24>(ref sourceRef);
 
                     if (BitConverter.IsLittleEndian)
-                        result = BitConverterX.ReverseEndianness(result);
+                        result = result.ReverseEndianness();
                 }
                 else
                 {
@@ -466,7 +467,7 @@ namespace AuroraLib.Core
                     result = Unsafe.ReadUnaligned<UInt24>(ref sourceRef);
 
                     if (!BitConverter.IsLittleEndian)
-                        result = BitConverterX.ReverseEndianness(result);
+                        result = result.ReverseEndianness();
                 }
                 else
                 {
@@ -489,7 +490,7 @@ namespace AuroraLib.Core
         {
             if (destination.Length >= sizeof(UInt24))
             {
-                UInt24 value = (BitConverter.IsLittleEndian == isBigEndian) ? this : BitConverterX.ReverseEndianness(this);
+                UInt24 value = (BitConverter.IsLittleEndian == isBigEndian) ? this : this.ReverseEndianness();
                 Unsafe.WriteUnaligned(ref MemoryMarshal.GetReference(destination), value);
                 bytesWritten = sizeof(UInt24);
                 return true;

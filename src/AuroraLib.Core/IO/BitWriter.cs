@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace AuroraLib.Core.IO
@@ -30,7 +31,8 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         public void Write(bool bit)
         {
-            _buffer = BitConverterX.SetBit(_buffer, BitPosition, bit);
+            int bitmask = 1 << BitPosition;
+            _buffer = bit ? (byte)(_buffer | bitmask) : (byte)(_buffer & ~bitmask);
 
             if (BitPosition == 7)
                 Flush();
@@ -74,7 +76,7 @@ namespace AuroraLib.Core.IO
                 {
                     if (BitPosition != 0 || bitCount - i < 8)
                     {
-                        Write(BitConverterX.GetBit(value, i++));
+                        Write((value >> i++ & 1) != 0);
                     }
                     else
                     {
@@ -90,7 +92,7 @@ namespace AuroraLib.Core.IO
                 {
                     if (BitPosition != 0 || bitCount - i < 8)
                     {
-                        Write(BitConverterX.GetBit(value, bitCount - i++ - 1));
+                        Write((value >> (bitCount - i++ - 1) & 1) != 0);
                     }
                     else
                     {

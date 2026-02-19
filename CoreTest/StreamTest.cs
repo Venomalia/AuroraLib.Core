@@ -1,6 +1,4 @@
 using AuroraLib.Core;
-using AuroraLib.Core.Buffers;
-using AuroraLib.Core.Format.Identifier;
 using AuroraLib.Core.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -47,7 +45,7 @@ namespace CoreUnitTest
             {
                 stream.Write(vaule, order);
                 stream.Position = 0;
-                short actualVaule = stream.Read<short>(order);
+                short actualVaule = stream.ReadInt16(order);
 
                 Assert.AreEqual(vaule, actualVaule);
             }
@@ -64,7 +62,7 @@ namespace CoreUnitTest
             {
                 stream.Write(vaule, order);
                 stream.Position = 0;
-                int actualVaule = stream.Read<int>(order);
+                int actualVaule = stream.ReadInt32(order);
 
                 Assert.AreEqual(vaule, actualVaule);
             }
@@ -81,7 +79,7 @@ namespace CoreUnitTest
             {
                 stream.Write(vaule, order);
                 stream.Position = 0;
-                long actualVaule = stream.Read<long>(order);
+                long actualVaule = stream.ReadInt64(order);
 
                 Assert.AreEqual(vaule, actualVaule);
             }
@@ -159,47 +157,41 @@ namespace CoreUnitTest
         }
 
         [TestMethod]
-        [DataRow(10, Endian.Little)]
-        [DataRow(10, Endian.Big)]
-        [DataRow(311, Endian.Little)]
-        [DataRow(311, Endian.Big)]
-        public void ReadSpan(int length, Endian order)
+        [DataRow(10)]
+        [DataRow(311)]
+        public void ReadSpan(int length)
         {
-            using (MemoryPoolStream stream = new MemoryPoolStream())
-            using (SpanBuffer<int> buffer = new SpanBuffer<int>(length))
-            {
-                for (int i = 0; i < length; i++)
-                    stream.Write(i, order);
+            using MemoryPoolStream stream = new MemoryPoolStream();
+            Span<int> buffer = stackalloc int[length];
 
-                stream.Position = 0;
-                stream.Read(buffer.Span, order);
+            for (int i = 0; i < length; i++)
+                stream.Write(i);
 
-                for (int i = 0; i < length; i++)
-                    Assert.AreEqual(i, buffer.Span[i]);
-            }
+            stream.Position = 0;
+            stream.Read(buffer);
+
+            for (int i = 0; i < length; i++)
+                Assert.AreEqual(i, buffer[i]);
         }
 
         [TestMethod]
-        [DataRow(10, Endian.Little)]
-        [DataRow(10, Endian.Big)]
-        [DataRow(311, Endian.Little)]
-        [DataRow(311, Endian.Big)]
-        public void WriteSpan(int length, Endian order)
+        [DataRow(10)]
+        [DataRow(311)]
+        public void WriteSpan(int length)
         {
-            using (MemoryPoolStream stream = new MemoryPoolStream())
-            using (SpanBuffer<int> buffer = new SpanBuffer<int>(length))
+            using MemoryPoolStream stream = new MemoryPoolStream();
+            Span<int> buffer = stackalloc int[length];
+
+            for (int i = 0; i < length; i++)
+                buffer[i] = i;
+
+            stream.Write<int>(buffer);
+            stream.Position = 0;
+
+            for (int i = 0; i < length; i++)
             {
-                for (int i = 0; i < length; i++)
-                    buffer.Span[i] = i;
-
-                stream.Write<int>(buffer, order);
-                stream.Position = 0;
-
-                for (int i = 0; i < length; i++)
-                {
-                    int vaule = stream.ReadInt32(order);
-                    Assert.AreEqual(i, vaule);
-                }
+                int vaule = stream.ReadInt32();
+                Assert.AreEqual(i, vaule);
             }
         }
 
@@ -323,7 +315,7 @@ namespace CoreUnitTest
                 stream.Write(actual);
                 stream.Position = 0;
 
-                bool vaule = stream.Match(new Identifier32(expected));
+                bool vaule = stream.Match(expected.AsBytes());
 
                 Assert.AreEqual(vaule, expected == actual);
             }
@@ -346,20 +338,18 @@ namespace CoreUnitTest
         }
 
         [TestMethod]
-        [DataRow(Endian.Little)]
-        [DataRow(Endian.Big)]
-        public void WriteList(Endian order)
+        public void WriteList()
         {
             List<uint> list = new List<uint>() { 5, 10, 6, 8, 6 };
 
             using (MemoryPoolStream stream = new MemoryPoolStream())
             {
-                stream.WriteCollection(list, order);
+                stream.WriteCollection(list);
 
                 stream.Position = 0;
                 for (int i = 0; i < list.Count; i++)
                 {
-                    uint vaule = stream.ReadUInt32(order);
+                    uint vaule = stream.ReadUInt32();
                     Assert.AreEqual(list[i], vaule);
                 }
             }
@@ -367,19 +357,17 @@ namespace CoreUnitTest
 
 
         [TestMethod]
-        [DataRow(Endian.Little)]
-        [DataRow(Endian.Big)]
-        public void ReadList(Endian order)
+        public void ReadList()
         {
             ReadOnlySpan<int> data = new int[] { 5, 10, 6, 8, 6 };
             List<int> list = new List<int>();
 
             using (MemoryPoolStream stream = new MemoryPoolStream())
             {
-                stream.Write(data, order);
+                stream.Write(data);
                 stream.Position = 0;
 
-                stream.ReadCollection(list, data.Length, order);
+                stream.ReadCollection(list, data.Length);
                 for (int i = 0; i < data.Length; i++)
                 {
                     Assert.AreEqual(list[i], data[i]);

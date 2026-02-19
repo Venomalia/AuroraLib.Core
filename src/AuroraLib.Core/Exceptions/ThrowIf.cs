@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace AuroraLib.Core
+namespace AuroraLib.Core.Exceptions
 {
     /// <summary>
     /// Provides methods to simplifying common argument validation patterns.

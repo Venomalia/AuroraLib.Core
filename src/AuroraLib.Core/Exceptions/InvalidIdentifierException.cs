@@ -1,4 +1,3 @@
-using AuroraLib.Core.Format.Identifier;
 using System;
 
 namespace AuroraLib.Core.Exceptions
@@ -27,11 +26,7 @@ namespace AuroraLib.Core.Exceptions
             => ExpectedIdentifier = expectedIdentifier;
 
         /// <inheritdoc cref="InvalidIdentifierException(string)"/>
-        public InvalidIdentifierException(ReadOnlySpan<byte> expectedIdentifier) : this(BitConverterX.ToString(expectedIdentifier))
-        { }
-
-        /// <inheritdoc cref="InvalidIdentifierException(string)"/>
-        public InvalidIdentifierException(IIdentifier expectedIdentifier) : this(expectedIdentifier.AsSpan())
+        public InvalidIdentifierException(ReadOnlySpan<byte> expectedIdentifier) : this(expectedIdentifier.ToHexString())
         { }
 
         /// <summary>
@@ -43,7 +38,7 @@ namespace AuroraLib.Core.Exceptions
             => ExpectedIdentifier = expectedIdentifier;
 
         /// <inheritdoc cref="InvalidIdentifierException(string,string)"/>
-        public InvalidIdentifierException(ReadOnlySpan<byte> identifier, ReadOnlySpan<byte> expectedIdentifier) : this(BitConverterX.ToString(identifier), BitConverterX.ToString(expectedIdentifier))
+        public InvalidIdentifierException(ReadOnlySpan<byte> identifier, ReadOnlySpan<byte> expectedIdentifier) : this(identifier.ToHexString(), expectedIdentifier.ToHexString())
         { }
     }
 

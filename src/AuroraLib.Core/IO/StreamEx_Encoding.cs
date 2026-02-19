@@ -12,23 +12,7 @@ namespace AuroraLib.Core.IO
 {
     public static partial class StreamEx
     {
-
         #region Read Span<char>
-        /// <inheritdoc cref=" Read(Stream,Span{char}, Encoding)"/>
-        [DebuggerStepThrough]
-        public static int Read(this Stream stream, Span<char> chars)
-        {
-#if NET20_OR_GREATER
-            byte[] bytes = new byte[chars.Length];
-            int r = stream.Read(bytes, 0, bytes.Length);
-#else
-            Span<byte> bytes = stackalloc byte[chars.Length];
-            int r = stream.Read(bytes);
-#endif
-            EncodingX.GetChars(bytes, chars);
-            return r;
-        }
-
         /// <summary>
         /// Reads characters from the stream into the provided character span, until it is filled.
         /// </summary>
@@ -48,15 +32,14 @@ namespace AuroraLib.Core.IO
             encoding.GetChars(bytes, chars);
             return r;
         }
+
+        /// <inheritdoc cref=" Read(Stream,Span{char}, Encoding)"/>
+        [DebuggerStepThrough]
+        public static int Read(this Stream stream, Span<char> chars) => stream.Read(chars, EncodingX.DefaultEncoding);
+
         #endregion
 
         #region Write ReadOnlySpan<char>
-        /// <inheritdoc cref="Write(Stream, ReadOnlySpan{char}, Encoding)"/>
-        [DebuggerStepThrough]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Write(this Stream stream, ReadOnlySpan<char> chars)
-            => stream.Write(chars, EncodingX.DefaultEncoding);
-
         /// <summary>
         /// Writes a sequence of characters to the <paramref name="stream"/>.
         /// won't be null terminated.
@@ -79,6 +62,12 @@ namespace AuroraLib.Core.IO
             stream.Write(buffer);
 #endif
         }
+
+        /// <inheritdoc cref="Write(Stream, ReadOnlySpan{char}, Encoding)"/>
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Write(this Stream stream, ReadOnlySpan<char> chars)
+            => stream.Write(chars, EncodingX.DefaultEncoding);
 
         #endregion
 
@@ -108,7 +97,7 @@ namespace AuroraLib.Core.IO
             Span<byte> bytes = stackalloc byte[length];
             stream.ReadExactly(bytes);
 #endif
-            return EncodingX.GetCString(bytes, encoding, padding);
+            return encoding.GetCString(bytes, padding);
         }
 
         #endregion
@@ -185,14 +174,7 @@ namespace AuroraLib.Core.IO
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ReadCString(this Stream stream, Predicate<byte> ifstopByte)
-        {
-            List<byte> bytes = ReadCStringBytes(stream, ifstopByte);
-#if NET5_0_OR_GREATER
-            return EncodingX.GetString(bytes.UnsafeAsSpan());
-#else
-            return EncodingX.GetString(bytes.ToArray());
-#endif
-        }
+            => ReadCString(stream, EncodingX.DefaultEncoding, ifstopByte);
 
         /// <summary>
         /// Reads a string from the <paramref name="stream"/> using the specified encoding until the provided <paramref name="ifstopByte"/> predicate returns true.
@@ -206,11 +188,7 @@ namespace AuroraLib.Core.IO
         public static string ReadCString(this Stream stream, Encoding encoding, Predicate<byte> ifstopByte)
         {
             List<byte> bytes = ReadCStringBytes(stream, ifstopByte);
-#if NET5_0_OR_GREATER
             return encoding.GetString(bytes.UnsafeAsSpan());
-#else
-            return encoding.GetString(bytes.ToArray());
-#endif
         }
 
         private static List<byte> ReadCStringBytes(this Stream stream, Predicate<byte> ifstopByte)
